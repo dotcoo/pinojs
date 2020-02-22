@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const config = {
@@ -34,7 +34,7 @@ const config = {
 
 if (process.env.NODE_ENV === 'development') {
   config.entry = path.join(__dirname, './test/test.js');
-  config.plugins.push(new HtmlWebpackPlugin({
+  config.plugins.push(new HtmlPlugin({
     template: './test/test.html',
     filename: 'index.html',
   }));

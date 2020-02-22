@@ -33,6 +33,11 @@ console.log(pino.number({
 
 // float int 方法与 number 方法参数一致
 
+console.log(pino.string({
+  len: 8, // 长度
+  chars: '0123456789abcdefghijklmnopqrstuvwxyz', // 字符
+})); // pm7s6eyg
+
 // ### 柯里化
 
 // 随机多个数据
@@ -181,3 +186,192 @@ console.log({
 //     ]
 //   }
 // }
+
+// ### 地址
+
+console.log(pino.range(10, () => pino.country() + pino.province() + pino.city() + pino.district() + pino.street() + pino.building()));
+
+console.log(pino.range(10, () => pino.country() + pino.province() + pino.city() + pino.district() + pino.street() + pino.community()));
+
+console.log(pino.range(10, pino.address));
+
+console.log(pino.range(10, pino.office_address));
+
+console.log(pino.range(10, pino.home_address));
+
+// ### 车牌
+
+console.log(pino.range(10, pino.license_plate));
+
+console.log(pino.range(10, pino.license_plate.currying('黑龙江')));
+
+console.log(pino.range(10, pino.license_plate.currying('河南')));
+
+console.log(pino.range(10, pino.license_plate.currying('豫')));
+
+console.log(pino.range(10, pino.license_plate.currying('河南', 'A')));
+
+// ### 颜色
+
+console.log(pino.range(10, pino.color_name));
+
+console.log(pino.range(10, pino.color));
+
+console.log(pino.range(10, pino.hex_color));
+
+console.log(pino.range(10, pino.rgb_color));
+
+console.log(pino.range(10, pino.rgba_color));
+
+console.log(pino.range(10, pino.colorful));
+
+console.log(pino.range(10, pino.hex_colorful));
+
+console.log(pino.range(10, pino.rgb_colorful));
+
+console.log(pino.range(10, pino.rgba_colorful));
+
+// ### 公司
+
+const company_names = pino.range(10, pino.company_name)
+
+console.log(company_names);
+
+console.log(company_names.map(name => pino.company_name_pinyin(name)));
+
+console.log(pino.range(10, pino.company_type));
+
+console.log(pino.range(10, pino.company_suffix));
+
+console.log(pino.range(10, pino.company));
+
+console.log(pino.range(10, pino.company_short));
+
+// ### 时间
+
+console.log(pino.date_expr('+7d')); // y: Year, m: Month, d: Day, h: Hours, i: Minutes, s: Second
+
+console.log(pino.date_format(new Date(), 'y-m-d h:i:s')); // y: Year, m: Month, d: Day, h: Hours, i: Minutes, s: Second
+
+console.log(pino.range(10, pino.date));
+
+console.log(pino.range(10, pino.date.currying({ start: '-3d', end: '+3d', format: 'y-m-d' })));
+
+// ### 图片
+
+const image_url = pino.image_url({
+  width: 200,
+  height: 160,
+  background: pino.colorful(), // optional
+  foreground: pino.colorful(), // optional
+  format: 'png', // optional
+  text: 'pino.js', // optional
+});
+
+console.log(image_url);
+
+console.log('%ci', `color: rgba(0,0,0,0); padding: 0 100px; line-height: 160px; background: url('${image_url}') no-repeat;`);
+
+const image_data_url = pino.image_data_url({
+  width: 200,
+  height: 160,
+  background: pino.colorful(), // optional
+  foreground: pino.colorful(), // optional
+  text: 'pin.js', // optional
+  font: 'bold 20px "微软雅黑"', // optional
+});
+
+console.log(image_data_url);
+
+console.log('%ci', `color: rgba(0,0,0,0); padding: 0 100px; line-height: 160px; background: url('${image_data_url}') no-repeat;`);
+
+const image_avatar = pino.image_avatar({
+  width: 360, // 图片宽度 // optional
+  height: 360, // 图片高度 // optional
+  padding: 20, // 边距 // optional
+  dot: 8, // 点行列数 // optional
+});
+
+console.log(image_avatar);
+
+console.log('%ci', `color: rgba(0,0,0,0); padding: 0 180px; line-height: 360px; background: url('${image_avatar}') no-repeat;`);
+
+// ### 网络
+
+console.log(pino.range(10, pino.domain_tld));
+
+console.log(pino.range(10, pino.domain_name));
+
+console.log(pino.range(10, pino.domain_host));
+
+console.log(pino.range(10, pino.domain));
+
+console.log(pino.range(10, pino.hostname));
+
+console.log(pino.range(10, pino.free_email_domain));
+
+console.log(pino.range(10, pino.free_email));
+
+console.log(pino.range(10, pino.company_email_domain));
+
+console.log(pino.range(10, pino.company_email));
+
+console.log(pino.range(10, pino.email));
+
+console.log(pino.range(10, pino.ipv4));
+
+console.log(pino.range(10, pino.ipv6));
+
+console.log(pino.range(10, pino.mac_address));
+
+console.log(pino.range(10, pino.protocal));
+
+console.log(pino.range(10, pino.site));
+
+console.log(pino.range(10, pino.url_path));
+
+console.log(pino.range(10, pino.url_page));
+
+console.log(pino.range(10, pino.url_extension));
+
+console.log(pino.range(10, pino.url));
+
+// ### 文本
+
+console.log(pino.range(10, pino.word));
+
+console.log(pino.range(10, pino.text.currying(100)));
+
+// ### 个人信息
+
+const last_names = pino.range(10, pino.last_name);
+console.log(last_names);
+console.log(last_names.map(v => pino.last_name_pinyin(v)));
+
+const first_names = pino.range(10, pino.first_name);
+console.log(first_names);
+console.log(first_names.map(v => pino.first_name_pinyin(v)));
+
+const first_name_males = pino.range(10, pino.first_name_male);
+console.log(first_name_males);
+// console.log(first_name_males.map(v => pino.first_name_male_pinyin(v)));
+
+const first_name_females = pino.range(10, pino.first_name_female);
+console.log(first_name_females);
+// console.log(first_name_females.map(v => pino.first_name_female_pinyin(v)));
+
+const names = pino.range(10, pino.name);
+console.log(names);
+console.log(names.map(v => pino.name_pinyin(v)));
+
+const name_males = pino.range(10, pino.name_male);
+console.log(name_males);
+// console.log(name_males.map(v => pino.name_male_pinyin(v)));
+
+const name_females = pino.range(10, pino.name_female);
+console.log(name_females);
+// console.log(name_females.map(v => pino.name_female_pinyin(v)));
+
+console.log(pino.range(10, pino.job));
+
+console.log(pino.range(10, pino.phone));
