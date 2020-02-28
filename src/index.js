@@ -1,8 +1,3 @@
-import Server_ from './Server';
-import XMLHttpRequest_ from './XMLHttpRequest';
-import fetch_ from './fetch';
-import locale_zh_CN from './providers/zh_CN';
-
 // ====== constant ======
 
 const MIN_BYTE = -128;
@@ -114,7 +109,7 @@ pino.range = function(...args) {
     throw new Error('Start is greater than end and step size is greater than or equal to 0!');
   }
   for (let i = start; start < end ? i < end : i > end; i += step) {
-    arr.push(f.currying ? f() : f(i, arr));
+    arr.push(f.length > 0 ? f(i, arr) : f());
   }
   return arr;
 }.bind(pino);
@@ -282,59 +277,67 @@ pino.register = function(name, method) {
   this[name].currying = this.currying;
 }.bind(pino);
 
-pino.locales = {
-  'zh_CN': locale_zh_CN,
-};
-
-pino.locales['zh_CN'](pino);
-
 pino.locale = function(locale) {
-  locale = locale.replace(/-/g, '_');
-  if (locale in locales) {
-    locales[locale](pino);
-  }
+  locale(pino);
 }.bind(pino);
 
-// ====== Server ======
+pino.locale(require('./providers/zh_CN'));
 
-pino.server = new Server_();
+// ====== Server fetch XMLHttpRequest ======
 
-pino.use = pino.server.use.bind(pino.server);
-pino.get = pino.server.get.bind(pino.server);
-pino.post = pino.server.post.bind(pino.server);
-pino.put = pino.server.put.bind(pino.server);
-pino.delete = pino.server.delete.bind(pino.server);
-pino.route = pino.server.route.bind(pino.server);
+if (typeof window !== 'undefined') {
 
-pino.servers = [pino.server];
+  // ====== Server ======
 
-pino.addServer = function(server) {
-  this.servers.push(server);
-}.bind(pino);
+  const Server = require('./Server');
 
-pino.handle = async function(req) {
-  for (const server of this.servers) {
-    if (server.isHost(req.uri.host)) {
-      return await server.handle(req);
+  pino.server = new Server();
+
+  pino.use = pino.server.use.bind(pino.server);
+  pino.get = pino.server.get.bind(pino.server);
+  pino.post = pino.server.post.bind(pino.server);
+  pino.put = pino.server.put.bind(pino.server);
+  pino.delete = pino.server.delete.bind(pino.server);
+  pino.route = pino.server.route.bind(pino.server);
+
+  pino.servers = [pino.server];
+
+  pino.addServer = function(server) {
+    this.servers.push(server);
+  }.bind(pino);
+
+  pino.handle = async function(req) {
+    for (const server of this.servers) {
+      if (server.isHost(req.uri.host)) {
+        return await server.handle(req);
+      }
     }
-  }
-  return false;
-}.bind(pino);
+    return false;
+  }.bind(pino);
 
-// ====== mount ======
+  pino.Server = Server;
+  pino.Server.handle = pino.handle;
 
-pino.Server = Server_;
-pino.Server.handle = pino.handle;
+  // ====== fetch ======
 
-pino.XMLHttpRequest = XMLHttpRequest_;
-pino.XMLHttpRequest.handle = pino.handle;
+  const fetch = require('./fetch');
 
-pino.fetch = fetch_;
-pino.fetch.handle = pino.handle;
+  pino.fetch = fetch;
+  pino.fetch.handle = pino.handle;
+
+  // ====== XMLHttpRequest ======
+
+  const XMLHttpRequest = require('./XMLHttpRequest');
+
+  pino.XMLHttpRequest = XMLHttpRequest;
+  pino.XMLHttpRequest.handle = pino.handle;
+
+  pino.setup = function() {
+    window.XMLHttpRequest = XMLHttpRequest;
+    window.fetch = fetch;
+  }.bind(pino);
+}
 
 // ====== export ======
 
-export default pino;
-export var Server = Server_;
-export var XMLHttpRequest = XMLHttpRequest_;
-export var fetch = fetch_;
+module.exports = pino;

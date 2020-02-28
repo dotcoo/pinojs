@@ -81,7 +81,7 @@ function rgba_colorful(diff = 160) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
-export default function(pino) {
+module.exports = function(pino) {
   pino.register('color_name', color_name);
   pino.register('color', color);
   pino.register('hex_color', hex_color);

@@ -1,3 +1,5 @@
+pino.setup();
+
 (async() => {
   const res1 = await fetch('/blog/1000');
   const data1 = await res1.text();

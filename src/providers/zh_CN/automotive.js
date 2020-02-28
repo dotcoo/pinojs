@@ -28,6 +28,6 @@ function license_plate(province = null, city = null) {
   return license_plate;
 }
 
-export default function(pino) {
+module.exports = function(pino) {
   pino.register('license_plate', license_plate);
 };

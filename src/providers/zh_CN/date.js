@@ -3,7 +3,14 @@ function date_expr(expr, date = new Date()) {
     return new Date(expr);
   } else if (typeof expr === 'string' && (expr.startsWith('+') || expr.startsWith('-'))) {
     const args = [date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()];
-    for (const [_, number, unit] of expr.toLowerCase().matchAll(/([+-]\d+)([ymdhis])/g)) {
+    // for (const [_, number, unit] of expr.toLowerCase().matchAll(/([+-]\d+)([ymdhis])/g)) {
+    const reg = /([+-]\d+)([ymdhis])/g;
+    while (true) {
+      const result = reg.exec(expr.toLowerCase());
+      if (!result) {
+        break;
+      }
+      const [_, number, unit] = result;
       if ('ymdhis'.indexOf(unit) === -1) {
         throw new Error('error unit!');
       }
@@ -41,7 +48,7 @@ function date(...args) {
   return this.date_format(new Date(this.int({ min: conf.start.getTime(), max: conf.end.getTime() })), conf.format);
 }
 
-export default function(pino) {
+module.exports = function(pino) {
   pino.register('date_expr', date_expr);
   pino.register('date_format', date_format);
   pino.register('date', date);

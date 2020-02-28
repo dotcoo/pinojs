@@ -1,8 +1,3 @@
-import pino from '../src/index';
-import './Server_test';
-import './XMLHttpRequest_test';
-import './fetch_test';
-
 // ### 随机基础类型
 
 console.log(pino.bool(), pino.boolean()); // true false // 随机出现 true 和 false
@@ -113,7 +108,7 @@ console.log({
       gender: pino.bool(), // true -> 男, false -> 女
       age: age(),
       score: score(),
-    })),
+    })),   
     total: 83,
   },
 });
@@ -268,34 +263,33 @@ const image_url = pino.image_url({
   text: 'pino.js', // optional
 });
 
-console.log(image_url);
-
 console.log('%ci', `color: rgba(0,0,0,0); padding: 0 100px; line-height: 160px; background: url('${image_url}') no-repeat;`);
 
-const image_data_url = pino.image_data_url({
-  width: 200,
-  height: 160,
-  background: pino.colorful(), // optional
-  foreground: pino.colorful(), // optional
-  text: 'pin.js', // optional
-  font: 'bold 20px "微软雅黑"', // optional
-});
+if (typeof window !== 'undefined') {
+  const image_data_url = pino.image_data_url({
+    width: 200,
+    height: 160,
+    background: pino.colorful(), // optional
+    foreground: pino.colorful(), // optional
+    text: 'pin.js', // optional
+    font: 'bold 20px "Impact"', // optional
+  });
 
-console.log(image_data_url);
+  console.log(image_data_url);
 
-console.log('%ci', `color: rgba(0,0,0,0); padding: 0 100px; line-height: 160px; background: url('${image_data_url}') no-repeat;`);
+  console.log('%ci', `color: rgba(0,0,0,0); padding: 0 100px; line-height: 160px; background: url('${image_data_url}') no-repeat;`);
 
-const image_avatar = pino.image_avatar({
-  width: 360, // 图片宽度 // optional
-  height: 360, // 图片高度 // optional
-  padding: 20, // 边距 // optional
-  dot: 8, // 点行列数 // optional
-});
+  const image_avatar = pino.image_avatar({
+    width: 360, // 图片宽度 // optional
+    height: 360, // 图片高度 // optional
+    padding: 20, // 边距 // optional
+    dot: 8, // 点行列数 // optional
+  });
 
-console.log(image_avatar);
+  console.log(image_avatar);
 
-console.log('%ci', `color: rgba(0,0,0,0); padding: 0 180px; line-height: 360px; background: url('${image_avatar}') no-repeat;`);
-
+  console.log('%ci', `color: rgba(0,0,0,0); padding: 0 180px; line-height: 360px; background: url('${image_avatar}') no-repeat;`);
+}
 // ### 网络
 
 console.log(pino.range(10, pino.domain_tld));

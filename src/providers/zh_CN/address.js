@@ -225,7 +225,7 @@ function postcode() {
   return this.int({ min: 100000, max: 999999 });
 }
 
-export default function(pino) {
+module.exports = function(pino) {
   pino.register('country', country);
   pino.register('province', province);
   pino.register('city_name', city_name);

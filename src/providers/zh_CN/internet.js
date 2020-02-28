@@ -106,7 +106,7 @@ function url(domain_name = null) {
   return `${this.site(domain_name)}${this.url_path()}/${this.url_page()}.${this.url_extension()}`;
 }
 
-export default function(pino) {
+module.exports = function(pino) {
   pino.register('domain_tld', domain_tld);
   pino.register('domain_name', domain_name);
   pino.register('domain_host', domain_host);

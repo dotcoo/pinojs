@@ -47,7 +47,7 @@ function text(len = 200) {
   return text.substr(0, len - 1) + '。';
 }
 
-export default function(pino) {
+module.exports = function(pino) {
   pino.register('word', word);
   pino.register('text', text);
 };

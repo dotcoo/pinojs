@@ -1,5 +1,3 @@
-import pino from '../src/index';
-
 // const app = new pino.Server();
 const app = pino.server;
 
@@ -45,5 +43,3 @@ app.post('/blog/:bid', async(req, res, next) => {
 //   console.log((await app.handle(new Request('/blog/1'))).body);
 //   console.log((await app.handle(new Request('/blog/2/comment/1'))).body);
 // })();
-
-export default app;

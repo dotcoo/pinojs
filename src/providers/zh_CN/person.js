@@ -279,7 +279,7 @@ function phone() {
   return `1${this.pick([3, 5, 8])}${this.int({ min: 100000000, max: 999999999 })}`;
 }
 
-export default function(pino) {
+module.exports = function(pino) {
   pino.register('last_name', last_name);
   pino.register('last_name_pinyin', last_name_pinyin);
   pino.register('first_name', first_name);

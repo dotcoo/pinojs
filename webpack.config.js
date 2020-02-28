@@ -14,7 +14,7 @@ const config = {
     filename: '[name].js',
     library: 'pino',
     libraryTarget: 'umd',
-    libraryExport: 'default',
+    // libraryExport: 'default',
   },
   devtool: 'source-map',
   plugins: [

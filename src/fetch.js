@@ -8,7 +8,7 @@ async function fetch(url, init, ...args) {
     body: { configurable: true, enumerable: false, value: '', writable: true },
   });
   req.method = init && init.method ? init.method : 'GET';
-  req.uri = new URL(url, window.location.href);
+  req.uri = new window.URL(url, window.location.href);
   req.url = req.uri.href;
 
   const res = await fetch.handle(req);
@@ -24,6 +24,4 @@ fetch.handle = async function(req) {
   return false;
 };
 
-window.fetch = fetch;
-
-export default fetch;
+module.exports = fetch;

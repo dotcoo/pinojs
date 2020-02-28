@@ -72,7 +72,7 @@ function company_short() {
   return`${this.pick(company_names)}${this.pick(company_types)}`;
 }
 
-export default function(pino) {
+module.exports = function(pino) {
   pino.register('company_name', company_name);
   pino.register('company_name_pinyin', company_name_pinyin);
   pino.register('company_type', company_type);

@@ -131,4 +131,4 @@ class Server {
   }
 }
 
-export default Server;
+module.exports = Server;

@@ -96,270 +96,384 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
+// ====== constant ======
 
-// CONCATENATED MODULE: ./src/Server.js
-const AsyncFunction = (async() => {}).constructor;
+const MIN_BYTE = -128;
+const MAX_BYTE = 127;
+const MAX_UBYTE = 255;
+const MIN_SHORT = -32768;
+const MAX_SHORT = 32767;
+const MAX_USHORT = 65535;
+const MIN_INT = -2147483648;
+const MAX_INT = 2147483647;
+const MAX_UINT = 4294967295;
+const MIN_BIGINT = Number.MIN_SAFE_INTEGER / 2;
+const MAX_BIGINT = Number.MAX_SAFE_INTEGER / 2;
+const MAX_UBIGINT = Number.MAX_SAFE_INTEGER / 2;
 
-function entries2props(vals) {
-  if (vals.entries) {
-    for (const [name, value] of vals.entries()) {
-      vals[name] = value;
+// ====== pino ======
+
+const pino = {};
+
+pino.a2f = function(args) {
+  return args.length > 0 && typeof args[args.length - 1] === 'function' && args[args.length - 1].constructor === Function ? args.pop() : false;
+}.bind(pino);
+
+pino.currying = function(...cargs) {
+  const method = this;
+  const func = function(...args) {
+    return method(...cargs, ...args)
+  }.bind(pino);
+  func.currying = pino.currying;
+  return func;
+};
+pino.currying.bind = () => {};
+
+// ====== types ======
+
+pino.bool = function() {
+  return Math.floor(Math.random() * MAX_INT) % 2 === 1;
+}.bind(pino);
+pino.bool.currying = pino.currying;
+pino.boolean = pino.bool;
+
+pino.number = function(...args) {
+  const def = {
+    min: MIN_INT,
+    max: MAX_INT,
+    decimal: -1,
+  };
+  const conf = Object.assign({}, def, ...args);
+  let n = conf.min + Math.random() * (conf.max - conf.min);
+  if (conf.decimal > -1) {
+    n = n.toFixed(conf.decimal) - 0;
+  }
+  return n;
+}.bind(pino);
+pino.number.currying = pino.currying;
+
+pino.string = function(...args) {
+  if (args.length > 0 && typeof args[0] === 'number') {
+    args[0] = { len: args[0] };
+  }
+  const def = {
+    len: 8,
+    chars: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  };
+  const conf = Object.assign({}, def, ...args);
+  let str = '';
+  for (let i = 0; i < conf.len; i++) {
+    str += conf.chars.charAt(Math.random() * conf.chars.length | 0);
+  }
+  return str;
+}.bind(pino);
+pino.string.currying = pino.currying;
+
+// ====== range ======
+
+pino.empty = function(size = 0) {
+  return new Array(size);
+}.bind(pino);
+
+pino.zeros = function(size = 0) {
+  return new Array(size).fill(0);
+}.bind(pino);
+
+pino.ones = function(size = 0) {
+  return new Array(size).fill(1);
+}.bind(pino);
+
+pino.fill = function(size = 0, value = 0) {
+  return new Array(size).fill(value);
+}.bind(pino);
+
+pino.range = function(...args) {
+  let start = 0;
+  let end = 0;
+  let step = 1;
+  const f = this.a2f(args) || ((i, arr) => i);
+  if (args.length === 1) {
+    end = args[0];
+  } else if (args.length === 2) {
+    start = args[0];
+    end = args[1];
+  } else if (args.length === 3) {
+    start = args[0];
+    end = args[1];
+    step = args[2];
+  }
+  const arr = [];
+  if (start > end && step >= 0) {
+    throw new Error('Start is greater than end and step size is greater than or equal to 0!');
+  }
+  for (let i = start; start < end ? i < end : i > end; i += step) {
+    arr.push(f.length > 0 ? f(i, arr) : f());
+  }
+  return arr;
+}.bind(pino);
+
+pino.page = function(total, page, pagesize, f) {
+  return this.range((page - 1) * pagesize, Math.min(page * pagesize, total), f);
+}.bind(pino);
+
+// ====== math ======
+
+pino.linspace = function(start, end, num, endpoint = true) {
+  const step = (end - start) / (num - endpoint);
+  const arr = [];
+  for (let i = 0; i < num; i++) {
+    arr.push(start + step * i);
+  }
+  return arr;
+}.bind(pino);
+
+pino.min = function(...args) {
+  return Math.min(...args);
+}.bind(pino);
+
+pino.max = function(...args) {
+  return Math.max(...args);
+}.bind(pino);
+
+pino.sum = function(...args) {
+  return args.reduce((a, c) => a + c, 0);
+}.bind(pino);
+
+pino.mean = function(...args) {
+  return this.sum(...args) / args.length;
+}.bind(pino);
+
+pino.median = function(...args) {
+  const f = this.a2f(args) || ((a, b) => a - b);
+  args.sort(f);
+  if (args.length % 2 === 0) {
+    return (args[args.length / 2 - 1] + args[args.length / 2]) / 2;
+  } else {
+    return args[Math.floor(args.length / 2)];
+  }
+}.bind(pino);
+
+pino.var = function(...args) {
+  const mean = this.mean(...args);
+  const sum = this.sum(...args.map(v => (v - mean) ** 2));
+  return sum / args.length;
+}.bind(pino);
+
+pino.std = function(...args) {
+  return Math.sqrt(this.var(...args));
+}.bind(pino);
+
+// ====== probability ======
+
+pino.normal = function (u = 0, a = 1, size = 0) {
+  throw new Error('like numpy.normal, but not implemented!');
+}.bind(pino);
+pino.normal.currying = pino.currying;
+
+// Fisher–Yates https://bost.ocks.org/mike/shuffle/compare.html
+pino.shuffle = function(arr) {
+  let m = arr.length; let t; let i;
+  while (m) {
+    i = Math.floor(Math.random() * m--);
+    t = arr[m];
+    arr[m] = arr[i];
+    arr[i] = t;
+  }
+  return arr;
+}.bind(pino);
+
+pino.probability_table = function(...args) {
+  const shuffle = this.a2f(args) || this.shuffle;
+  const tab = [];
+  for (const [value, count] of args) {
+    for (let i = 0; i < count; i++) {
+      tab.push(value);
+    }
+  }
+  return shuffle(tab);
+}.bind(pino);
+
+pino.probability = function(...args) {
+  let tab = [];
+  let cur = 0;
+  return (i, arr) => {
+    if (cur >= tab.length) {
+      tab = this.probability_table(...args);
+      cur = 0;
+    }
+    const value = tab[cur++];
+    return value && value.constructor === Function ? value(i, arr) : value;
+  };
+}.bind(pino);
+
+pino.pick = function(...args) {
+  args = args.flat();
+  return args[this.uint() % args.length];
+}.bind(pino);
+
+pino.picks = function(count, ...args) {
+  args = args.flat();
+  const vals = [];
+  for (let i = 0; i < count; i++) {
+    const r = this.uint() % args.length;
+    vals.push(args[r]);
+    if (r === args.length - 1) {
+      args.pop();
+    } else {
+      args[r] = args.pop();
     }
   }
   return vals;
+}.bind(pino);
+
+// ====== quick ======
+
+pino.float = pino.number.currying({ min: MIN_INT, max: MAX_INT });
+
+pino.float8 = pino.number.currying({ min: MIN_BYTE, max: MAX_BYTE });
+
+pino.float16 = pino.number.currying({ min: MIN_SHORT, max: MAX_SHORT });
+
+pino.float32 = pino.number.currying({ min: MIN_INT, max: MAX_INT });
+
+pino.float64 = pino.number.currying({ min: MIN_BIGINT, max: MAX_BIGINT });
+
+pino.ufloat = pino.number.currying({ min: 0, max: MAX_UINT });
+
+pino.ufloat8 = pino.number.currying({ min: 0, max: MAX_UBYTE });
+
+pino.ufloat16 = pino.number.currying({ min: 0, max: MAX_USHORT });
+
+pino.ufloat32 = pino.number.currying({ min: 0, max: MAX_UINT });
+
+pino.ufloat64 = pino.number.currying({ min: 0, max: MAX_UBIGINT });
+
+pino.int = pino.number.currying({ min: MIN_INT, max: MAX_INT, decimal: 0 });
+
+pino.int8 = pino.number.currying({ min: MIN_BYTE, max: MAX_BYTE, decimal: 0 });
+
+pino.int16 = pino.number.currying({ min: MIN_SHORT, max: MAX_SHORT, decimal: 0 });
+
+pino.int32 = pino.number.currying({ min: MIN_INT, max: MAX_INT, decimal: 0 });
+
+pino.int64 = pino.number.currying({ min: MIN_BIGINT, max: MAX_BIGINT, decimal: 0 });
+
+pino.uint = pino.number.currying({ min: 0, max: MAX_UINT, decimal: 0 });
+
+pino.uint8 = pino.number.currying({ min: 0, max: MAX_UBYTE, decimal: 0 });
+
+pino.uint16 = pino.number.currying({ min: 0, max: MAX_USHORT, decimal: 0 });
+
+pino.uint32 = pino.number.currying({ min: 0, max: MAX_UINT, decimal: 0 });
+
+pino.uint64 = pino.number.currying({ min: 0, max: MAX_UBIGINT, decimal: 0 });
+
+// ====== providers ======
+
+pino.register = function(name, method) {
+  this[name] = method.bind(this);
+  this[name].currying = this.currying;
+}.bind(pino);
+
+pino.locale = function(locale) {
+  locale(pino);
+}.bind(pino);
+
+pino.locale(__webpack_require__(1));
+
+// ====== Server fetch XMLHttpRequest ======
+
+if (typeof window !== 'undefined') {
+
+  // ====== Server ======
+
+  const Server = __webpack_require__(11);
+
+  pino.server = new Server();
+
+  pino.use = pino.server.use.bind(pino.server);
+  pino.get = pino.server.get.bind(pino.server);
+  pino.post = pino.server.post.bind(pino.server);
+  pino.put = pino.server.put.bind(pino.server);
+  pino.delete = pino.server.delete.bind(pino.server);
+  pino.route = pino.server.route.bind(pino.server);
+
+  pino.servers = [pino.server];
+
+  pino.addServer = function(server) {
+    this.servers.push(server);
+  }.bind(pino);
+
+  pino.handle = async function(req) {
+    for (const server of this.servers) {
+      if (server.isHost(req.uri.host)) {
+        return await server.handle(req);
+      }
+    }
+    return false;
+  }.bind(pino);
+
+  pino.Server = Server;
+  pino.Server.handle = pino.handle;
+
+  // ====== fetch ======
+
+  const fetch = __webpack_require__(12);
+
+  pino.fetch = fetch;
+  pino.fetch.handle = pino.handle;
+
+  // ====== XMLHttpRequest ======
+
+  const XMLHttpRequest = __webpack_require__(13);
+
+  pino.XMLHttpRequest = XMLHttpRequest;
+  pino.XMLHttpRequest.handle = pino.handle;
+
+  pino.setup = function() {
+    window.XMLHttpRequest = XMLHttpRequest;
+    window.fetch = fetch;
+  }.bind(pino);
 }
 
-class Server {
-  constructor(host = window.location.host) {
-    this.host = host;
-    this.middlewares = [];
-    this.handler = null;
-  }
+// ====== export ======
 
-  use(middleware) {
-    if (middleware.constructor !== AsyncFunction) {
-      throw new Error('middleware can only be asynchronous functions!');
-    }
-    this.middlewares.push(middleware);
-  }
+module.exports = pino;
 
-  isHost(host) {
-    return this.host.constructor === RegExp ? this.host.test(host) : this.host === host;
-  }
 
-  get(path, handle) {
-    this.route('GET', path, handle);
-  }
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
 
-  post(path, handle) {
-    this.route('POST', path, handle);
-  }
+const address = __webpack_require__(2);
+const automotive = __webpack_require__(3);
+const color = __webpack_require__(4);
+const company = __webpack_require__(5);
+const date = __webpack_require__(6);
+const image = __webpack_require__(7);
+const internet = __webpack_require__(8);
+const lorem = __webpack_require__(9);
+const person = __webpack_require__(10);
 
-  put(path, handle) {
-    this.route('PUT', path, handle);
-  }
-
-  delete(path, handle) {
-    this.route('DELETE', path, handle);
-  }
-
-  route(method, path, handle) {
-    if (handle.constructor !== AsyncFunction) {
-      throw new Error('handle can only be asynchronous functions!');
-    }
-    let pathReg = path;
-    if (path.constructor === String) {
-      const paramsNames = [...path.matchAll(/:([a-z_][a-z0-9_]*)/ig)].map(v => v[1]);
-      let pathRegStr = '^' + path.replace(/\//g, '\\/') + '$';
-      for (const name of paramsNames) {
-        pathRegStr = pathRegStr.replace(':' + name, `(?<${name}>[a-z0-9_]+)`);
-      }
-      pathReg = new RegExp(pathRegStr, 'ig');
-    }
-    this.use(async(req, res, next) => {
-      if (req.uri.host !== this.host || req.method !== method || !new RegExp(pathReg.source, pathReg.flags).test(req.uri.pathname)) {
-        await next(req, res);
-        return;
-      }
-      req.params = entries2props(new window.URLSearchParams([...req.uri.pathname.matchAll(new RegExp(pathReg.source, pathReg.flags))].pop().groups));
-      res.request = req;
-      if (false) {}
-      await handle(req, res, next);
-      if (false) {}
-    });
-  }
-
-  async notfound(req, res, next) {
-    res.status = 404;
-    res.statusText = 'not found';
-    res.body = '';
-  }
-
-  getHandler() {
-    let nextMiddleware = this.notfound;
-    for (let i = this.middlewares.length - 1; i >= 0; i--) {
-      const middleware = this.middlewares[i];
-      const next = nextMiddleware;
-      nextMiddleware = async (req, res) => await middleware(req, res, next);
-    }
-    return nextMiddleware;
-  }
-
-  async handle(req) {
-    if (this.handler === null) {
-      this.handler = this.getHandler();
-    }
-    req.uri = new window.URL(req.url, window.location.href);
-    entries2props(req.headers);
-    req.query = entries2props(new window.URLSearchParams(req.uri.search));
-    req.form = new window.URLSearchParams();
-    if (req.method === 'POST' && req.headers.get('Content-Type')) {
-      if (req.headers.get('Content-Type').startsWith('application/x-www-form-urlencoded')) {
-        req.form = entries2props(new window.URLSearchParams(req.body));
-      } else if (req.headers.get('Content-Type').startsWith('application/json')) {
-        req.form = JSON.parse(req.body);
-      }
-    }
-    req.body = req.body ? req.body : '';
-    const res = new window.Response();
-    Object.defineProperties(res, {
-      url: { configurable: true, enumerable: false, value: '', writable: true },
-      status: { configurable: true, enumerable: false, value: 200, writable: true },
-      statusText: { configurable: true, enumerable: false, value: 'OK', writable: true },
-      body: { configurable: true, enumerable: false, value: '', writable: true },
-    });
-    res.url = req.url;
-    res.send = function(data) {
-      this.body = data;
-    };
-    res.json = function(data) {
-      this.body = JSON.stringify(data);
-    };
-    await this.handler(req, res);
-    entries2props(res.headers);
-    res.text = async function() {
-      return this.body;
-    };
-    res.json = async function() {
-      return JSON.parse(this.body);
-    };
-    return res;
-  }
-}
-
-/* harmony default export */ var src_Server = (Server);
-
-// CONCATENATED MODULE: ./src/XMLHttpRequest.js
-window.XMLHttpRequestReal = window.XMLHttpRequest;
-
-class XMLHttpRequest extends window.XMLHttpRequestReal {
-  constructor() {
-    // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-    super();
-
-    // https://developer.mozilla.org/en-US/docs/Web/API/Request
-    this.req = new window.Request('', {});
-    Object.defineProperties(this.req, {
-      method: { configurable: true, enumerable: false, value: 'GET', writable: true },
-      url: { configurable: true, enumerable: false, value: '', writable: true },
-      body: { configurable: true, enumerable: false, value: '', writable: true },
-    });
-
-    // https://developer.mozilla.org/en-US/docs/Web/API/Response
-    this.res = null;
-
-    Object.defineProperties(this, {
-      readyState: { configurable: true, enumerable: false, value: 4, writable: true },
-      status: { configurable: true, enumerable: false, value: 200, writable: true },
-      statusText: { configurable: true, enumerable: false, value: 'OK', writable: true },
-      responseText: { configurable: true, enumerable: false, value: '', writable: true },
-    });
-  }
-
-  open(method, url, async = true, ...args) {
-    super.open(method, url, async, ...args);
-    this.req.method = method;
-    this.req.uri = new URL(url, window.location.href);
-    this.req.url = this.req.uri.href;
-  }
-
-  setRequestHeader(name, value) {
-    super.setRequestHeader(name, value);
-    this.req.headers.set(name, value);
-  }
-
-  getAllResponseHeaders() {
-    let headers = '';
-    for (const [name, value] of this.res.headers.entries()) {
-      headers += `${name}: ${value}\r\n`;
-    }
-    return headers;
-  }
-
-  getResponseHeader(name) {
-    return this.req.headers.get(name);
-  }
-
-  async send(value = '') {
-    this.req.headers.set('Host', this.req.uri.host);
-    this.req.headers.set('User-Agent', window.navigator.userAgent);
-    this.req.headers.set('Accept', '*/*');
-    this.req.headers.set('Referer', window.location.href);
-    this.req.headers.set('Accept-Language', window.navigator.language);
-    this.req.headers.set('Cookie', window.document.cookie);
-    this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    this.req.body = value;
-
-    this.res = await XMLHttpRequest.handle(this.req);
-
-    if (this.res === false || this.res && this.res.status === 404) {
-      return super.send(value);
-    }
-
-    this.readyState = 4;
-    this.status = this.res.status;
-    this.statusText = this.res.statusText;
-    this.responseText = this.res.body;
-
-    setTimeout(() => {
-      if (this.onload) {
-        this.onload();
-      } else if (this.onreadystatechange) {
-        this.onreadystatechange();
-      } else {
-        throw new Error('not found onload and onreadystatechange!');
-      }
-    }, XMLHttpRequest.delay);
-  }
-}
-
-XMLHttpRequest.delay = 200;
-
-XMLHttpRequest.handle = async function(req) {
-  return false;
+module.exports = function(pino) {
+  address(pino);
+  automotive(pino);
+  color(pino);
+  company(pino);
+  date(pino);
+  image(pino);
+  internet(pino);
+  lorem(pino);
+  person(pino);
 };
 
-window.XMLHttpRequest = XMLHttpRequest;
 
-/* harmony default export */ var src_XMLHttpRequest = (XMLHttpRequest);
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
 
-// CONCATENATED MODULE: ./src/fetch.js
-window.fetchReal = window.fetch;
-
-async function fetch(url, init, ...args) {
-  const req = new window.Request('', {});
-  Object.defineProperties(req, {
-    method: { configurable: true, enumerable: false, value: 'GET', writable: true },
-    url: { configurable: true, enumerable: false, value: '', writable: true },
-    body: { configurable: true, enumerable: false, value: '', writable: true },
-  });
-  req.method = init && init.method ? init.method : 'GET';
-  req.uri = new URL(url, window.location.href);
-  req.url = req.uri.href;
-
-  const res = await fetch.handle(req);
-
-  if (res === false || (res && res.status === 404)) {
-    return window.fetchReal(url, init, ...args);
-  }
-
-  return res;
-}
-
-fetch.handle = async function(req) {
-  return false;
-};
-
-window.fetch = fetch;
-
-/* harmony default export */ var src_fetch = (fetch);
-
-// CONCATENATED MODULE: ./src/providers/zh_CN/address.js
 const address_countries = [
   "阿富汗", "阿拉斯加", "阿尔巴尼亚", "阿尔及利亚", "安道尔", "安哥拉", "安圭拉岛英", "安提瓜和巴布达",
   "阿根廷", "亚美尼亚", "阿鲁巴岛", "阿森松", "澳大利亚", "奥地利", "阿塞拜疆", "巴林", "孟加拉国",
@@ -587,7 +701,7 @@ function postcode() {
   return this.int({ min: 100000, max: 999999 });
 }
 
-/* harmony default export */ var zh_CN_address = (function(pino) {
+module.exports = function(pino) {
   pino.register('country', country);
   pino.register('province', province);
   pino.register('city_name', city_name);
@@ -611,9 +725,13 @@ function postcode() {
   pino.register('office_address', office_address);
   pino.register('address', address);
   pino.register('postcode', postcode);
-});;
+};
 
-// CONCATENATED MODULE: ./src/providers/zh_CN/automotive.js
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
 const automotive_provinces = {
   "北京": "京", "天津": "津", "河北": "冀", "山西": "晋", "内蒙": "蒙",
   "辽宁": "辽", "吉林": "吉", "黑龙": "黑", "上海": "沪", "江苏": "苏",
@@ -644,11 +762,15 @@ function license_plate(province = null, city = null) {
   return license_plate;
 }
 
-/* harmony default export */ var automotive = (function(pino) {
+module.exports = function(pino) {
   pino.register('license_plate', license_plate);
-});;
+};
 
-// CONCATENATED MODULE: ./src/providers/zh_CN/color.js
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
 const color_names = [
   "AliceBlue", "AntiqueWhite", "Aqua", "Aquamarine", "Azure", "Beige", "Bisque", 
   "Black", "BlanchedAlmond", "Blue", "BlueViolet", "Brown", "BurlyWood", "CadetBlue", 
@@ -732,7 +854,7 @@ function rgba_colorful(diff = 160) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
-/* harmony default export */ var zh_CN_color = (function(pino) {
+module.exports = function(pino) {
   pino.register('color_name', color_name);
   pino.register('color', color);
   pino.register('hex_color', hex_color);
@@ -744,9 +866,13 @@ function rgba_colorful(diff = 160) {
   pino.register('hex_colorful', hex_colorful);
   pino.register('rgb_colorful', rgb_colorful);
   pino.register('rgba_colorful', rgba_colorful);
-});;
+};
 
-// CONCATENATED MODULE: ./src/providers/zh_CN/company.js
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
 // const pinyin = require('node-pinyin');
 
 const company_names = [
@@ -821,16 +947,20 @@ function company_short() {
   return`${this.pick(company_names)}${this.pick(company_types)}`;
 }
 
-/* harmony default export */ var zh_CN_company = (function(pino) {
+module.exports = function(pino) {
   pino.register('company_name', company_name);
   pino.register('company_name_pinyin', company_name_pinyin);
   pino.register('company_type', company_type);
   pino.register('company_suffix', company_suffix);
   pino.register('company', company);
   pino.register('company_short', company_short);
-});;
+};
 
-// CONCATENATED MODULE: ./src/providers/zh_CN/date.js
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
 function date_expr(expr, date = new Date()) {
   if (typeof expr === 'number') {
     return new Date(expr);
@@ -874,13 +1004,17 @@ function date(...args) {
   return this.date_format(new Date(this.int({ min: conf.start.getTime(), max: conf.end.getTime() })), conf.format);
 }
 
-/* harmony default export */ var zh_CN_date = (function(pino) {
+module.exports = function(pino) {
   pino.register('date_expr', date_expr);
   pino.register('date_format', date_format);
   pino.register('date', date);
-});;
+};
 
-// CONCATENATED MODULE: ./src/providers/zh_CN/image.js
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
 function image_url(...args) {
   const def = {
     width: 600,
@@ -896,95 +1030,103 @@ function image_url(...args) {
   return `https://dummyimage.com/${conf.width}x${conf.height}/${conf.background}/${conf.foreground}.${conf.format}?text=${encodeURIComponent(conf.text)}`;
 }
 
-const canvas = document.createElement('canvas');
-const ctx = canvas.getContext('2d');
+if (typeof window !== 'undefined') {
+  const canvas = window.document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
 
-function image_data_url(...args) {
-  const def = {
-    width: 600,
-    height: 400,
-    background: this.colorful(),
-    foreground: this.colorful(),
-    text: '',
-    font: '',
-  };
-  const conf = Object.assign({}, def, ...args);
-  ctx.clearRect(0, 0, conf.width, conf.height);
-  conf.text = conf.text ? conf.text : `${conf.width}x${conf.height}`;
-  conf.textlen = conf.text.split('').map(c => encodeURIComponent(c).length <= 3 ? 1 : 1.2).reduce((a, c) => a + c, 0);
-  conf.font = conf.font ? conf.font : `bold ${Math.floor(conf.width / (conf.textlen))}px "微软雅黑"`;
-  canvas.width = conf.width;
-  canvas.height = conf.height;
-  ctx.fillStyle = conf.background;
-  ctx.fillRect(0, 0, conf.width, conf.height);
-  ctx.font = conf.font;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = conf.foreground;
-  ctx.fillText(conf.text, Math.floor(conf.width / 2), Math.floor(conf.height / 2));
-  return canvas.toDataURL();
-}
-
-function image_random_matrix(width, height, ratio = 0.4) {
-  ratio /= 2;
-  const wh = width / 2;
-  const matrix = new Array(width * height).fill(false);
-  let count = 0;
-  while (count / matrix.length < ratio) {
-    const i = Math.random() * 65535 % matrix.length | 0;
-    const w = i % width;
-    if (w >= wh || matrix[i]) {
-      continue;
-    }
-    const h = i / height | 0;
-    matrix[i] = true;
-    matrix[width * h + width - 1 - w] = true;
-    count++;
+  function image_data_url(...args) {
+    const def = {
+      width: 600,
+      height: 400,
+      background: this.colorful(),
+      foreground: this.colorful(),
+      text: '',
+      font: '',
+    };
+    const conf = Object.assign({}, def, ...args);
+    ctx.clearRect(0, 0, conf.width, conf.height);
+    conf.text = conf.text ? conf.text : `${conf.width}x${conf.height}`;
+    conf.textlen = conf.text.split('').map(c => encodeURIComponent(c).length <= 3 ? 1 : 1.2).reduce((a, c) => a + c, 0);
+    conf.font = conf.font ? conf.font : `bold ${Math.floor(conf.width / (conf.textlen))}px "微软雅黑"`;
+    canvas.width = conf.width;
+    canvas.height = conf.height;
+    ctx.fillStyle = conf.background;
+    ctx.fillRect(0, 0, conf.width, conf.height);
+    ctx.font = conf.font;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = conf.foreground;
+    ctx.fillText(conf.text, Math.floor(conf.width / 2), Math.floor(conf.height / 2));
+    return canvas.toDataURL();
   }
-  if (false) {}
-  return matrix;
-}
 
-function image_avatar(...args) {
-  const def = {
-    width: 360, // 图片宽度
-    height: 360, // 图片高度
-    padding: 20, // 边距
-    dot: 8, // 点行列数
-    dot_cols: null, // 点列数
-    dot_rows: null, // 点行数
-    diff: 160, // 鲜艳度
-    color: null, // 颜色
-    ratio: 0.4, // 填充比例
-  };
-  const conf = Object.assign({}, def, ...args);
-  ctx.clearRect(0, 0, conf.width, conf.height);
-  conf.dot_cols = conf.dot_cols === null ? conf.dot : conf.dot_cols;
-  conf.dot_rows = conf.dot_rows === null ? conf.dot : conf.dot_rows;
-  conf.color = this.colorful(conf.diff);
-  canvas.width = conf.width;
-  canvas.height = conf.height;
-  ctx.fillStyle = conf.color;
-  const dot_width = (conf.width - conf.padding * 2) / conf.dot_cols;
-  const dot_height = (conf.height - conf.padding * 2) / conf.dot_rows;
-  for (const [i, v] of this.image_random_matrix(conf.dot_cols, conf.dot_rows, conf.ratio).entries()) {
-    if (v) {
-      const x = Math.floor(conf.padding + dot_width * (i % conf.dot_cols));
-      const y = Math.floor(conf.padding + dot_height * (i / conf.dot_rows | 0));
-      ctx.fillRect(x, y, Math.ceil(dot_width), Math.ceil(dot_height));
+  function image_random_matrix(width, height, ratio = 0.4) {
+    ratio /= 2;
+    const wh = width / 2;
+    const matrix = new Array(width * height).fill(false);
+    let count = 0;
+    while (count / matrix.length < ratio) {
+      const i = Math.random() * 65535 % matrix.length | 0;
+      const w = i % width;
+      if (w >= wh || matrix[i]) {
+        continue;
+      }
+      const h = i / height | 0;
+      matrix[i] = true;
+      matrix[width * h + width - 1 - w] = true;
+      count++;
     }
+    if (false) {}
+    return matrix;
   }
-  return canvas.toDataURL();
+
+  function image_avatar(...args) {
+    const def = {
+      width: 360, // 图片宽度
+      height: 360, // 图片高度
+      padding: 20, // 边距
+      dot: 8, // 点行列数
+      dot_cols: null, // 点列数
+      dot_rows: null, // 点行数
+      diff: 160, // 鲜艳度
+      color: null, // 颜色
+      ratio: 0.4, // 填充比例
+    };
+    const conf = Object.assign({}, def, ...args);
+    ctx.clearRect(0, 0, conf.width, conf.height);
+    conf.dot_cols = conf.dot_cols === null ? conf.dot : conf.dot_cols;
+    conf.dot_rows = conf.dot_rows === null ? conf.dot : conf.dot_rows;
+    conf.color = this.colorful(conf.diff);
+    canvas.width = conf.width;
+    canvas.height = conf.height;
+    ctx.fillStyle = conf.color;
+    const dot_width = (conf.width - conf.padding * 2) / conf.dot_cols;
+    const dot_height = (conf.height - conf.padding * 2) / conf.dot_rows;
+    for (const [i, v] of this.image_random_matrix(conf.dot_cols, conf.dot_rows, conf.ratio).entries()) {
+      if (v) {
+        const x = Math.floor(conf.padding + dot_width * (i % conf.dot_cols));
+        const y = Math.floor(conf.padding + dot_height * (i / conf.dot_rows | 0));
+        ctx.fillRect(x, y, Math.ceil(dot_width), Math.ceil(dot_height));
+      }
+    }
+    return canvas.toDataURL();
+  }
 }
 
-/* harmony default export */ var zh_CN_image = (function(pino) {
+module.exports = function(pino) {
   pino.register('image_url', image_url);
-  pino.register('image_data_url', image_data_url);
-  pino.register('image_random_matrix', image_random_matrix);
-  pino.register('image_avatar', image_avatar);
-});;
+  if (typeof window !== 'undefined') {
+    pino.register('image_data_url', image_data_url);
+    pino.register('image_random_matrix', image_random_matrix);
+    pino.register('image_avatar', image_avatar);
+  }
+};
 
-// CONCATENATED MODULE: ./src/providers/zh_CN/internet.js
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
 const internet_free_email_domains = [
   'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com',
   '163.com', '126.com', 'yeah.net', 'qq.com', 'foxmail.com',
@@ -1093,7 +1235,7 @@ function url(domain_name = null) {
   return `${this.site(domain_name)}${this.url_path()}/${this.url_page()}.${this.url_extension()}`;
 }
 
-/* harmony default export */ var internet = (function(pino) {
+module.exports = function(pino) {
   pino.register('domain_tld', domain_tld);
   pino.register('domain_name', domain_name);
   pino.register('domain_host', domain_host);
@@ -1113,9 +1255,13 @@ function url(domain_name = null) {
   pino.register('url_page', url_page);
   pino.register('url_extension', url_extension);
   pino.register('url', url);
-});;
+};
 
-// CONCATENATED MODULE: ./src/providers/zh_CN/lorem.js
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
 const lorem_words = [
   '活动', '重要', '显示', '大小', '使用', '最后', '系列', '注意', '一些', '其中',
   '我的', '怎么', '最新', '只要', '为了', '一下', '位置', '组织', '日期', '成功',
@@ -1156,7 +1302,7 @@ function word() {
   return this.pick(lorem_words);
 }
 
-function lorem_text(len = 200) {
+function text(len = 200) {
   const proba = this.probability(['，', 8], ['。', 2]);
   let text = '';
   while(text.length < len) {
@@ -1165,12 +1311,16 @@ function lorem_text(len = 200) {
   return text.substr(0, len - 1) + '。';
 }
 
-/* harmony default export */ var lorem = (function(pino) {
+module.exports = function(pino) {
   pino.register('word', word);
-  pino.register('text', lorem_text);
-});;
+  pino.register('text', text);
+};
 
-// CONCATENATED MODULE: ./src/providers/zh_CN/person.js
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
 // const pinyin = require('node-pinyin');
 
 const person_last_names = [
@@ -1412,7 +1562,7 @@ function first_name_female() {
 //   return this.pick(person_first_names_female_pinyin);
 // }
 
-function person_name() {
+function name() {
   return this.last_name() + this.first_name();
 }
 
@@ -1440,7 +1590,7 @@ function username() {
   return this.name_pinyin();
 }
 
-function person_password() {
+function password() {
   return this.string({ len: 10, chars: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+`-=' });
 }
 
@@ -1452,7 +1602,7 @@ function phone() {
   return `1${this.pick([3, 5, 8])}${this.int({ min: 100000000, max: 999999999 })}`;
 }
 
-/* harmony default export */ var person = (function(pino) {
+module.exports = function(pino) {
   pino.register('last_name', last_name);
   pino.register('last_name_pinyin', last_name_pinyin);
   pino.register('first_name', first_name);
@@ -1461,388 +1611,286 @@ function phone() {
   // pino.register('first_name_male_pinyin', first_name_male_pinyin);
   pino.register('first_name_female', first_name_female);
   // pino.register('first_name_female_pinyin', first_name_female_pinyin);
-  pino.register('name', person_name);
+  pino.register('name', name);
   pino.register('name_pinyin', name_pinyin);
   pino.register('name_male', name_male);
   // pino.register('name_male_pinyin', name_male_pinyin);
   pino.register('name_female', name_female);
   // pino.register('name_female_pinyin', name_female_pinyin);
   pino.register('username', username);
-  pino.register('password', person_password);
+  pino.register('password', password);
   pino.register('job', job);
   pino.register('phone', phone);
-});;
-
-// CONCATENATED MODULE: ./src/providers/zh_CN/index.js
-
-
-
-
-
-
-
-
-
-
-/* harmony default export */ var zh_CN = (function(pino) {
-  zh_CN_address(pino);
-  automotive(pino);
-  zh_CN_color(pino);
-  zh_CN_company(pino);
-  zh_CN_date(pino);
-  zh_CN_image(pino);
-  internet(pino);
-  lorem(pino);
-  person(pino);
-});;
-
-// CONCATENATED MODULE: ./src/index.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Server", function() { return src_Server_0; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "XMLHttpRequest", function() { return src_XMLHttpRequest_0; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetch", function() { return src_fetch_0; });
-
-
-
-
-
-// ====== constant ======
-
-const MIN_BYTE = -128;
-const MAX_BYTE = 127;
-const MAX_UBYTE = 255;
-const MIN_SHORT = -32768;
-const MAX_SHORT = 32767;
-const MAX_USHORT = 65535;
-const MIN_INT = -2147483648;
-const MAX_INT = 2147483647;
-const MAX_UINT = 4294967295;
-const MIN_BIGINT = Number.MIN_SAFE_INTEGER / 2;
-const MAX_BIGINT = Number.MAX_SAFE_INTEGER / 2;
-const MAX_UBIGINT = Number.MAX_SAFE_INTEGER / 2;
-
-// ====== pino ======
-
-const src_pino = {};
-
-src_pino.a2f = function(args) {
-  return args.length > 0 && typeof args[args.length - 1] === 'function' && args[args.length - 1].constructor === Function ? args.pop() : false;
-}.bind(src_pino);
-
-src_pino.currying = function(...cargs) {
-  const method = this;
-  const func = function(...args) {
-    return method(...cargs, ...args)
-  }.bind(src_pino);
-  func.currying = src_pino.currying;
-  return func;
 };
-src_pino.currying.bind = () => {};
 
-// ====== types ======
 
-src_pino.bool = function() {
-  return Math.floor(Math.random() * MAX_INT) % 2 === 1;
-}.bind(src_pino);
-src_pino.bool.currying = src_pino.currying;
-src_pino.boolean = src_pino.bool;
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
 
-src_pino.number = function(...args) {
-  const def = {
-    min: MIN_INT,
-    max: MAX_INT,
-    decimal: -1,
-  };
-  const conf = Object.assign({}, def, ...args);
-  let n = conf.min + Math.random() * (conf.max - conf.min);
-  if (conf.decimal > -1) {
-    n = n.toFixed(conf.decimal) - 0;
-  }
-  return n;
-}.bind(src_pino);
-src_pino.number.currying = src_pino.currying;
+const AsyncFunction = (async() => {}).constructor;
 
-src_pino.string = function(...args) {
-  if (args.length > 0 && typeof args[0] === 'number') {
-    args[0] = { len: args[0] };
-  }
-  const def = {
-    len: 8,
-    chars: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-  };
-  const conf = Object.assign({}, def, ...args);
-  let str = '';
-  for (let i = 0; i < conf.len; i++) {
-    str += conf.chars.charAt(Math.random() * conf.chars.length | 0);
-  }
-  return str;
-}.bind(src_pino);
-src_pino.string.currying = src_pino.currying;
-
-// ====== range ======
-
-src_pino.empty = function(size = 0) {
-  return new Array(size);
-}.bind(src_pino);
-
-src_pino.zeros = function(size = 0) {
-  return new Array(size).fill(0);
-}.bind(src_pino);
-
-src_pino.ones = function(size = 0) {
-  return new Array(size).fill(1);
-}.bind(src_pino);
-
-src_pino.fill = function(size = 0, value = 0) {
-  return new Array(size).fill(value);
-}.bind(src_pino);
-
-src_pino.range = function(...args) {
-  let start = 0;
-  let end = 0;
-  let step = 1;
-  const f = this.a2f(args) || ((i, arr) => i);
-  if (args.length === 1) {
-    end = args[0];
-  } else if (args.length === 2) {
-    start = args[0];
-    end = args[1];
-  } else if (args.length === 3) {
-    start = args[0];
-    end = args[1];
-    step = args[2];
-  }
-  const arr = [];
-  if (start > end && step >= 0) {
-    throw new Error('Start is greater than end and step size is greater than or equal to 0!');
-  }
-  for (let i = start; start < end ? i < end : i > end; i += step) {
-    arr.push(f.currying ? f() : f(i, arr));
-  }
-  return arr;
-}.bind(src_pino);
-
-src_pino.page = function(total, page, pagesize, f) {
-  return this.range((page - 1) * pagesize, Math.min(page * pagesize, total), f);
-}.bind(src_pino);
-
-// ====== math ======
-
-src_pino.linspace = function(start, end, num, endpoint = true) {
-  const step = (end - start) / (num - endpoint);
-  const arr = [];
-  for (let i = 0; i < num; i++) {
-    arr.push(start + step * i);
-  }
-  return arr;
-}.bind(src_pino);
-
-src_pino.min = function(...args) {
-  return Math.min(...args);
-}.bind(src_pino);
-
-src_pino.max = function(...args) {
-  return Math.max(...args);
-}.bind(src_pino);
-
-src_pino.sum = function(...args) {
-  return args.reduce((a, c) => a + c, 0);
-}.bind(src_pino);
-
-src_pino.mean = function(...args) {
-  return this.sum(...args) / args.length;
-}.bind(src_pino);
-
-src_pino.median = function(...args) {
-  const f = this.a2f(args) || ((a, b) => a - b);
-  args.sort(f);
-  if (args.length % 2 === 0) {
-    return (args[args.length / 2 - 1] + args[args.length / 2]) / 2;
-  } else {
-    return args[Math.floor(args.length / 2)];
-  }
-}.bind(src_pino);
-
-src_pino.var = function(...args) {
-  const mean = this.mean(...args);
-  const sum = this.sum(...args.map(v => (v - mean) ** 2));
-  return sum / args.length;
-}.bind(src_pino);
-
-src_pino.std = function(...args) {
-  return Math.sqrt(this.var(...args));
-}.bind(src_pino);
-
-// ====== probability ======
-
-src_pino.normal = function (u = 0, a = 1, size = 0) {
-  throw new Error('like numpy.normal, but not implemented!');
-}.bind(src_pino);
-src_pino.normal.currying = src_pino.currying;
-
-// Fisher–Yates https://bost.ocks.org/mike/shuffle/compare.html
-src_pino.shuffle = function(arr) {
-  let m = arr.length; let t; let i;
-  while (m) {
-    i = Math.floor(Math.random() * m--);
-    t = arr[m];
-    arr[m] = arr[i];
-    arr[i] = t;
-  }
-  return arr;
-}.bind(src_pino);
-
-src_pino.probability_table = function(...args) {
-  const shuffle = this.a2f(args) || this.shuffle;
-  const tab = [];
-  for (const [value, count] of args) {
-    for (let i = 0; i < count; i++) {
-      tab.push(value);
-    }
-  }
-  return shuffle(tab);
-}.bind(src_pino);
-
-src_pino.probability = function(...args) {
-  let tab = [];
-  let cur = 0;
-  return (i, arr) => {
-    if (cur >= tab.length) {
-      tab = this.probability_table(...args);
-      cur = 0;
-    }
-    const value = tab[cur++];
-    return value && value.constructor === Function ? value(i, arr) : value;
-  };
-}.bind(src_pino);
-
-src_pino.pick = function(...args) {
-  args = args.flat();
-  return args[this.uint() % args.length];
-}.bind(src_pino);
-
-src_pino.picks = function(count, ...args) {
-  args = args.flat();
-  const vals = [];
-  for (let i = 0; i < count; i++) {
-    const r = this.uint() % args.length;
-    vals.push(args[r]);
-    if (r === args.length - 1) {
-      args.pop();
-    } else {
-      args[r] = args.pop();
+function entries2props(vals) {
+  if (vals.entries) {
+    for (const [name, value] of vals.entries()) {
+      vals[name] = value;
     }
   }
   return vals;
-}.bind(src_pino);
+}
 
-// ====== quick ======
+class Server {
+  constructor(host = window.location.host) {
+    this.host = host;
+    this.middlewares = [];
+    this.handler = null;
+  }
 
-src_pino.float = src_pino.number.currying({ min: MIN_INT, max: MAX_INT });
+  use(middleware) {
+    if (middleware.constructor !== AsyncFunction) {
+      throw new Error('middleware can only be asynchronous functions!');
+    }
+    this.middlewares.push(middleware);
+  }
 
-src_pino.float8 = src_pino.number.currying({ min: MIN_BYTE, max: MAX_BYTE });
+  isHost(host) {
+    return this.host.constructor === RegExp ? this.host.test(host) : this.host === host;
+  }
 
-src_pino.float16 = src_pino.number.currying({ min: MIN_SHORT, max: MAX_SHORT });
+  get(path, handle) {
+    this.route('GET', path, handle);
+  }
 
-src_pino.float32 = src_pino.number.currying({ min: MIN_INT, max: MAX_INT });
+  post(path, handle) {
+    this.route('POST', path, handle);
+  }
 
-src_pino.float64 = src_pino.number.currying({ min: MIN_BIGINT, max: MAX_BIGINT });
+  put(path, handle) {
+    this.route('PUT', path, handle);
+  }
 
-src_pino.ufloat = src_pino.number.currying({ min: 0, max: MAX_UINT });
+  delete(path, handle) {
+    this.route('DELETE', path, handle);
+  }
 
-src_pino.ufloat8 = src_pino.number.currying({ min: 0, max: MAX_UBYTE });
+  route(method, path, handle) {
+    if (handle.constructor !== AsyncFunction) {
+      throw new Error('handle can only be asynchronous functions!');
+    }
+    let pathReg = path;
+    if (path.constructor === String) {
+      const paramsNames = [...path.matchAll(/:([a-z_][a-z0-9_]*)/ig)].map(v => v[1]);
+      let pathRegStr = '^' + path.replace(/\//g, '\\/') + '$';
+      for (const name of paramsNames) {
+        pathRegStr = pathRegStr.replace(':' + name, `(?<${name}>[a-z0-9_]+)`);
+      }
+      pathReg = new RegExp(pathRegStr, 'ig');
+    }
+    this.use(async(req, res, next) => {
+      if (req.uri.host !== this.host || req.method !== method || !new RegExp(pathReg.source, pathReg.flags).test(req.uri.pathname)) {
+        await next(req, res);
+        return;
+      }
+      req.params = entries2props(new window.URLSearchParams([...req.uri.pathname.matchAll(new RegExp(pathReg.source, pathReg.flags))].pop().groups));
+      res.request = req;
+      if (false) {}
+      await handle(req, res, next);
+      if (false) {}
+    });
+  }
 
-src_pino.ufloat16 = src_pino.number.currying({ min: 0, max: MAX_USHORT });
+  async notfound(req, res, next) {
+    res.status = 404;
+    res.statusText = 'not found';
+    res.body = '';
+  }
 
-src_pino.ufloat32 = src_pino.number.currying({ min: 0, max: MAX_UINT });
+  getHandler() {
+    let nextMiddleware = this.notfound;
+    for (let i = this.middlewares.length - 1; i >= 0; i--) {
+      const middleware = this.middlewares[i];
+      const next = nextMiddleware;
+      nextMiddleware = async (req, res) => await middleware(req, res, next);
+    }
+    return nextMiddleware;
+  }
 
-src_pino.ufloat64 = src_pino.number.currying({ min: 0, max: MAX_UBIGINT });
+  async handle(req) {
+    if (this.handler === null) {
+      this.handler = this.getHandler();
+    }
+    req.uri = new window.URL(req.url, window.location.href);
+    entries2props(req.headers);
+    req.query = entries2props(new window.URLSearchParams(req.uri.search));
+    req.form = new window.URLSearchParams();
+    if (req.method === 'POST' && req.headers.get('Content-Type')) {
+      if (req.headers.get('Content-Type').startsWith('application/x-www-form-urlencoded')) {
+        req.form = entries2props(new window.URLSearchParams(req.body));
+      } else if (req.headers.get('Content-Type').startsWith('application/json')) {
+        req.form = JSON.parse(req.body);
+      }
+    }
+    req.body = req.body ? req.body : '';
+    const res = new window.Response();
+    Object.defineProperties(res, {
+      url: { configurable: true, enumerable: false, value: '', writable: true },
+      status: { configurable: true, enumerable: false, value: 200, writable: true },
+      statusText: { configurable: true, enumerable: false, value: 'OK', writable: true },
+      body: { configurable: true, enumerable: false, value: '', writable: true },
+    });
+    res.url = req.url;
+    res.send = function(data) {
+      this.body = data;
+    };
+    res.json = function(data) {
+      this.body = JSON.stringify(data);
+    };
+    await this.handler(req, res);
+    entries2props(res.headers);
+    res.text = async function() {
+      return this.body;
+    };
+    res.json = async function() {
+      return JSON.parse(this.body);
+    };
+    return res;
+  }
+}
 
-src_pino.int = src_pino.number.currying({ min: MIN_INT, max: MAX_INT, decimal: 0 });
+module.exports = Server;
 
-src_pino.int8 = src_pino.number.currying({ min: MIN_BYTE, max: MAX_BYTE, decimal: 0 });
 
-src_pino.int16 = src_pino.number.currying({ min: MIN_SHORT, max: MAX_SHORT, decimal: 0 });
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
 
-src_pino.int32 = src_pino.number.currying({ min: MIN_INT, max: MAX_INT, decimal: 0 });
+window.fetchReal = window.fetch;
 
-src_pino.int64 = src_pino.number.currying({ min: MIN_BIGINT, max: MAX_BIGINT, decimal: 0 });
+async function fetch(url, init, ...args) {
+  const req = new window.Request('', {});
+  Object.defineProperties(req, {
+    method: { configurable: true, enumerable: false, value: 'GET', writable: true },
+    url: { configurable: true, enumerable: false, value: '', writable: true },
+    body: { configurable: true, enumerable: false, value: '', writable: true },
+  });
+  req.method = init && init.method ? init.method : 'GET';
+  req.uri = new window.URL(url, window.location.href);
+  req.url = req.uri.href;
 
-src_pino.uint = src_pino.number.currying({ min: 0, max: MAX_UINT, decimal: 0 });
+  const res = await fetch.handle(req);
 
-src_pino.uint8 = src_pino.number.currying({ min: 0, max: MAX_UBYTE, decimal: 0 });
+  if (res === false || (res && res.status === 404)) {
+    return window.fetchReal(url, init, ...args);
+  }
 
-src_pino.uint16 = src_pino.number.currying({ min: 0, max: MAX_USHORT, decimal: 0 });
+  return res;
+}
 
-src_pino.uint32 = src_pino.number.currying({ min: 0, max: MAX_UINT, decimal: 0 });
-
-src_pino.uint64 = src_pino.number.currying({ min: 0, max: MAX_UBIGINT, decimal: 0 });
-
-// ====== providers ======
-
-src_pino.register = function(name, method) {
-  this[name] = method.bind(this);
-  this[name].currying = this.currying;
-}.bind(src_pino);
-
-src_pino.locales = {
-  'zh_CN': zh_CN,
+fetch.handle = async function(req) {
+  return false;
 };
 
-src_pino.locales['zh_CN'](src_pino);
+module.exports = fetch;
 
-src_pino.locale = function(locale) {
-  locale = locale.replace(/-/g, '_');
-  if (locale in locales) {
-    locales[locale](src_pino);
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+window.XMLHttpRequestReal = window.XMLHttpRequest;
+
+class XMLHttpRequest extends window.XMLHttpRequestReal {
+  constructor() {
+    // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+    super();
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Request
+    this.req = new window.Request('', {});
+    Object.defineProperties(this.req, {
+      method: { configurable: true, enumerable: false, value: 'GET', writable: true },
+      url: { configurable: true, enumerable: false, value: '', writable: true },
+      body: { configurable: true, enumerable: false, value: '', writable: true },
+    });
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Response
+    this.res = null;
+
+    Object.defineProperties(this, {
+      readyState: { configurable: true, enumerable: false, value: 4, writable: true },
+      status: { configurable: true, enumerable: false, value: 200, writable: true },
+      statusText: { configurable: true, enumerable: false, value: 'OK', writable: true },
+      responseText: { configurable: true, enumerable: false, value: '', writable: true },
+    });
   }
-}.bind(src_pino);
 
-// ====== Server ======
+  open(method, url, async = true, ...args) {
+    super.open(method, url, async, ...args);
+    this.req.method = method;
+    this.req.uri = new URL(url, window.location.href);
+    this.req.url = this.req.uri.href;
+  }
 
-src_pino.server = new src_Server();
+  setRequestHeader(name, value) {
+    super.setRequestHeader(name, value);
+    this.req.headers.set(name, value);
+  }
 
-src_pino.use = src_pino.server.use.bind(src_pino.server);
-src_pino.get = src_pino.server.get.bind(src_pino.server);
-src_pino.post = src_pino.server.post.bind(src_pino.server);
-src_pino.put = src_pino.server.put.bind(src_pino.server);
-src_pino.delete = src_pino.server.delete.bind(src_pino.server);
-src_pino.route = src_pino.server.route.bind(src_pino.server);
-
-src_pino.servers = [src_pino.server];
-
-src_pino.addServer = function(server) {
-  this.servers.push(server);
-}.bind(src_pino);
-
-src_pino.handle = async function(req) {
-  for (const server of this.servers) {
-    if (server.isHost(req.uri.host)) {
-      return await server.handle(req);
+  getAllResponseHeaders() {
+    let headers = '';
+    for (const [name, value] of this.res.headers.entries()) {
+      headers += `${name}: ${value}\r\n`;
     }
+    return headers;
   }
+
+  getResponseHeader(name) {
+    return this.req.headers.get(name);
+  }
+
+  async send(value = '') {
+    this.req.headers.set('Host', this.req.uri.host);
+    this.req.headers.set('User-Agent', window.navigator.userAgent);
+    this.req.headers.set('Accept', '*/*');
+    this.req.headers.set('Referer', window.location.href);
+    this.req.headers.set('Accept-Language', window.navigator.language);
+    this.req.headers.set('Cookie', window.document.cookie);
+    this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+    this.req.body = value;
+
+    this.res = await XMLHttpRequest.handle(this.req);
+
+    if (this.res === false || this.res && this.res.status === 404) {
+      return super.send(value);
+    }
+
+    this.readyState = 4;
+    this.status = this.res.status;
+    this.statusText = this.res.statusText;
+    this.responseText = this.res.body;
+
+    setTimeout(() => {
+      if (this.onload) {
+        this.onload();
+      } else if (this.onreadystatechange) {
+        this.onreadystatechange();
+      } else {
+        throw new Error('not found onload and onreadystatechange!');
+      }
+    }, XMLHttpRequest.delay);
+  }
+}
+
+XMLHttpRequest.delay = 200;
+
+XMLHttpRequest.handle = async function(req) {
   return false;
-}.bind(src_pino);
+};
 
-// ====== mount ======
-
-src_pino.Server = src_Server;
-src_pino.Server.handle = src_pino.handle;
-
-src_pino.XMLHttpRequest = src_XMLHttpRequest;
-src_pino.XMLHttpRequest.handle = src_pino.handle;
-
-src_pino.fetch = src_fetch;
-src_pino.fetch.handle = src_pino.handle;
-
-// ====== export ======
-
-/* harmony default export */ var src = __webpack_exports__["default"] = (src_pino);
-var src_Server_0 = src_Server;
-var src_XMLHttpRequest_0 = src_XMLHttpRequest;
-var src_fetch_0 = src_fetch;
+module.exports = XMLHttpRequest;
 
 
 /***/ })
-/******/ ])["default"];
+/******/ ]);
 });
 //# sourceMappingURL=pino.js.map

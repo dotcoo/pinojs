@@ -88,6 +88,4 @@ XMLHttpRequest.handle = async function(req) {
   return false;
 };
 
-window.XMLHttpRequest = XMLHttpRequest;
-
-export default XMLHttpRequest;
+module.exports = XMLHttpRequest;
