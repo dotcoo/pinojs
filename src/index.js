@@ -24,7 +24,7 @@ pino.a2f = function(args) {
 pino.currying = function(...cargs) {
   const method = this;
   const func = function(...args) {
-    return method(...cargs, ...args)
+    return method(...cargs, ...args);
   }.bind(pino);
   func.currying = pino.currying;
   return func;
@@ -286,7 +286,6 @@ pino.locale(require('./providers/zh_CN'));
 // ====== Server fetch XMLHttpRequest ======
 
 if (typeof window !== 'undefined') {
-
   // ====== Server ======
 
   const Server = require('./Server');

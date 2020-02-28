@@ -61,7 +61,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
 
     this.res = await XMLHttpRequest.handle(this.req);
 
-    if (this.res === false || this.res && this.res.status === 404) {
+    if (this.res === false || (this.res && this.res.status === 404)) {
       return super.send(value);
     }
 

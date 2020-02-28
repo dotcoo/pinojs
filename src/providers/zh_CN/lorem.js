@@ -41,7 +41,7 @@ function word() {
 function text(len = 200) {
   const proba = this.probability(['，', 8], ['。', 2]);
   let text = '';
-  while(text.length < len) {
+  while (text.length < len) {
     text += this.range(this.int({ min: 3, max: 9 }), this.word).join('') + proba();
   }
   return text.substr(0, len - 1) + '。';

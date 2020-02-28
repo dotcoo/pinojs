@@ -1,7 +1,7 @@
 const internet_free_email_domains = [
   'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com',
   '163.com', '126.com', 'yeah.net', 'qq.com', 'foxmail.com',
-  'sina.com.cn', 'sohu.com', 
+  'sina.com.cn', 'sohu.com',
 ];
 
 const internet_protocols = [
@@ -39,7 +39,7 @@ function domain_name(domain_name = null) {
 }
 
 function domain_host() {
-  return this.pick(internet_hosts);;
+  return this.pick(internet_hosts);
 }
 
 function domain(domain_name = null) {
