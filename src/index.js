@@ -27,9 +27,31 @@ pino.currying = function(...cargs) {
     return method(...cargs, ...args);
   }.bind(pino);
   func.currying = pino.currying;
+  func.unique = pino.unique;
   return func;
 };
 pino.currying.bind = () => {};
+
+pino.unique = function() {
+  const method = this;
+  const values = new Set();
+  const func = function(...args) {
+    let i = 0;
+    while (i < values.size * 2 + 100) {
+      const value = method(...args);
+      if (!values.has(value)) {
+        values.add(value);
+        return value;
+      }
+      i++;
+    }
+    throw new Error('Maximum number of cycles exceeded!');
+  }.bind(pino);
+  // func.currying = pino.currying;
+  // func.unique = pino.unique;
+  return func;
+};
+pino.unique.bind = () => {};
 
 // ====== types ======
 
@@ -37,6 +59,7 @@ pino.bool = function() {
   return Math.floor(Math.random() * MAX_INT) % 2 === 1;
 }.bind(pino);
 pino.bool.currying = pino.currying;
+pino.bool.unique = pino.unique;
 pino.boolean = pino.bool;
 
 pino.number = function(...args) {
@@ -53,6 +76,7 @@ pino.number = function(...args) {
   return n;
 }.bind(pino);
 pino.number.currying = pino.currying;
+pino.number.unique = pino.unique;
 
 pino.string = function(...args) {
   if (args.length > 0 && typeof args[0] === 'number') {
@@ -70,6 +94,7 @@ pino.string = function(...args) {
   return str;
 }.bind(pino);
 pino.string.currying = pino.currying;
+pino.string.unique = pino.unique;
 
 // ====== range ======
 
@@ -171,6 +196,7 @@ pino.normal = function (u = 0, a = 1, size = 0) {
   throw new Error('like numpy.normal, but not implemented!');
 }.bind(pino);
 pino.normal.currying = pino.currying;
+pino.normal.unique = pino.unique;
 
 // Fisher–Yates https://bost.ocks.org/mike/shuffle/compare.html
 pino.shuffle = function(arr) {
@@ -275,6 +301,7 @@ pino.uint64 = pino.number.currying({ min: 0, max: MAX_UBIGINT, decimal: 0 });
 pino.register = function(name, method) {
   this[name] = method.bind(this);
   this[name].currying = this.currying;
+  this[name].unique = this.unique;
 }.bind(pino);
 
 pino.locale = function(locale) {
