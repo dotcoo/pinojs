@@ -49,30 +49,35 @@ const company_suffixes = [
 ];
 
 function company_name() {
-  return this.pick(company_names);
+  return this.pick(this.company_names);
 }
 
 function company_name_pinyin(name = null) {
-  return name ? company_names_pinyin[company_names.indexOf(name)] : this.pick(company_names_pinyin);
+  return name ? this.company_names_pinyin[this.company_names.indexOf(name)] : this.pick(this.company_names_pinyin);
 }
 
 function company_type() {
-  return this.pick(company_types);
+  return this.pick(this.company_types);
 }
 
 function company_suffix() {
-  return this.pick(company_suffixes);
+  return this.pick(this.company_suffixes);
 }
 
 function company() {
-  return `${this.city_name()}${this.pick(company_names)}${this.pick(company_types)}${this.pick(company_suffixes)}`;
+  return `${this.city_name()}${this.pick(this.company_names)}${this.pick(this.company_types)}${this.pick(this.company_suffixes)}`;
 }
 
 function company_short() {
-  return `${this.pick(company_names)}${this.pick(company_types)}`;
+  return `${this.pick(this.company_names)}${this.pick(this.company_types)}`;
 }
 
 module.exports = function(pino) {
+  pino.company_names = company_names;
+  pino.company_names_pinyin = company_names_pinyin;
+  pino.company_types = company_types;
+  pino.company_suffixes = company_suffixes;
+
   pino.register('company_name', company_name);
   pino.register('company_name_pinyin', company_name_pinyin);
   pino.register('company_type', company_type);

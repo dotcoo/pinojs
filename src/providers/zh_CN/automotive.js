@@ -38,20 +38,28 @@ const automotive_names = [
   '云', '藏', '陕', '甘', '青', '宁', '新',
 ];
 
-function license_plate(province = null, city = this.string({ len: 1, chars: 'ABCDEFGHJKLMNPQRSTUVWXYZ' })) {
-  let license_plate = '';
-  if (province && province.substr(0, 2) in automotive_provinces) {
-    license_plate += automotive_provinces[province.substr(0, 2)];
-  } else if (province) {
-    license_plate += province;
-  } else {
-    license_plate += this.pick(automotive_names);
-  }
-  license_plate += city;
-  license_plate += this.string({ len: 5, chars: 'ABCDEFGHJKLMNPQRSTUVWXYZ01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789' });
-  return license_plate;
+function license_plate_p2n(province) {
+  return this.automotive_names[province.substring(0, 2)];
+}
+
+function license_plate_province() {
+  return this.pick(this.automotive_names);
+}
+
+function license_plate_city() {
+  return this.string(1, 'ABCDEFGHJKLMNPQRSTUVWXYZ');
+}
+
+function license_plate() {
+  return this.pick(this.automotive_names) + this.string(1, 'ABCDEFGHJKLMNPQRSTUVWXYZ') + this.string(5, 'ABCDEFGHJKLMNPQRSTUVWXYZ01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789');
 }
 
 module.exports = function(pino) {
+  pino.automotive_provinces = automotive_provinces;
+  pino.automotive_names = automotive_names;
+
+  pino.register('license_plate_p2n', license_plate_p2n);
+  pino.register('license_plate_province', license_plate_province);
+  pino.register('license_plate_city', license_plate_city);
   pino.register('license_plate', license_plate);
 };

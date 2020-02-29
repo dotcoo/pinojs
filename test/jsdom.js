@@ -1,4 +1,4 @@
-const { JSDOM, ResourceLoader } = require("jsdom");
+const { JSDOM } = require('jsdom');
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -11,9 +11,9 @@ const html = `<!DOCTYPE html>
 </html>`;
 
 const options = {
-  url: "http://localhost/",
-  referrer: "http://localhost/",
-  contentType: "text/html",
+  url: 'http://localhost/',
+  referrer: 'http://localhost/',
+  contentType: 'text/html',
   includeNodeLocations: true,
   storageQuota: 10000000,
 };
@@ -48,7 +48,7 @@ class XMLHttpRequest {
   }
 
   setRequestHeader(name, value) {
-    this.headers.set(name, value)
+    this.headers.set(name, value);
   }
 
   send() {

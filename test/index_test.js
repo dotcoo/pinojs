@@ -2,8 +2,10 @@
 
 console.log(pino.bool(), pino.boolean()); // true false // 随机出现 true 和 false
 
+// pino.number(min, max, dotlen);
 console.log(pino.number()); // 725529809.7393556
 
+// pino.string(len, chars);
 console.log(pino.string(10)); // pm7s6eyg29
 
 // 其它
@@ -16,44 +18,29 @@ console.log(pino.int(), pino.int8(), pino.int16(), pino.int32(), pino.int64()); 
 
 console.log(pino.uint(), pino.uint8(), pino.uint16(), pino.uint32(), pino.uint64()); // 1886266343 88 12053 40027370 4276249758040316
 
-// ### 参数
-
-console.log(pino.bool(), pino.boolean()); // true false // bool boolean 方法没有参数
-
-console.log(pino.number({
-  min: 60, // 最小值 (包含)
-  max: 80, // 最大值 (不包含)
-  decimal: 2, // 保留两位小数
-})); // 75.92
-
-// float int 方法与 number 方法参数一致
-
-console.log(pino.string({
-  len: 8, // 长度
-  chars: '0123456789abcdefghijklmnopqrstuvwxyz', // 字符
-})); // pm7s6eyg
-
 // ### 柯里化
 
 // 随机多个数据
 
 const scores = [];
 for (let i = 0; i < 35; i++) {
-  scores.push(pino.int({ min: 0, max: 101 }));
+  scores.push(pino.number(0, 101, 1));
 }
 console.log(scores);
 
 // 每次传入参数比较麻烦, 可以使用柯里化把参数绑定进去
 
-const score = pino.int.currying({ min: 0, max: 101 });
+const score = pino.number.currying(0, 101, 1);
 for (let i = 0; i < 35; i++) {
   scores.push(score()); // 更容易理解
 }
 console.log(scores);
 
+// 为什么要这么做呢? 主要是配合
+
 // ### 生成对象
 
-const age = pino.int.currying({ min: 18, max: 25 });
+const age = pino.number.currying(18, 25, 0);
 
 const user = {
   username: pino.string(10),
@@ -108,7 +95,7 @@ console.log({
       gender: pino.bool(), // true -> 男, false -> 女
       age: age(),
       score: score(),
-    })),   
+    })),
     total: 83,
   },
 });
@@ -148,9 +135,9 @@ const gender_probability = pino.probability(
 );
 
 const score_probability = pino.probability(
-  [pino.int.currying({ min: 0, max: 60 }), 3], // 不及格, 比例: `6.52173%`, 计算公式: `3 / (3 + 9 + 32 + 2)`
-  [pino.int.currying({ min: 60, max: 80 }), 9], // 及格, 比例: `19.56521%`, 计算公式: `9 / (3 + 9 + 32 + 2)`
-  [pino.int.currying({ min: 80, max: 100 }), 32], // 优秀, 这里使用了柯里化, 在柯里化函数执行的时候会随机返回对应范围的数据
+  [pino.number.currying(0, 60, 0), 3], // 不及格, 比例: `6.52173%`, 计算公式: `3 / (3 + 9 + 32 + 2)`
+  [pino.number.currying(60, 80, 0), 9], // 及格, 比例: `19.56521%`, 计算公式: `9 / (3 + 9 + 32 + 2)`
+  [pino.number.currying(80, 100, 0), 32], // 优秀, 这里使用了柯里化, 在柯里化函数执行的时候会随机返回对应范围的数据
   [100, 2], // 满分, 为什么需要添加这一行呢? 因为数值返回是 `[min，max)`, 包含 min, 不包含 max, 所以需要这一行
 );
 
@@ -228,7 +215,7 @@ console.log(pino.range(10, pino.rgba_colorful));
 
 // ### 公司
 
-const company_names = pino.range(10, pino.company_name)
+const company_names = pino.range(10, pino.company_name);
 
 console.log(company_names);
 

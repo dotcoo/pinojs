@@ -35,19 +35,21 @@ const lorem_words = [
 ];
 
 function word() {
-  return this.pick(lorem_words);
+  return this.pick(this.lorem_words);
 }
 
 function text(len = 200) {
   const proba = this.probability(['，', 8], ['。', 2]);
   let text = '';
   while (text.length < len) {
-    text += this.range(this.int({ min: 3, max: 9 }), this.word).join('') + proba();
+    text += this.range(this.number(3, 9, 0), this.word).join('') + proba();
   }
   return text.substr(0, len - 1) + '。';
 }
 
 module.exports = function(pino) {
+  pino.lorem_words = lorem_words;
+
   pino.register('word', word);
   pino.register('text', text);
 };

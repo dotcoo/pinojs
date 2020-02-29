@@ -19,106 +19,73 @@ const pino = {};
 
 pino.a2f = function(args) {
   return args.length > 0 && typeof args[args.length - 1] === 'function' && args[args.length - 1].constructor === Function ? args.pop() : false;
-}.bind(pino);
+};
 
-pino.currying = function(...cargs) {
-  const method = this;
-  const func = function(...args) {
-    return method(...cargs, ...args);
-  }.bind(pino);
+pino.unique = function() {
+  const values = new Set();
+  return (...args) => {
+    for (let max = values.size * 2 + 100, i = 0; i < max; i++) {
+      const value = this(...args);
+      if (values.has(value)) {
+        continue;
+      }
+      values.add(value);
+      return value;
+    }
+    throw new Error('Maximum number of cycles exceeded!');
+  };
+};
+// Function.prototype.unique = pino.unique;
+
+pino.currying = function(...args) {
+  const func = this.bind(pino, ...args);
   func.currying = pino.currying;
   func.unique = pino.unique;
   return func;
 };
-pino.currying.bind = () => {};
-
-pino.unique = function() {
-  const method = this;
-  const values = new Set();
-  const func = function(...args) {
-    let i = 0;
-    while (i < values.size * 2 + 100) {
-      const value = method(...args);
-      if (!values.has(value)) {
-        values.add(value);
-        return value;
-      }
-      i++;
-    }
-    throw new Error('Maximum number of cycles exceeded!');
-  }.bind(pino);
-  // func.currying = pino.currying;
-  // func.unique = pino.unique;
-  return func;
-};
-pino.unique.bind = () => {};
+// Function.prototype.currying = pino.currying;
 
 // ====== types ======
 
 pino.bool = function() {
   return Math.floor(Math.random() * MAX_INT) % 2 === 1;
-}.bind(pino);
-pino.bool.currying = pino.currying;
-pino.bool.unique = pino.unique;
+};
 pino.boolean = pino.bool;
 
-pino.number = function(...args) {
-  const def = {
-    min: MIN_INT,
-    max: MAX_INT,
-    decimal: -1,
-  };
-  const conf = Object.assign({}, def, ...args);
-  let n = conf.min + Math.random() * (conf.max - conf.min);
-  if (conf.decimal > -1) {
-    n = n.toFixed(conf.decimal) - 0;
-  }
-  return n;
-}.bind(pino);
-pino.number.currying = pino.currying;
-pino.number.unique = pino.unique;
-
-pino.string = function(...args) {
-  if (args.length > 0 && typeof args[0] === 'number') {
-    args[0] = { len: args[0] };
-  }
-  const def = {
-    len: 8,
-    chars: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-  };
-  const conf = Object.assign({}, def, ...args);
+pino.string = function(len = 8, chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
   let str = '';
-  for (let i = 0; i < conf.len; i++) {
-    str += conf.chars.charAt(Math.random() * conf.chars.length | 0);
+  for (let i = 0; i < len; i++) {
+    str += chars.charAt(Math.random() * chars.length | 0);
   }
   return str;
-}.bind(pino);
+};
 pino.string.currying = pino.currying;
 pino.string.unique = pino.unique;
 
+pino.number = function(min = MIN_INT, max = MAX_INT, decimal = -1) {
+  let n = min + Math.random() * (max - min);
+  if (decimal > -1) {
+    n = n.toFixed(decimal) - 0;
+  }
+  return n;
+};
+pino.number.currying = pino.currying;
+pino.number.unique = pino.unique;
+
+pino.pick = function(...args) {
+  args = args.flat();
+  return args[Math.random() * MAX_UINT % args.length | 0];
+};
+pino.pick.currying = pino.currying;
+pino.pick.unique = pino.unique;
+
 // ====== range ======
-
-pino.empty = function(size = 0) {
-  return new Array(size);
-}.bind(pino);
-
-pino.zeros = function(size = 0) {
-  return new Array(size).fill(0);
-}.bind(pino);
-
-pino.ones = function(size = 0) {
-  return new Array(size).fill(1);
-}.bind(pino);
-
-pino.fill = function(size = 0, value = 0) {
-  return new Array(size).fill(value);
-}.bind(pino);
 
 pino.range = function(...args) {
   let start = 0;
   let end = 0;
   let step = 1;
-  const f = this.a2f(args) || ((i, arr) => i);
+  const f = pino.a2f(args) || ((i, arr) => i);
   if (args.length === 1) {
     end = args[0];
   } else if (args.length === 2) {
@@ -137,66 +104,13 @@ pino.range = function(...args) {
     arr.push(f.length > 0 ? f(i, arr) : f());
   }
   return arr;
-}.bind(pino);
+};
 
 pino.page = function(total, page, pagesize, f) {
-  return this.range((page - 1) * pagesize, Math.min(page * pagesize, total), f);
-}.bind(pino);
-
-// ====== math ======
-
-pino.linspace = function(start, end, num, endpoint = true) {
-  const step = (end - start) / (num - endpoint);
-  const arr = [];
-  for (let i = 0; i < num; i++) {
-    arr.push(start + step * i);
-  }
-  return arr;
-}.bind(pino);
-
-pino.min = function(...args) {
-  return Math.min(...args);
-}.bind(pino);
-
-pino.max = function(...args) {
-  return Math.max(...args);
-}.bind(pino);
-
-pino.sum = function(...args) {
-  return args.reduce((a, c) => a + c, 0);
-}.bind(pino);
-
-pino.mean = function(...args) {
-  return this.sum(...args) / args.length;
-}.bind(pino);
-
-pino.median = function(...args) {
-  const f = this.a2f(args) || ((a, b) => a - b);
-  args.sort(f);
-  if (args.length % 2 === 0) {
-    return (args[args.length / 2 - 1] + args[args.length / 2]) / 2;
-  } else {
-    return args[Math.floor(args.length / 2)];
-  }
-}.bind(pino);
-
-pino.var = function(...args) {
-  const mean = this.mean(...args);
-  const sum = this.sum(...args.map(v => (v - mean) ** 2));
-  return sum / args.length;
-}.bind(pino);
-
-pino.std = function(...args) {
-  return Math.sqrt(this.var(...args));
-}.bind(pino);
+  return pino.range((page - 1) * pagesize, Math.min(page * pagesize, total), f);
+};
 
 // ====== probability ======
-
-pino.normal = function (u = 0, a = 1, size = 0) {
-  throw new Error('like numpy.normal, but not implemented!');
-}.bind(pino);
-pino.normal.currying = pino.currying;
-pino.normal.unique = pino.unique;
 
 // Fisher–Yates https://bost.ocks.org/mike/shuffle/compare.html
 pino.shuffle = function(arr) {
@@ -208,10 +122,10 @@ pino.shuffle = function(arr) {
     arr[i] = t;
   }
   return arr;
-}.bind(pino);
+};
 
 pino.probability_table = function(...args) {
-  const shuffle = this.a2f(args) || this.shuffle;
+  const shuffle = pino.a2f(args) || pino.shuffle;
   const tab = [];
   for (const [value, count] of args) {
     for (let i = 0; i < count; i++) {
@@ -219,94 +133,74 @@ pino.probability_table = function(...args) {
     }
   }
   return shuffle(tab);
-}.bind(pino);
+};
 
 pino.probability = function(...args) {
   let tab = [];
   let cur = 0;
   return (i, arr) => {
     if (cur >= tab.length) {
-      tab = this.probability_table(...args);
+      tab = pino.probability_table(...args);
       cur = 0;
     }
     const value = tab[cur++];
     return value && value.constructor === Function ? value(i, arr) : value;
   };
-}.bind(pino);
-
-pino.pick = function(...args) {
-  args = args.flat();
-  return args[this.uint() % args.length];
-}.bind(pino);
-
-pino.picks = function(count, ...args) {
-  args = args.flat();
-  const vals = [];
-  for (let i = 0; i < count; i++) {
-    const r = this.uint() % args.length;
-    vals.push(args[r]);
-    if (r === args.length - 1) {
-      args.pop();
-    } else {
-      args[r] = args.pop();
-    }
-  }
-  return vals;
-}.bind(pino);
+};
 
 // ====== quick ======
 
-pino.float = pino.number.currying({ min: MIN_INT, max: MAX_INT });
+pino.float = pino.number.currying(MIN_INT, MAX_INT, -1);
 
-pino.float8 = pino.number.currying({ min: MIN_BYTE, max: MAX_BYTE });
+pino.float8 = pino.number.currying(MIN_BYTE, MAX_BYTE, -1);
 
-pino.float16 = pino.number.currying({ min: MIN_SHORT, max: MAX_SHORT });
+pino.float16 = pino.number.currying(MIN_SHORT, MAX_SHORT, -1);
 
-pino.float32 = pino.number.currying({ min: MIN_INT, max: MAX_INT });
+pino.float32 = pino.number.currying(MIN_INT, MAX_INT, -1);
 
-pino.float64 = pino.number.currying({ min: MIN_BIGINT, max: MAX_BIGINT });
+pino.float64 = pino.number.currying(MIN_BIGINT, MAX_BIGINT, -1);
 
-pino.ufloat = pino.number.currying({ min: 0, max: MAX_UINT });
+pino.ufloat = pino.number.currying(0, MAX_UINT, -1);
 
-pino.ufloat8 = pino.number.currying({ min: 0, max: MAX_UBYTE });
+pino.ufloat8 = pino.number.currying(0, MAX_UBYTE, -1);
 
-pino.ufloat16 = pino.number.currying({ min: 0, max: MAX_USHORT });
+pino.ufloat16 = pino.number.currying(0, MAX_USHORT, -1);
 
-pino.ufloat32 = pino.number.currying({ min: 0, max: MAX_UINT });
+pino.ufloat32 = pino.number.currying(0, MAX_UINT, -1);
 
-pino.ufloat64 = pino.number.currying({ min: 0, max: MAX_UBIGINT });
+pino.ufloat64 = pino.number.currying(0, MAX_UBIGINT, -1);
 
-pino.int = pino.number.currying({ min: MIN_INT, max: MAX_INT, decimal: 0 });
+pino.int = pino.number.currying(MIN_INT, MAX_INT, 0);
 
-pino.int8 = pino.number.currying({ min: MIN_BYTE, max: MAX_BYTE, decimal: 0 });
+pino.int8 = pino.number.currying(MIN_BYTE, MAX_BYTE, 0);
 
-pino.int16 = pino.number.currying({ min: MIN_SHORT, max: MAX_SHORT, decimal: 0 });
+pino.int16 = pino.number.currying(MIN_SHORT, MAX_SHORT, 0);
 
-pino.int32 = pino.number.currying({ min: MIN_INT, max: MAX_INT, decimal: 0 });
+pino.int32 = pino.number.currying(MIN_INT, MAX_INT, 0);
 
-pino.int64 = pino.number.currying({ min: MIN_BIGINT, max: MAX_BIGINT, decimal: 0 });
+pino.int64 = pino.number.currying(MIN_BIGINT, MAX_BIGINT, 0);
 
-pino.uint = pino.number.currying({ min: 0, max: MAX_UINT, decimal: 0 });
+pino.uint = pino.number.currying(0, MAX_UINT, 0);
 
-pino.uint8 = pino.number.currying({ min: 0, max: MAX_UBYTE, decimal: 0 });
+pino.uint8 = pino.number.currying(0, MAX_UBYTE, 0);
 
-pino.uint16 = pino.number.currying({ min: 0, max: MAX_USHORT, decimal: 0 });
+pino.uint16 = pino.number.currying(0, MAX_USHORT, 0);
 
-pino.uint32 = pino.number.currying({ min: 0, max: MAX_UINT, decimal: 0 });
+pino.uint32 = pino.number.currying(0, MAX_UINT, 0);
 
-pino.uint64 = pino.number.currying({ min: 0, max: MAX_UBIGINT, decimal: 0 });
+pino.uint64 = pino.number.currying(0, MAX_UBIGINT, 0);
 
 // ====== providers ======
 
 pino.register = function(name, method) {
-  this[name] = method.bind(this);
-  this[name].currying = this.currying;
-  this[name].unique = this.unique;
-}.bind(pino);
+  pino[name] = method.bind(pino);
+  pino[name].currying = pino.currying;
+  pino[name].unique = pino.unique;
+};
 
 pino.locale = function(locale) {
   locale(pino);
-}.bind(pino);
+};
 
 pino.locale(require('./providers/zh_CN'));
 
@@ -329,17 +223,17 @@ if (typeof window !== 'undefined') {
   pino.servers = [pino.server];
 
   pino.addServer = function(server) {
-    this.servers.push(server);
-  }.bind(pino);
+    pino.servers.push(server);
+  };
 
   pino.handle = async function(req) {
-    for (const server of this.servers) {
+    for (const server of pino.servers) {
       if (server.isHost(req.uri.host)) {
         return await server.handle(req);
       }
     }
     return false;
-  }.bind(pino);
+  };
 
   pino.Server = Server;
   pino.Server.handle = pino.handle;
@@ -361,7 +255,7 @@ if (typeof window !== 'undefined') {
   pino.setup = function() {
     window.XMLHttpRequest = XMLHttpRequest;
     window.fetch = fetch;
-  }.bind(pino);
+  };
 }
 
 // ====== export ======

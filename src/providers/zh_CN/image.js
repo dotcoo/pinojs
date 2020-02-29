@@ -1,5 +1,5 @@
-function image_url(...args) {
-  const def = {
+function image_url(options) {
+  const opts = {
     width: 600,
     height: 400,
     background: 0,
@@ -7,16 +7,16 @@ function image_url(...args) {
     format: 'png',
     text: '',
   };
-  const conf = Object.assign({}, def, ...args);
-  conf.background = conf.background.replace('#', '');
-  conf.foreground = conf.foreground.replace('#', '');
-  return `https://dummyimage.com/${conf.width}x${conf.height}/${conf.background}/${conf.foreground}.${conf.format}?text=${encodeURIComponent(conf.text)}`;
+  Object.assign(opts, options);
+  opts.background = opts.background.replace('#', '');
+  opts.foreground = opts.foreground.replace('#', '');
+  return `https://dummyimage.com/${opts.width}x${opts.height}/${opts.background}/${opts.foreground}.${opts.format}?text=${encodeURIComponent(opts.text)}`;
 }
 
 let canvas = null;
 let ctx = null;
 
-function image_data_url(...args) {
+function image_data_url(options) {
   if (typeof window === 'undefined') {
     return '';
   }
@@ -24,7 +24,7 @@ function image_data_url(...args) {
     canvas = window.document.createElement('canvas');
     ctx = canvas.getContext('2d');
   }
-  const def = {
+  const opts = {
     width: 600,
     height: 400,
     background: this.colorful(),
@@ -32,20 +32,20 @@ function image_data_url(...args) {
     text: '',
     font: '',
   };
-  const conf = Object.assign({}, def, ...args);
-  ctx.clearRect(0, 0, conf.width, conf.height);
-  conf.text = conf.text ? conf.text : `${conf.width}x${conf.height}`;
-  conf.textlen = conf.text.split('').map(c => encodeURIComponent(c).length <= 3 ? 1 : 1.2).reduce((a, c) => a + c, 0);
-  conf.font = conf.font ? conf.font : `bold ${Math.floor(conf.width / (conf.textlen))}px '微软雅黑'`;
-  canvas.width = conf.width;
-  canvas.height = conf.height;
-  ctx.fillStyle = conf.background;
-  ctx.fillRect(0, 0, conf.width, conf.height);
-  ctx.font = conf.font;
+  Object.assign(opts, options);
+  ctx.clearRect(0, 0, opts.width, opts.height);
+  opts.text = opts.text ? opts.text : `${opts.width}x${opts.height}`;
+  opts.textlen = opts.text.split('').map(c => encodeURIComponent(c).length <= 3 ? 1 : 1.2).reduce((a, c) => a + c, 0);
+  opts.font = opts.font ? opts.font : `bold ${Math.floor(opts.width / (opts.textlen))}px '微软雅黑'`;
+  canvas.width = opts.width;
+  canvas.height = opts.height;
+  ctx.fillStyle = opts.background;
+  ctx.fillRect(0, 0, opts.width, opts.height);
+  ctx.font = opts.font;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = conf.foreground;
-  ctx.fillText(conf.text, Math.floor(conf.width / 2), Math.floor(conf.height / 2));
+  ctx.fillStyle = opts.foreground;
+  ctx.fillText(opts.text, Math.floor(opts.width / 2), Math.floor(opts.height / 2));
   return canvas.toDataURL();
 }
 
@@ -85,7 +85,7 @@ function image_random_matrix(width, height, ratio = 0.4) {
   return matrix;
 }
 
-function image_avatar(...args) {
+function image_avatar(options) {
   if (typeof window === 'undefined') {
     return '';
   }
@@ -93,7 +93,7 @@ function image_avatar(...args) {
     canvas = window.document.createElement('canvas');
     ctx = canvas.getContext('2d');
   }
-  const def = {
+  const opts = {
     width: 360, // 图片宽度
     height: 360, // 图片高度
     padding: 20, // 边距
@@ -104,20 +104,20 @@ function image_avatar(...args) {
     color: null, // 颜色
     ratio: 0.4, // 填充比例
   };
-  const conf = Object.assign({}, def, ...args);
-  ctx.clearRect(0, 0, conf.width, conf.height);
-  conf.dot_cols = conf.dot_cols === null ? conf.dot : conf.dot_cols;
-  conf.dot_rows = conf.dot_rows === null ? conf.dot : conf.dot_rows;
-  conf.color = this.colorful(conf.diff);
-  canvas.width = conf.width;
-  canvas.height = conf.height;
-  ctx.fillStyle = conf.color;
-  const dot_width = (conf.width - conf.padding * 2) / conf.dot_cols;
-  const dot_height = (conf.height - conf.padding * 2) / conf.dot_rows;
-  for (const [i, v] of this.image_random_matrix(conf.dot_cols, conf.dot_rows, conf.ratio).entries()) {
+  Object.assign(opts, options);
+  ctx.clearRect(0, 0, opts.width, opts.height);
+  opts.dot_cols = opts.dot_cols === null ? opts.dot : opts.dot_cols;
+  opts.dot_rows = opts.dot_rows === null ? opts.dot : opts.dot_rows;
+  opts.color = this.colorful(opts.diff);
+  canvas.width = opts.width;
+  canvas.height = opts.height;
+  ctx.fillStyle = opts.color;
+  const dot_width = (opts.width - opts.padding * 2) / opts.dot_cols;
+  const dot_height = (opts.height - opts.padding * 2) / opts.dot_rows;
+  for (const [i, v] of this.image_random_matrix(opts.dot_cols, opts.dot_rows, opts.ratio).entries()) {
     if (v) {
-      const x = Math.floor(conf.padding + dot_width * (i % conf.dot_cols));
-      const y = Math.floor(conf.padding + dot_height * (i / conf.dot_rows | 0));
+      const x = Math.floor(opts.padding + dot_width * (i % opts.dot_cols));
+      const y = Math.floor(opts.padding + dot_height * (i / opts.dot_rows | 0));
       ctx.fillRect(x, y, Math.ceil(dot_width), Math.ceil(dot_height));
     }
   }

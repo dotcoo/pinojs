@@ -134,15 +134,15 @@ const address_communities = [
 ];
 
 function country() {
-  return this.pick(address_countries);
+  return this.pick(this.address_countries);
 }
 
 function province() {
-  return this.pick(address_provinces);
+  return this.pick(this.address_provinces);
 }
 
 function city_name() {
-  return this.pick(address_cities);
+  return this.pick(this.address_cities);
 }
 
 function city_suffix() {
@@ -150,63 +150,63 @@ function city_suffix() {
 }
 
 function city() {
-  return this.pick(address_cities) + '市';
+  return this.pick(this.address_cities) + '市';
 }
 
 function district_name() {
-  return this.pick(address_districts);
+  return this.pick(this.address_districts);
 }
 
 function district_suffix() {
-  return this.pick(address_districts_suffixes);
+  return this.pick(this.address_districts_suffixes);
 }
 
 function district() {
-  return this.pick(address_districts) + this.pick(address_districts_suffixes);
+  return this.pick(this.address_districts) + this.pick(this.address_districts_suffixes);
 }
 
 function street_name() {
-  return this.pick(address_streets);
+  return this.pick(this.address_streets);
 }
 
 function street_number() {
-  return this.uint({ min: 1, max: 366 }) + '号';
+  return this.number(1, 366, 0) + '号';
 }
 
 function street() {
-  return this.pick(address_streets) + this.street_number();
+  return this.pick(this.address_streets) + this.street_number();
 }
 
 function building_name() {
-  return this.pick(address_buildings);
+  return this.pick(this.address_buildings);
 }
 
 function building_unit() {
-  return this.pick(address_buildings_units);
+  return this.pick(this.address_buildings_units);
 }
 
 function building_number() {
-  return this.uint({ min: 1, max: 31 }) + this.uint({ min: 1, max: 31 }).toString().padStart(2, 0) + '室';
+  return this.number(1, 31, 0) + this.number(1, 31, 0).toString().padStart(2, 0) + '室';
 }
 
 function building() {
-  return this.pick(address_buildings) + this.pick(address_buildings_units) + this.building_number();
+  return this.pick(this.address_buildings) + this.pick(this.address_buildings_units) + this.building_number();
 }
 
 function community_name() {
-  return this.pick(address_communities);
+  return this.pick(this.address_communities);
 }
 
 function community_unit() {
-  return this.uint({ min: 1, max: 7 }) + '号楼' + this.uint({ min: 1, max: 4 }) + '单元';
+  return this.number(1, 7, 0) + '号楼' + this.number(1, 4, 0) + '单元';
 }
 
 function community_number() {
-  return this.uint({ min: 1, max: 21 }) + '楼' + this.uint({ min: 1, max: 121 }) + '号';
+  return this.number(1, 21, 0) + '楼' + this.number(1, 121, 0) + '号';
 }
 
 function community() {
-  return this.pick(address_communities) + this.community_unit() + this.community_number();
+  return this.pick(this.address_communities) + this.community_unit() + this.community_number();
 }
 
 function office_address() {
@@ -222,10 +222,20 @@ function address() {
 }
 
 function postcode() {
-  return this.int({ min: 100000, max: 999999 });
+  return this.number(100000, 999999, 0);
 }
 
 module.exports = function(pino) {
+  pino.address_countries = address_countries;
+  pino.address_provinces = address_provinces;
+  pino.address_cities = address_cities;
+  pino.address_districts = address_districts;
+  pino.address_districts_suffixes = address_districts_suffixes;
+  pino.address_streets = address_streets;
+  pino.address_buildings = address_buildings;
+  pino.address_buildings_units = address_buildings_units;
+  pino.address_communities = address_communities;
+
   pino.register('country', country);
   pino.register('province', province);
   pino.register('city_name', city_name);

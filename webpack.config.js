@@ -6,7 +6,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const config = {
   mode: 'development',
   entry: {
-    'pino': path.join(__dirname, './src/index.js'),
+    pino: path.join(__dirname, './src/index.js'),
     'pino.min': path.join(__dirname, './src/index.js'),
   },
   output: {

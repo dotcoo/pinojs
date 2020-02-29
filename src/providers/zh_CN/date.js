@@ -36,16 +36,10 @@ function date_format(date, format = 'y-m-d h:i:s') {
   return format.replace(/y/ig, y).replace(/m/ig, m).replace(/d/ig, d).replace(/h/ig, h).replace(/i/ig, i).replace(/s/ig, s);
 }
 
-function date(...args) {
-  const def = {
-    start: 0,
-    end: 4294967295000,
-    format: 'y-m-d h:i:s',
-  };
-  const conf = Object.assign({}, def, ...args);
-  conf.start = this.date_expr(conf.start);
-  conf.end = this.date_expr(conf.end);
-  return this.date_format(new Date(this.int({ min: conf.start.getTime(), max: conf.end.getTime() })), conf.format);
+function date(start = 0, end = 4294967295000, format = 'y-m-d h:i:s') {
+  start = this.date_expr(start);
+  end = this.date_expr(end);
+  return this.date_format(new Date(this.number(start.getTime(), end.getTime(), 0)), format);
 }
 
 module.exports = function(pino) {

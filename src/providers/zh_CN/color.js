@@ -26,7 +26,7 @@ const color_names = [
 ];
 
 function color_name() {
-  return this.pick(color_names);
+  return this.pick(this.color_names);
 }
 
 function color() {
@@ -64,27 +64,29 @@ function random_colorful(diff = 160) {
   }
 }
 
-function colorful(diff = 160) {
-  const [r, g, b] = this.random_colorful(diff);
+function colorful() {
+  const [r, g, b] = this.random_colorful();
   return `#${r.toString(16).padStart(2, 0)}${g.toString(16).padStart(2, 0)}${b.toString(16).padStart(2, 0)}`;
 }
 
-function hex_colorful(diff = 160) {
-  const [r, g, b] = this.random_colorful(diff);
+function hex_colorful() {
+  const [r, g, b] = this.random_colorful();
   return `#${r.toString(16).padStart(2, 0)}${g.toString(16).padStart(2, 0)}${b.toString(16).padStart(2, 0)}`;
 }
 
-function rgb_colorful(diff = 160) {
-  const [r, g, b] = this.random_colorful(diff);
+function rgb_colorful() {
+  const [r, g, b] = this.random_colorful();
   return `rgb(${r},${g},${b})`;
 }
 
-function rgba_colorful(diff = 160) {
-  const [r, g, b, a] = this.random_colorful(diff);
+function rgba_colorful() {
+  const [r, g, b, a] = this.random_colorful();
   return `rgba(${r},${g},${b},${a})`;
 }
 
 module.exports = function(pino) {
+  pino.color_names = color_names;
+
   pino.register('color_name', color_name);
   pino.register('color', color);
   pino.register('hex_color', hex_color);

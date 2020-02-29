@@ -11,7 +11,10 @@ module.exports = {
   ],
   globals: {
     Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly'
+    SharedArrayBuffer: 'readonly',
+    pino: true,
+    axios: true,
+    $: true,
   },
   parserOptions: {
     ecmaVersion: 2020
@@ -25,7 +28,6 @@ module.exports = {
     'comma-dangle': ['warn', 'always-multiline'],
     'no-prototype-builtins': 'off',
     'space-before-function-paren': 'off',
-    'no-extra-bind': 'off',
     'camelcase': 'off',
     // 'node/no-deprecated-api': 'off',
   }

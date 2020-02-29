@@ -31,15 +31,15 @@ const internet_url_extensions = [
 ];
 
 function domain_tld() {
-  return this.pick(internet_tlds);
+  return this.pick(this.internet_tlds);
 }
 
 function domain_name(domain_name = null) {
-  return domain_name || this.string({ len: 8, chars: 'abcdefghijklmnopqrstuvwxy' });
+  return domain_name || this.string(8, 'abcdefghijklmnopqrstuvwxy');
 }
 
 function domain_host() {
-  return this.pick(internet_hosts);
+  return this.pick(this.internet_hosts);
 }
 
 function domain(domain_name = null) {
@@ -51,19 +51,19 @@ function hostname(domain_name = null) {
 }
 
 function free_email_domain() {
-  return this.pick(internet_free_email_domains);
+  return this.pick(this.internet_free_email_domains);
 }
 
 function free_email() {
-  return `${this.name_pinyin()}@${this.pick(internet_free_email_domains)}`;
+  return `${this.name_pinyin()}@${this.pick(this.internet_free_email_domains)}`;
 }
 
 function company_email_domain() {
-  return `${this.company_name_pinyin()}.${this.pick(internet_tlds)}`;
+  return `${this.company_name_pinyin()}.${this.pick(this.internet_tlds)}`;
 }
 
 function company_email() {
-  return `${this.name_pinyin()}@${this.company_name_pinyin()}.${this.pick(internet_tlds)}`;
+  return `${this.name_pinyin()}@${this.company_name_pinyin()}.${this.pick(this.internet_tlds)}`;
 }
 
 function email() {
@@ -83,7 +83,7 @@ function mac_address() {
 }
 
 function protocal() {
-  return this.pick(internet_protocols);
+  return this.pick(this.internet_protocols);
 }
 
 function site(domain_name = null) {
@@ -91,15 +91,15 @@ function site(domain_name = null) {
 }
 
 function url_path(depth = 2) {
-  return '/' + this.range(depth, () => this.pick(internet_url_paths)).join('/');
+  return '/' + this.range(depth, () => this.pick(this.internet_url_paths)).join('/');
 }
 
 function url_page() {
-  return this.pick(internet_url_pages);
+  return this.pick(this.internet_url_pages);
 }
 
 function url_extension() {
-  return this.pick(internet_url_extensions);
+  return this.pick(this.internet_url_extensions);
 }
 
 function url(domain_name = null) {
@@ -107,6 +107,14 @@ function url(domain_name = null) {
 }
 
 module.exports = function(pino) {
+  pino.internet_free_email_domains = internet_free_email_domains;
+  pino.internet_protocols = internet_protocols;
+  pino.internet_tlds = internet_tlds;
+  pino.internet_hosts = internet_hosts;
+  pino.internet_url_paths = internet_url_paths;
+  pino.internet_url_pages = internet_url_pages;
+  pino.internet_url_extensions = internet_url_extensions;
+
   pino.register('domain_tld', domain_tld);
   pino.register('domain_name', domain_name);
   pino.register('domain_host', domain_host);

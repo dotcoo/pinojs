@@ -193,39 +193,39 @@ const person_jobs = [
 ];
 
 function last_name() {
-  return this.pick(person_last_names);
+  return this.pick(this.person_last_names);
 }
 
 function last_name_pinyin(name = null) {
-  if (name && person_last_names.indexOf(name) > -1) {
-    return person_last_names_pinyin[person_last_names.indexOf(name)];
+  if (name && this.person_last_names.indexOf(name) > -1) {
+    return this.person_last_names_pinyin[this.person_last_names.indexOf(name)];
   }
-  return this.pick(person_last_names_pinyin);
+  return this.pick(this.person_last_names_pinyin);
 }
 
 function first_name() {
-  return this.pick(person_first_names_male, person_first_names_female);
+  return this.pick(this.person_first_names_male, person_first_names_female);
 }
 
 function first_name_pinyin(name = null) {
-  if (name && person_first_names_male.indexOf(name) > -1) {
-    return person_first_names_male_pinyin[person_first_names_male.indexOf(name)];
+  if (name && this.person_first_names_male.indexOf(name) > -1) {
+    return this.person_first_names_male_pinyin[this.person_first_names_male.indexOf(name)];
   }
   if (name && person_first_names_female.indexOf(name) > -1) {
-    return person_first_names_female_pinyin[person_first_names_female.indexOf(name)];
+    return this.person_first_names_female_pinyin[person_first_names_female.indexOf(name)];
   }
-  return this.pick(person_first_names_male_pinyin, person_first_names_female_pinyin);
+  return this.pick(this.person_first_names_male_pinyin, this.person_first_names_female_pinyin);
 }
 
 function first_name_male() {
-  return this.pick(person_first_names_male);
+  return this.pick(this.person_first_names_male);
 }
 
 // function first_name_male_pinyin(name = null) {
-//   if (name && person_first_names_male.indexOf(name) > -1) {
-//     return person_first_names_male_pinyin[person_first_names_male.indexOf(name)];
+//   if (name && this.person_first_names_male.indexOf(name) > -1) {
+//     return this.person_first_names_male_pinyin[this.person_first_names_male.indexOf(name)];
 //   }
-//   return this.pick(person_first_names_male_pinyin);
+//   return this.pick(this.person_first_names_male_pinyin);
 // }
 
 function first_name_female() {
@@ -234,9 +234,9 @@ function first_name_female() {
 
 // function first_name_female_pinyin(name = null) {
 //   if (name && person_first_names_female.indexOf(name) > -1) {
-//     return person_first_names_female_pinyin[person_first_names_female.indexOf(name)];
+//     return this.person_first_names_female_pinyin[person_first_names_female.indexOf(name)];
 //   }
-//   return this.pick(person_first_names_female_pinyin);
+//   return this.pick(this.person_first_names_female_pinyin);
 // }
 
 function name() {
@@ -268,18 +268,26 @@ function username() {
 }
 
 function password() {
-  return this.string({ len: 10, chars: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+`-=' });
+  return this.string(10, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+`-=');
 }
 
 function job() {
-  return this.pick(person_jobs);
+  return this.pick(this.person_jobs);
 }
 
 function phone() {
-  return `1${this.pick([3, 5, 8])}${this.int({ min: 100000000, max: 999999999 })}`;
+  return `1${this.pick([3, 5, 8])}${this.number(100000000, 999999999, 0)}`;
 }
 
 module.exports = function(pino) {
+  pino.person_last_names = person_last_names;
+  pino.person_last_names_pinyin = person_last_names_pinyin;
+  pino.person_first_names_male = person_first_names_male;
+  pino.person_first_names_male_pinyin = person_first_names_male_pinyin;
+  pino.person_first_names_female = person_first_names_female;
+  pino.person_first_names_female_pinyin = person_first_names_female_pinyin;
+  pino.person_jobs = person_jobs;
+
   pino.register('last_name', last_name);
   pino.register('last_name_pinyin', last_name_pinyin);
   pino.register('first_name', first_name);
