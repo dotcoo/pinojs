@@ -33,9 +33,9 @@ const config = {
 };
 
 if (process.env.NODE_ENV === 'development') {
-  config.entry = path.join(__dirname, './test/test.js');
+  config.entry = path.join(__dirname, './test/dev.js');
   config.plugins.push(new HtmlPlugin({
-    template: './test/test.html',
+    template: './test/dev.html',
     filename: 'index.html',
   }));
 }

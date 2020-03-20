@@ -237,7 +237,7 @@ console.log(pino.date_format(new Date(), 'y-m-d h:i:s')); // y: Year, m: Month, 
 
 console.log(pino.range(10, pino.date));
 
-console.log(pino.range(10, pino.date.currying({ start: '-3d', end: '+3d', format: 'y-m-d' })));
+console.log(pino.range(10, pino.date.currying('-3d', '+3d', 'y-m-d')));
 
 // ### 图片
 
