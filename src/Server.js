@@ -10,8 +10,8 @@ function entries2props(vals) {
 }
 
 class Server {
-  constructor(host = window.location.host) {
-    this.host = host;
+  constructor(host = null) {
+    this.host = host ? host : window.location.host;
     this.middlewares = [];
     this.handler = null;
   }

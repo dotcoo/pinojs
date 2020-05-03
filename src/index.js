@@ -206,7 +206,7 @@ pino.locale(require('./providers/zh_CN'));
 
 // ====== Server fetch XMLHttpRequest ======
 
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.cookie !== 'undefined') {
   // ====== Server ======
 
   const Server = require('./Server');
