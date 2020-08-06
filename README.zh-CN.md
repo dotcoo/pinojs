@@ -409,6 +409,8 @@ console.log(pino.range(10, pino.phone));
 ### 拦截 Ajax 和 fetch
 
 ``` js
+// 请求处理
+
 // middleware1
 pino.use(async (req, res, next) => {
   req.haha = 'm1';
@@ -452,9 +454,20 @@ pino.post('/blog/:bid', async (req, res, next) => {
   });
 });
 
-// ajax
+// 劫持 XMLHttpRequest 和 fetch
+pino.setup();
+
+// ajax 请求
 $.getJSON({ url: '/blog/1' });
 
-// fetch
+// fetch 请求
 fetch('/blog/1');
+```
+
+## License
+
+```
+[MIT](https://github.com/wee9/pinojs/blob/master/LICENSE) license.
+
+Copyright (c) 2020-present dotcoo zhao
 ```

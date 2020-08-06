@@ -7,7 +7,7 @@ async function fetch(url, init, ...args) {
     url: { configurable: true, enumerable: false, value: '', writable: true },
     body: { configurable: true, enumerable: false, value: '', writable: true },
   });
-  req.method = init && init.method ? init.method : 'GET';
+  req.method = init && init.method.toUpperCase() ? init.method : 'GET';
   req.uri = new window.URL(url, window.location.href);
   req.url = req.uri.href;
 

@@ -26,7 +26,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
 
   open(method, url, async = true, ...args) {
     super.open(method, url, async, ...args);
-    this.req.method = method;
+    this.req.method = method.toUpperCase();
     this.req.uri = new URL(url, window.location.href);
     this.req.url = this.req.uri.href;
   }

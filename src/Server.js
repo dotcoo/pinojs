@@ -1,4 +1,4 @@
-const AsyncFunction = (async() => {}).constructor;
+// const AsyncFunction = (async() => {}).constructor;
 
 function entries2props(vals) {
   if (vals.entries) {
@@ -17,9 +17,9 @@ class Server {
   }
 
   use(middleware) {
-    if (middleware.constructor !== AsyncFunction) {
-      throw new Error('middleware can only be asynchronous functions!');
-    }
+    // if (middleware.constructor !== AsyncFunction) {
+    //   throw new Error('middleware can only be asynchronous functions!');
+    // }
     this.middlewares.push(middleware);
   }
 
@@ -44,9 +44,9 @@ class Server {
   }
 
   route(method, path, handle) {
-    if (handle.constructor !== AsyncFunction) {
-      throw new Error('handle can only be asynchronous functions!');
-    }
+    // if (handle.constructor !== AsyncFunction) {
+    //   throw new Error('handle can only be asynchronous functions!');
+    // }
     let pathReg = path;
     if (path.constructor === String) {
       const paramsNames = [...path.matchAll(/:([a-z_][a-z0-9_]*)/ig)].map(v => v[1]);

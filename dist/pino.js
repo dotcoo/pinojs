@@ -306,7 +306,7 @@ pino.locale(__webpack_require__(1));
 
 // ====== Server fetch XMLHttpRequest ======
 
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.cookie !== 'undefined') {
   // ====== Server ======
 
   const Server = __webpack_require__(11);
@@ -334,9 +334,6 @@ if (typeof window !== 'undefined') {
     }
     return false;
   };
-
-  pino.Server = Server;
-  pino.Server.handle = pino.handle;
 
   // ====== fetch ======
 
@@ -1636,7 +1633,7 @@ module.exports = function(pino) {
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const AsyncFunction = (async() => {}).constructor;
+// const AsyncFunction = (async() => {}).constructor;
 
 function entries2props(vals) {
   if (vals.entries) {
@@ -1648,16 +1645,16 @@ function entries2props(vals) {
 }
 
 class Server {
-  constructor(host = window.location.host) {
-    this.host = host;
+  constructor(host = null) {
+    this.host = host ? host : window.location.host;
     this.middlewares = [];
     this.handler = null;
   }
 
   use(middleware) {
-    if (middleware.constructor !== AsyncFunction) {
-      throw new Error('middleware can only be asynchronous functions!');
-    }
+    // if (middleware.constructor !== AsyncFunction) {
+    //   throw new Error('middleware can only be asynchronous functions!');
+    // }
     this.middlewares.push(middleware);
   }
 
@@ -1682,9 +1679,9 @@ class Server {
   }
 
   route(method, path, handle) {
-    if (handle.constructor !== AsyncFunction) {
-      throw new Error('handle can only be asynchronous functions!');
-    }
+    // if (handle.constructor !== AsyncFunction) {
+    //   throw new Error('handle can only be asynchronous functions!');
+    // }
     let pathReg = path;
     if (path.constructor === String) {
       const paramsNames = [...path.matchAll(/:([a-z_][a-z0-9_]*)/ig)].map(v => v[1]);
@@ -1781,7 +1778,7 @@ async function fetch(url, init, ...args) {
     url: { configurable: true, enumerable: false, value: '', writable: true },
     body: { configurable: true, enumerable: false, value: '', writable: true },
   });
-  req.method = init && init.method ? init.method : 'GET';
+  req.method = init && init.method.toUpperCase() ? init.method : 'GET';
   req.uri = new window.URL(url, window.location.href);
   req.url = req.uri.href;
 
@@ -1833,7 +1830,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
 
   open(method, url, async = true, ...args) {
     super.open(method, url, async, ...args);
-    this.req.method = method;
+    this.req.method = method.toUpperCase();
     this.req.uri = new URL(url, window.location.href);
     this.req.url = this.req.uri.href;
   }

@@ -415,6 +415,8 @@ console.log(pino.range(10, pino.phone));
 ### Ajax and Fetch
 
 ``` js
+// Request handle
+
 // middleware1
 pino.use(async (req, res, next) => {
   req.haha = 'm1';
@@ -458,9 +460,20 @@ pino.post('/blog/:bid', async (req, res, next) => {
   });
 });
 
+// Intercept XMLHttpRequest and fetch
+pino.setup();
+
 // ajax
 $.getJSON({ url: '/blog/1' });
 
 // fetch
 fetch('/blog/1');
+```
+
+## License
+
+```
+[MIT](https://github.com/wee9/pinojs/blob/master/LICENSE) license.
+
+Copyright (c) 2020-present dotcoo zhao
 ```

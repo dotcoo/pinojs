@@ -235,9 +235,6 @@ if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && t
     return false;
   };
 
-  pino.Server = Server;
-  pino.Server.handle = pino.handle;
-
   // ====== fetch ======
 
   const fetch = require('./fetch');
