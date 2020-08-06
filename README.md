@@ -1,4 +1,4 @@
-English | [简体中文](./README.zh-CN.md)
+English | [简体中文](https://github.com/wee9/pinojs/blob/master/README.zh-CN.md)
 
 ## Introduction
 
