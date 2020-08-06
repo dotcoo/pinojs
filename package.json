@@ -12,8 +12,8 @@
     "pino",
     "pinojs"
   ],
-  "author": "dotcoo@tinywl.com",
-  "homepage": "https://github.com/tinywlcom/pinojs",
+  "author": "dotcoo@163.com",
+  "homepage": "https://github.com/wee9/pinojs",
   "license": "ISC",
   "devDependencies": {
     "axios": "^0.19.2",

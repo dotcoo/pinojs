@@ -1,38 +1,37 @@
 English | [简体中文](./README.zh-CN.md)
 
-## Introduction
+## 简介
 
-[pinojs](https://github.com/wee9/pinojs), Intercept ajax requests and respond to fake data.
+[pinojs](https://github.com/wee9/pinojs)， 拦截ajax请求并响应假数据。
 
-## Installing
+## 安装
 
-using npm
+使用 npm
 
 ``` bash
 npm install pinojs
 ```
 
-using cdn
+使用 cdn
 
 ``` html
 <script src="https://unpkg.com/pinojs/dist/pino.min.js"></script>
 ```
 
-## Example
+## 示例
 
-### Random
+### 随机基础类型
 
 ``` js
-// random return true or false
-console.log(pino.bool(), pino.boolean()); // true or false
+console.log(pino.bool(), pino.boolean()); // true false // 随机出现 true 和 false
 
-// pino.number(min, max, precision);
+// pino.number(min, max, dotlen);
 console.log(pino.number()); // 725529809.7393556
 
 // pino.string(len, chars);
 console.log(pino.string(10)); // pm7s6eyg29
 
-// other
+// 其它
 console.log(pino.float(), pino.float8(), pino.float16(), pino.float32(), pino.float64()); // 1885965470.3914413 94.31532790863642 5527.827595874842 -2017764709.9286506 2715833847827471.5
 
 console.log(pino.ufloat(), pino.ufloat8(), pino.ufloat16(), pino.ufloat32(), pino.ufloat64()); // 1738532697.7559228 235.0860977653759 4454.686755517535 616772531.1650121 1597656664024015.8
@@ -42,25 +41,27 @@ console.log(pino.int(), pino.int8(), pino.int16(), pino.int32(), pino.int64()); 
 console.log(pino.uint(), pino.uint8(), pino.uint16(), pino.uint32(), pino.uint64()); // 1886266343 88 12053 40027370 4276249758040316
 ```
 
-### Currying
+### 柯里化
 
 ``` js
-// random multiple data
+// 随机多个数据
 const scores = [];
 for (let i = 0; i < 35; i++) {
   scores.push(pino.number(0, 101, 1));
 }
 console.log(scores);
 
-// currying, binding parameter
+// 每次传入参数比较麻烦, 可以使用柯里化把参数绑定进去
 const score = pino.number.currying(0, 101, 1);
 for (let i = 0; i < 35; i++) {
-  scores.push(score()); // Easier to understand
+  scores.push(score()); // 更容易理解
 }
 console.log(scores);
+
+// 为什么需要柯里化? 主要是配合生成对象.
 ```
 
-### Object
+### 生成对象
 
 ``` js
 const age = pino.number.currying(18, 25, 0);
@@ -76,12 +77,13 @@ const user = {
 console.log(user); // {username: "zecf37u9r5", password: "4tq8tp80", gender: false, age: 21, score: 80}
 ```
 
-### Array
+### 生成数组数据
 
 ``` js
-// definition: pino.range(start, end, step, (i, arr) => i)
+// 方法签名: pino.range(start, end, step, (i, arr) => i)
 
-// generate array
+// 生成连续的数组
+
 console.log(pino.range(10)); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 console.log(pino.range(1, 10)); // [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -90,7 +92,8 @@ console.log(pino.range(1, 10, 2)); // [1, 3, 5, 7, 9]
 
 console.log(pino.range(10, 1, -2)); // [10, 8, 6, 4, 2]
 
-// generate array callback
+// 自定义处理
+
 console.log(pino.range(10, i => i * i)); // [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
 console.log(pino.range(1, 10, i => i * i)); // [1, 4, 9, 16, 25, 36, 49, 64, 81]
@@ -98,28 +101,26 @@ console.log(pino.range(1, 10, i => i * i)); // [1, 4, 9, 16, 25, 36, 49, 64, 81]
 console.log(pino.range(1, 10, 2, i => i * i)); // [1, 9, 25, 49, 81]
 
 console.log(pino.range(10, 1, -2, i => i * i)); // [100, 64, 36, 16, 4]
-```
 
-### Pagination
+// 分页数据
 
-``` js
-// definition: pino.page(total, page_current, page_size, (i, arr) => i)
+// 方法签名: pino.page(total, page_current, page_size, (i, arr) => i)
 
 console.log(pino.page(83, 1, 10, i => i * i)); // [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 ```
 
-### Complex Data
+### 生成嵌套数据
 
 ``` js
 console.log({
   code: 0,
   message: 'ok',
   data: {
-    users: pino.range(0, 10, (i, arr) => ({
+    users: pino.range(0, 10, (i, arr) => ({ // 当然这里更合适使用 pino.page
       id: i + 1,
       username: pino.string(10),
       password: pino.string(8),
-      gender: pino.bool(),
+      gender: pino.bool(), // true -> 男, false -> 女
       age: age(),
       score: score(),
     })),
@@ -148,41 +149,35 @@ console.log({
 // }
 ```
 
-### Probability
+### 概率
 
 ``` js
-// Sometimes our types are not consistent. For example, 
-// the gender and grades in the database user table 
-// are nullable, which means that we need to generate 
-// null, bool and number. If we only generate one type 
-// of data, the generated data is too perfect , At this 
-// time, you need to control the probability.
+// 有时候我们的类型不是一致的, 比如数据库用户表中的性别和成绩, 是可空的,
+// 也就是说需要产生 null, bool 和 number, 如果我们只产生一种类型的数据,
+// 生成的数据过于完美, 这时候就需要控制一下概率.
 
-// definition: probability([value1, count], [value2, count], ...)
+// 方法签名: probability([value1, count], [value2, count], ...)
 
-// gender
 const gender_probability = pino.probability(
-  [null, 6], // unfilled, proportion: `6.59340%`, formula: `6 / (6 + 53 + 32)`
-  [true, 53], // male, proportion: `58.24175%`, formula: `53 / (6 + 53 + 32)`
-  [false, 32], // female, proportion: `35.16483%`, formula: `32 / (6 + 53 + 32)`
+  [null, 6], // 未填写, 比例: `6.59340%`, 计算公式: `6 / (6 + 53 + 32)`
+  [true, 53], // 男性, 比例: `58.24175%`, 计算公式: `53 / (6 + 53 + 32)`
+  [false, 32], // 女性, 比例: `35.16483%`, 计算公式: `32 / (6 + 53 + 32)`
 );
 
-// score
 const score_probability = pino.probability(
-  [pino.number.currying(0, 60, 0), 3], // C
-  [pino.number.currying(60, 80, 0), 9], // B
-  [pino.number.currying(80, 100, 0), 32], // A
-  [100, 2], // A+
+  [pino.number.currying(0, 60, 0), 3], // 不及格, 比例: `6.52173%`, 计算公式: `3 / (3 + 9 + 32 + 2)`
+  [pino.number.currying(60, 80, 0), 9], // 及格, 比例: `19.56521%`, 计算公式: `9 / (3 + 9 + 32 + 2)`
+  [pino.number.currying(80, 100, 0), 32], // 优秀, 这里使用了柯里化, 在柯里化函数执行的时候会随机返回对应范围的数据
+  [100, 2], // 满分, 为什么需要添加这一行呢? 因为数值返回是 `[min，max)`, 包含 min, 不包含 max, 所以需要这一行
 );
 
-// result
 console.log({
   data: {
-    users: pino.range(0, 10, (i, arr) => ({
+    users: pino.range(0, 10, (i, arr) => ({ // 当然这里更合适使用 pino.page
       id: i + 1,
       username: pino.string(10),
-      gender: gender_probability(),
-      score: score_probability(),
+      gender: gender_probability(), // 这里使用概率表来产生数据
+      score: score_probability(), // 这里使用概率表来产生数据
     })),
   },
 });
@@ -205,7 +200,7 @@ console.log({
 // }
 ```
 
-### Address
+### 地址
 
 ``` js
 console.log(pino.range(10, () => pino.country() + pino.province() + pino.city() + pino.district() + pino.street() + pino.building()));
@@ -219,7 +214,7 @@ console.log(pino.range(10, pino.office_address));
 console.log(pino.range(10, pino.home_address));
 ```
 
-### License plate
+### 车牌
 
 ``` js
 console.log(pino.range(10, pino.license_plate));
@@ -233,7 +228,7 @@ console.log(pino.range(10, pino.license_plate.currying('豫')));
 console.log(pino.range(10, pino.license_plate.currying('河南', 'A')));
 ```
 
-### Color
+### 颜色
 
 ``` js
 console.log(pino.range(10, pino.color_name));
@@ -255,7 +250,7 @@ console.log(pino.range(10, pino.rgb_colorful));
 console.log(pino.range(10, pino.rgba_colorful));
 ```
 
-### Company
+### 公司
 
 ``` js
 const company_names = pino.range(10, pino.company_name);
@@ -273,7 +268,7 @@ console.log(pino.range(10, pino.company));
 console.log(pino.range(10, pino.company_short));
 ```
 
-### Date Time
+### 时间
 
 ``` js
 console.log(pino.date_expr('+7d')); // y: Year, m: Month, d: Day, h: Hours, i: Minutes, s: Second
@@ -285,7 +280,7 @@ console.log(pino.range(10, pino.date));
 console.log(pino.range(10, pino.date.currying('-3d', '+3d', 'y-m-d')));
 ```
 
-### Image
+### 图片
 
 ``` js
 const image_url = pino.image_url({
@@ -314,19 +309,18 @@ if (typeof window !== 'undefined') {
   console.log('%ci', `color: rgba(0,0,0,0); padding: 0 100px; line-height: 160px; background: url('${image_data_url}') no-repeat;`);
 
   const image_avatar = pino.image_avatar({
-    width: 360, // width // optional
-    height: 360, // height // optional
-    padding: 20, // padding // optional
-    dot: 8, // resolution // optional
+    width: 360, // 图片宽度 // optional
+    height: 360, // 图片高度 // optional
+    padding: 20, // 边距 // optional
+    dot: 8, // 点行列数 // optional
   });
 
   console.log(image_avatar);
 
   console.log('%ci', `color: rgba(0,0,0,0); padding: 0 180px; line-height: 360px; background: url('${image_avatar}') no-repeat;`);
-}
 ```
-
-### Network
+}
+### 网络
 
 ``` js
 console.log(pino.range(10, pino.domain_tld));
@@ -368,7 +362,7 @@ console.log(pino.range(10, pino.url_extension));
 console.log(pino.range(10, pino.url));
 ```
 
-### Word Text
+### 文本
 
 ``` js
 console.log(pino.range(10, pino.word));
@@ -376,7 +370,7 @@ console.log(pino.range(10, pino.word));
 console.log(pino.range(10, pino.text.currying(100)));
 ```
 
-### Person
+### 个人信息
 
 ``` js
 const last_names = pino.range(10, pino.last_name);
@@ -412,7 +406,7 @@ console.log(pino.range(10, pino.job));
 console.log(pino.range(10, pino.phone));
 ```
 
-### Ajax and Fetch
+### 拦截 Ajax 和 fetch
 
 ``` js
 // middleware1
