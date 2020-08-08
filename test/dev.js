@@ -1,6 +1,6 @@
 const pino = require('../src');
 window.pino = pino;
-pino.setup();
+pino.install();
 
 window.axios = require('axios');
 window.$ = require('jquery');

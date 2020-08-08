@@ -309,10 +309,9 @@ pino.locale(__webpack_require__(1));
 if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.cookie !== 'undefined') {
   // ====== Server ======
 
-  const Server = __webpack_require__(11);
+  pino.Server = __webpack_require__(11);
 
-  pino.server = new Server();
-
+  pino.server = new pino.Server();
   pino.use = pino.server.use.bind(pino.server);
   pino.get = pino.server.get.bind(pino.server);
   pino.post = pino.server.post.bind(pino.server);
@@ -323,35 +322,38 @@ if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && t
   pino.servers = [pino.server];
 
   pino.addServer = function(server) {
-    pino.servers.push(server);
+    this.servers.push(server);
   };
 
   pino.handle = async function(req) {
-    for (const server of pino.servers) {
-      if (server.isHost(req.uri.host)) {
+    for (const server of this.servers) {
+      if (server.isHost(new window.URL(req.url, window.location.href).host)) {
         return await server.handle(req);
       }
     }
-    return false;
+    return { status: 444 };
   };
 
   // ====== fetch ======
 
-  const fetch = __webpack_require__(12);
-
-  pino.fetch = fetch;
-  pino.fetch.handle = pino.handle;
+  pino.fetch = __webpack_require__(12);
+  pino.fetch.handle = pino.handle.bind(pino);
 
   // ====== XMLHttpRequest ======
 
-  const XMLHttpRequest = __webpack_require__(13);
+  pino.XMLHttpRequest = __webpack_require__(13);
+  pino.XMLHttpRequest.handle = pino.handle.bind(pino);
 
-  pino.XMLHttpRequest = XMLHttpRequest;
-  pino.XMLHttpRequest.handle = pino.handle;
+  // ====== install ======
 
-  pino.setup = function() {
-    window.XMLHttpRequest = XMLHttpRequest;
-    window.fetch = fetch;
+  pino.install = function() {
+    window.XMLHttpRequest = pino.XMLHttpRequest;
+    window.fetch = pino.fetch;
+  };
+
+  pino.uninstall = function() {
+    window.fetch = window.fetchReal;
+    window.XMLHttpRequest = window.XMLHttpRequestReal;
   };
 }
 
@@ -1325,7 +1327,7 @@ const person_last_names = [
   '任', '伍', '伦', '何', '余', '侧', '侯', '俞', '倪', '傅', '元', '光', '关',
   '冬', '冯', '冷', '刀', '刁', '刘', '刚', '区', '半', '华', '单', '卜', '卢',
   '古', '可', '叶', '后', '吕', '含', '吴', '周', '呼', '和', '咏', '品', '哏',
-  '唐', '回', '坤', '夏', '多', '夜', '大', '奇', '姜', '威', '孔', '孙', '孟',
+  '唐', '回', '坤', '夏', '多', '夜', '龙', '奇', '姜', '威', '孔', '孙', '孟',
   '宁', '宇', '安', '宋', '官', '宥', '家', '寐', '尤', '尧', '尹', '屠', '岳',
   '崔', '川', '左', '巫', '常', '平', '应', '庞', '康', '庾', '廖', '张', '弦',
   '張', '彭', '徐', '德', '恒', '恩', '恭', '慕', '成', '戴', '房', '承', '拳',
@@ -1342,7 +1344,7 @@ const person_last_names = [
   '邓', '邝', '邰', '邱', '郁', '郎', '郑', '郝', '郭', '酷', '释', '金', '钟',
   '钦', '钮', '镐', '闫', '阎', '阚', '阮', '阳', '阿', '陆', '陈', '陶', '雨',
   '雷', '霍', '韦', '韩', '顾', '颜', '饶', '馒', '马', '骆', '高', '魏', '鲁',
-  '鲍', '鸿', '鹏', '鹿', '麦', '黄', '黎', '黑', '齐', '龙',
+  '鲍', '鸿', '鹏', '鹿', '麦', '黄', '黎', '黑', '齐',
 ];
 
 // console.log(JSON.stringify(person_last_names.map(v => pinyin(v, { style: 'normal' }).flat().join(''))));
@@ -1388,7 +1390,7 @@ const person_first_names_male = [
   '洛洛', '键', '挺', '怀静', '乃麟', '澄庆', '逸晨', '未央', '之谦', '海啸',
   '家成', '娃', '珏', '子韬', '格叶', '寅', '祖名', '惟仁', '浩康', '罡', '东君',
   '方圆', '国豪', '旻佑', '晰', '明洋', '志健', '吉汉', '哲明', '盛强', '鲲',
-  '国丰', '子洋', '振棠', '继聪', '江', '崇正', '琥', '熙水', '张伟', '图', '中平',
+  '国丰', '子洋', '振棠', '继聪', '江', '崇正', '琥', '熙水', '卫健', '图', '中平',
   '德钟', '汉声', '敦豪', '继铃', '承光', '识贤', '晋豪', '协志', '治平', '川晖',
   '启田', '胜', '汤豪', '畊宏', '江龙', '文森', '天朔', '志安', '岳庭', '韶声',
   '云迪', '坤', '气', '建祥', '大佑', '旭东', '洛宾', '宇威', '尚实', '泳毅',
@@ -1400,7 +1402,7 @@ const person_first_names_male = [
   '晓', '昕阳', '志祥', '思远', '志光', '卓羲', '若权', '嘉尔', '剑辉', '义达',
   '国敬', '程明', '智成', '明', '明瀚', '文程', '紫骅', '猫', '一杰', '远喆', '晨',
   '嘉颖', '庚', '毅鹏', '志浩', '仕伟', '善为', '提', '不易', '恕权', '若昀', '爽',
-  '琪', '圣', '睿', '臣刚', '宗泽', '浚龙', '尊', '正宵', '桓宇', '卫健',
+  '琪', '圣', '睿', '臣刚', '宗泽', '浚龙', '尊', '正宵', '桓宇',
 ];
 
 // console.log(JSON.stringify(person_first_names_male.map(v => pinyin(v, { style: 'normal' }).flat().join(''))));
@@ -1633,8 +1635,6 @@ module.exports = function(pino) {
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// const AsyncFunction = (async() => {}).constructor;
-
 function entries2props(vals) {
   if (vals.entries) {
     for (const [name, value] of vals.entries()) {
@@ -1652,9 +1652,6 @@ class Server {
   }
 
   use(middleware) {
-    // if (middleware.constructor !== AsyncFunction) {
-    //   throw new Error('middleware can only be asynchronous functions!');
-    // }
     this.middlewares.push(middleware);
   }
 
@@ -1679,9 +1676,6 @@ class Server {
   }
 
   route(method, path, handle) {
-    // if (handle.constructor !== AsyncFunction) {
-    //   throw new Error('handle can only be asynchronous functions!');
-    // }
     let pathReg = path;
     if (path.constructor === String) {
       const paramsNames = [...path.matchAll(/:([a-z_][a-z0-9_]*)/ig)].map(v => v[1]);
@@ -1691,31 +1685,24 @@ class Server {
       }
       pathReg = new RegExp(pathRegStr, 'ig');
     }
-    this.use(async(req, res, next) => {
-      if (req.uri.host !== this.host || req.method !== method || !new RegExp(pathReg.source, pathReg.flags).test(req.uri.pathname)) {
-        await next(req, res);
+    this.use(async(req, next) => {
+      if (req.method !== method || !new RegExp(pathReg.source, pathReg.flags).test(req.uri.pathname)) {
+        await next(req);
         return;
       }
       req.params = entries2props(new window.URLSearchParams([...req.uri.pathname.matchAll(new RegExp(pathReg.source, pathReg.flags))].pop().groups));
-      res.request = req;
-      if (false) {}
-      await handle(req, res, next);
-      if (false) {}
+      await handle(req, next);
     });
   }
 
-  async notfound(req, res, next) {
-    res.status = 404;
-    res.statusText = 'not found';
-    res.body = '';
-  }
-
   getHandler() {
-    let nextMiddleware = this.notfound;
+    let nextMiddleware = async(req) => {
+      req.response.status = 444;
+    };
     for (let i = this.middlewares.length - 1; i >= 0; i--) {
       const middleware = this.middlewares[i];
       const next = nextMiddleware;
-      nextMiddleware = async (req, res) => await middleware(req, res, next);
+      nextMiddleware = async (req) => await middleware(req, next);
     }
     return nextMiddleware;
   }
@@ -1724,41 +1711,59 @@ class Server {
     if (this.handler === null) {
       this.handler = this.getHandler();
     }
-    req.uri = new window.URL(req.url, window.location.href);
-    entries2props(req.headers);
+    const init = req;
+    init.method = init.method ? init.method.toUpperCase() : 'GET';
+    const uri = new window.URL(init.url, window.location.href);
+    init.headers = new window.Headers(req.headers ? req.headers : {});
+    req = new window.Request(req.url, req);
+    req.uri = uri;
+    req.bodyContent = init.body || '';
+    req.params = new window.URLSearchParams();
     req.query = entries2props(new window.URLSearchParams(req.uri.search));
-    req.form = new window.URLSearchParams();
-    if (req.method === 'POST' && req.headers.get('Content-Type')) {
+    if ((req.method === 'POST' || req.method === 'PUT') && req.headers.get('Content-Type')) {
       if (req.headers.get('Content-Type').startsWith('application/x-www-form-urlencoded')) {
-        req.form = entries2props(new window.URLSearchParams(req.body));
-      } else if (req.headers.get('Content-Type').startsWith('application/json')) {
-        req.form = JSON.parse(req.body);
+        req.form = entries2props(new window.URLSearchParams(await req.text()));
+      } else {
+        req.form = new window.URLSearchParams();
       }
+      if (req.headers.get('Content-Type').startsWith('multipart/form-data')) {
+        req.formData = await req.formData();
+      } else {
+        req.formData = new FormData();
+      }
+      if (req.headers.get('Content-Type').startsWith('application/json')) {
+        req.json = await req.json();
+      } else {
+        req.json = {};
+      }
+    } else {
+      req.form = new window.URLSearchParams();
+      req.formData = new FormData();
+      req.json = {};
     }
-    req.body = req.body ? req.body : '';
-    const res = new window.Response();
-    Object.defineProperties(res, {
-      url: { configurable: true, enumerable: false, value: '', writable: true },
-      status: { configurable: true, enumerable: false, value: 200, writable: true },
-      statusText: { configurable: true, enumerable: false, value: 'OK', writable: true },
-      body: { configurable: true, enumerable: false, value: '', writable: true },
+    req.response = {
+      status: 200,
+      statusText: 'OK',
+      headers: new window.Headers(),
+      body: '',
+      send(body) {
+        this.body = body;
+      },
+      sendJson(json) {
+        this.body = JSON.stringify(json);
+      },
+    };
+    if (false) {}
+    await this.handler(req);
+    const res = req.response;
+    req.response = new window.Response(res.body, {
+      status: res.status,
+      statusText: res.statusText,
+      headers: res.headers,
     });
-    res.url = req.url;
-    res.send = function(data) {
-      this.body = data;
-    };
-    res.json = function(data) {
-      this.body = JSON.stringify(data);
-    };
-    await this.handler(req, res);
-    entries2props(res.headers);
-    res.text = async function() {
-      return this.body;
-    };
-    res.json = async function() {
-      return JSON.parse(this.body);
-    };
-    return res;
+    req.response.bodyContent = res.body;
+    if (false) {}
+    return req.response;
   }
 }
 
@@ -1771,28 +1776,14 @@ module.exports = Server;
 
 window.fetchReal = window.fetch;
 
-async function fetch(url, init, ...args) {
-  const req = new window.Request('', {});
-  Object.defineProperties(req, {
-    method: { configurable: true, enumerable: false, value: 'GET', writable: true },
-    url: { configurable: true, enumerable: false, value: '', writable: true },
-    body: { configurable: true, enumerable: false, value: '', writable: true },
-  });
-  req.method = init && init.method.toUpperCase() ? init.method : 'GET';
-  req.uri = new window.URL(url, window.location.href);
-  req.url = req.uri.href;
-
+async function fetch(url, init = {}, ...args) {
+  const req = { url, method: 'GET', headers: new window.Headers(), ...init, response: {} };
   const res = await fetch.handle(req);
-
-  if (res === false || (res && res.status === 404)) {
-    return window.fetchReal(url, init, ...args);
-  }
-
-  return res;
+  return res.status === 444 ? window.fetchReal(url, init, ...args) : res;
 }
 
 fetch.handle = async function(req) {
-  return false;
+  req.response.status = 444;
 };
 
 module.exports = fetch;
@@ -1806,41 +1797,21 @@ window.XMLHttpRequestReal = window.XMLHttpRequest;
 
 class XMLHttpRequest extends window.XMLHttpRequestReal {
   constructor() {
-    // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
     super();
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Request
-    this.req = new window.Request('', {});
-    Object.defineProperties(this.req, {
-      method: { configurable: true, enumerable: false, value: 'GET', writable: true },
-      url: { configurable: true, enumerable: false, value: '', writable: true },
-      body: { configurable: true, enumerable: false, value: '', writable: true },
-    });
-
-    // https://developer.mozilla.org/en-US/docs/Web/API/Response
-    this.res = null;
-
-    Object.defineProperties(this, {
-      readyState: { configurable: true, enumerable: false, value: 4, writable: true },
-      status: { configurable: true, enumerable: false, value: 200, writable: true },
-      statusText: { configurable: true, enumerable: false, value: 'OK', writable: true },
-      responseText: { configurable: true, enumerable: false, value: '', writable: true },
-    });
-  }
-
-  open(method, url, async = true, ...args) {
-    super.open(method, url, async, ...args);
-    this.req.method = method.toUpperCase();
-    this.req.uri = new URL(url, window.location.href);
-    this.req.url = this.req.uri.href;
-  }
-
-  setRequestHeader(name, value) {
-    super.setRequestHeader(name, value);
-    this.req.headers.set(name, value);
+    this.req = {
+      uri: null,
+      url: '',
+      method: 'GET',
+      headers: new window.Headers(),
+    };
   }
 
   getAllResponseHeaders() {
+    if (this.req.response === false) {
+      return super.getAllResponseHeaders();
+    }
     let headers = '';
     for (const [name, value] of this.res.headers.entries()) {
       headers += `${name}: ${value}\r\n`;
@@ -1849,30 +1820,58 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
   }
 
   getResponseHeader(name) {
+    if (this.req.response === false) {
+      return super.getResponseHeader(name);
+    }
     return this.req.headers.get(name);
   }
 
+  open(method, url, async = true, ...args) {
+    super.open(method, url, async, ...args);
+    this.req.uri = new window.URL(url, window.location.href);
+    this.req.url = this.req.uri.href;
+    this.req.method = method.toUpperCase();
+  }
+
+  setRequestHeader(name, value) {
+    super.setRequestHeader(name, value);
+    this.req.headers.set(name, value);
+  }
+
   async send(value = '') {
+    this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     this.req.headers.set('Host', this.req.uri.host);
     this.req.headers.set('User-Agent', window.navigator.userAgent);
     this.req.headers.set('Accept', '*/*');
     this.req.headers.set('Referer', window.location.href);
     this.req.headers.set('Accept-Language', window.navigator.language);
     this.req.headers.set('Cookie', window.document.cookie);
-    this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    this.req.body = value;
+    if (this.req.method === 'POST' || this.req.method === 'PUT') {
+      this.req.body = value;
+    }
 
     this.res = await XMLHttpRequest.handle(this.req);
 
-    if (this.res === false || (this.res && this.res.status === 404)) {
+    if (this.res.status === 444) {
       return super.send(value);
     }
+    
+    // remove readonly
+    Object.defineProperties(this, {
+      readyState: { value: 4, configurable: true, enumerable: true, writable: true },
+      status: { value: 200, configurable: true, enumerable: true, writable: true },
+      statusText: { value: 'OK', configurable: true, enumerable: true, writable: true },
+      responseText: { value: '', configurable: true, enumerable: true, writable: true },
+      // response: { value: null, configurable: true, enumerable: true, writable: true },
+      // responseURL: { value: window.location.href, configurable: true, enumerable: true, writable: true },
+      // responseXML: { value: null, configurable: true, enumerable: true, writable: true },
+      // upload: { value: null, configurable: true, enumerable: true, writable: true },
+    });
 
     this.readyState = 4;
     this.status = this.res.status;
     this.statusText = this.res.statusText;
-    this.responseText = this.res.body;
+    this.responseText = await this.res.text();
 
     setTimeout(() => {
       if (this.onload) {
@@ -1880,7 +1879,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
       } else if (this.onreadystatechange) {
         this.onreadystatechange();
       } else {
-        throw new Error('not found onload and onreadystatechange!');
+        this.dispatchEvent(new Event('load'))
       }
     }, XMLHttpRequest.delay);
   }
@@ -1889,7 +1888,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
 XMLHttpRequest.delay = 200;
 
 XMLHttpRequest.handle = async function(req) {
-  return false;
+  req.response.status = 444;
 };
 
 module.exports = XMLHttpRequest;

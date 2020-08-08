@@ -2,41 +2,21 @@ window.XMLHttpRequestReal = window.XMLHttpRequest;
 
 class XMLHttpRequest extends window.XMLHttpRequestReal {
   constructor() {
-    // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
     super();
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Request
-    this.req = new window.Request('', {});
-    Object.defineProperties(this.req, {
-      method: { configurable: true, enumerable: false, value: 'GET', writable: true },
-      url: { configurable: true, enumerable: false, value: '', writable: true },
-      body: { configurable: true, enumerable: false, value: '', writable: true },
-    });
-
-    // https://developer.mozilla.org/en-US/docs/Web/API/Response
-    this.res = null;
-
-    Object.defineProperties(this, {
-      readyState: { configurable: true, enumerable: false, value: 4, writable: true },
-      status: { configurable: true, enumerable: false, value: 200, writable: true },
-      statusText: { configurable: true, enumerable: false, value: 'OK', writable: true },
-      responseText: { configurable: true, enumerable: false, value: '', writable: true },
-    });
-  }
-
-  open(method, url, async = true, ...args) {
-    super.open(method, url, async, ...args);
-    this.req.method = method.toUpperCase();
-    this.req.uri = new URL(url, window.location.href);
-    this.req.url = this.req.uri.href;
-  }
-
-  setRequestHeader(name, value) {
-    super.setRequestHeader(name, value);
-    this.req.headers.set(name, value);
+    this.req = {
+      uri: null,
+      url: '',
+      method: 'GET',
+      headers: new window.Headers(),
+    };
   }
 
   getAllResponseHeaders() {
+    if (this.req.response === false) {
+      return super.getAllResponseHeaders();
+    }
     let headers = '';
     for (const [name, value] of this.res.headers.entries()) {
       headers += `${name}: ${value}\r\n`;
@@ -45,30 +25,58 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
   }
 
   getResponseHeader(name) {
+    if (this.req.response === false) {
+      return super.getResponseHeader(name);
+    }
     return this.req.headers.get(name);
   }
 
+  open(method, url, async = true, ...args) {
+    super.open(method, url, async, ...args);
+    this.req.uri = new window.URL(url, window.location.href);
+    this.req.url = this.req.uri.href;
+    this.req.method = method.toUpperCase();
+  }
+
+  setRequestHeader(name, value) {
+    super.setRequestHeader(name, value);
+    this.req.headers.set(name, value);
+  }
+
   async send(value = '') {
+    this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     this.req.headers.set('Host', this.req.uri.host);
     this.req.headers.set('User-Agent', window.navigator.userAgent);
     this.req.headers.set('Accept', '*/*');
     this.req.headers.set('Referer', window.location.href);
     this.req.headers.set('Accept-Language', window.navigator.language);
     this.req.headers.set('Cookie', window.document.cookie);
-    this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    this.req.body = value;
+    if (this.req.method === 'POST' || this.req.method === 'PUT') {
+      this.req.body = value;
+    }
 
     this.res = await XMLHttpRequest.handle(this.req);
 
-    if (this.res === false || (this.res && this.res.status === 404)) {
+    if (this.res.status === 444) {
       return super.send(value);
     }
+    
+    // remove readonly
+    Object.defineProperties(this, {
+      readyState: { value: 4, configurable: true, enumerable: true, writable: true },
+      status: { value: 200, configurable: true, enumerable: true, writable: true },
+      statusText: { value: 'OK', configurable: true, enumerable: true, writable: true },
+      responseText: { value: '', configurable: true, enumerable: true, writable: true },
+      // response: { value: null, configurable: true, enumerable: true, writable: true },
+      // responseURL: { value: window.location.href, configurable: true, enumerable: true, writable: true },
+      // responseXML: { value: null, configurable: true, enumerable: true, writable: true },
+      // upload: { value: null, configurable: true, enumerable: true, writable: true },
+    });
 
     this.readyState = 4;
     this.status = this.res.status;
     this.statusText = this.res.statusText;
-    this.responseText = this.res.body;
+    this.responseText = await this.res.text();
 
     setTimeout(() => {
       if (this.onload) {
@@ -76,7 +84,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
       } else if (this.onreadystatechange) {
         this.onreadystatechange();
       } else {
-        throw new Error('not found onload and onreadystatechange!');
+        this.dispatchEvent(new Event('load'))
       }
     }, XMLHttpRequest.delay);
   }
@@ -85,7 +93,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
 XMLHttpRequest.delay = 200;
 
 XMLHttpRequest.handle = async function(req) {
-  return false;
+  req.response.status = 444;
 };
 
 module.exports = XMLHttpRequest;

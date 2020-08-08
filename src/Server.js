@@ -1,5 +1,3 @@
-// const AsyncFunction = (async() => {}).constructor;
-
 function entries2props(vals) {
   if (vals.entries) {
     for (const [name, value] of vals.entries()) {
@@ -17,9 +15,6 @@ class Server {
   }
 
   use(middleware) {
-    // if (middleware.constructor !== AsyncFunction) {
-    //   throw new Error('middleware can only be asynchronous functions!');
-    // }
     this.middlewares.push(middleware);
   }
 
@@ -44,9 +39,6 @@ class Server {
   }
 
   route(method, path, handle) {
-    // if (handle.constructor !== AsyncFunction) {
-    //   throw new Error('handle can only be asynchronous functions!');
-    // }
     let pathReg = path;
     if (path.constructor === String) {
       const paramsNames = [...path.matchAll(/:([a-z_][a-z0-9_]*)/ig)].map(v => v[1]);
@@ -56,35 +48,24 @@ class Server {
       }
       pathReg = new RegExp(pathRegStr, 'ig');
     }
-    this.use(async(req, res, next) => {
-      if (req.uri.host !== this.host || req.method !== method || !new RegExp(pathReg.source, pathReg.flags).test(req.uri.pathname)) {
-        await next(req, res);
+    this.use(async(req, next) => {
+      if (req.method !== method || !new RegExp(pathReg.source, pathReg.flags).test(req.uri.pathname)) {
+        await next(req);
         return;
       }
       req.params = entries2props(new window.URLSearchParams([...req.uri.pathname.matchAll(new RegExp(pathReg.source, pathReg.flags))].pop().groups));
-      res.request = req;
-      if (process.env.NODE_ENV === 'development') {
-        console.log(req);
-      }
-      await handle(req, res, next);
-      if (process.env.NODE_ENV === 'development') {
-        console.log(res);
-      }
+      await handle(req, next);
     });
   }
 
-  async notfound(req, res, next) {
-    res.status = 404;
-    res.statusText = 'not found';
-    res.body = '';
-  }
-
   getHandler() {
-    let nextMiddleware = this.notfound;
+    let nextMiddleware = async(req) => {
+      req.response.status = 444;
+    };
     for (let i = this.middlewares.length - 1; i >= 0; i--) {
       const middleware = this.middlewares[i];
       const next = nextMiddleware;
-      nextMiddleware = async (req, res) => await middleware(req, res, next);
+      nextMiddleware = async (req) => await middleware(req, next);
     }
     return nextMiddleware;
   }
@@ -93,41 +74,78 @@ class Server {
     if (this.handler === null) {
       this.handler = this.getHandler();
     }
-    req.uri = new window.URL(req.url, window.location.href);
-    entries2props(req.headers);
+    const init = req;
+    init.method = init.method ? init.method.toUpperCase() : 'GET';
+    const uri = new window.URL(init.url, window.location.href);
+    init.headers = new window.Headers(req.headers ? req.headers : {});
+    req = new window.Request(req.url, req);
+    req.uri = uri;
+    req.bodyContent = init.body || '';
+    req.params = new window.URLSearchParams();
     req.query = entries2props(new window.URLSearchParams(req.uri.search));
-    req.form = new window.URLSearchParams();
-    if (req.method === 'POST' && req.headers.get('Content-Type')) {
+    if ((req.method === 'POST' || req.method === 'PUT') && req.headers.get('Content-Type')) {
       if (req.headers.get('Content-Type').startsWith('application/x-www-form-urlencoded')) {
-        req.form = entries2props(new window.URLSearchParams(req.body));
-      } else if (req.headers.get('Content-Type').startsWith('application/json')) {
-        req.form = JSON.parse(req.body);
+        req.form = entries2props(new window.URLSearchParams(await req.text()));
+      } else {
+        req.form = new window.URLSearchParams();
       }
+      if (req.headers.get('Content-Type').startsWith('multipart/form-data')) {
+        req.formData = await req.formData();
+      } else {
+        req.formData = new FormData();
+      }
+      if (req.headers.get('Content-Type').startsWith('application/json')) {
+        req.json = await req.json();
+      } else {
+        req.json = {};
+      }
+    } else {
+      req.form = new window.URLSearchParams();
+      req.formData = new FormData();
+      req.json = {};
     }
-    req.body = req.body ? req.body : '';
-    const res = new window.Response();
-    Object.defineProperties(res, {
-      url: { configurable: true, enumerable: false, value: '', writable: true },
-      status: { configurable: true, enumerable: false, value: 200, writable: true },
-      statusText: { configurable: true, enumerable: false, value: 'OK', writable: true },
-      body: { configurable: true, enumerable: false, value: '', writable: true },
+    req.response = {
+      status: 200,
+      statusText: 'OK',
+      headers: new window.Headers(),
+      body: '',
+      send(body) {
+        this.body = body;
+      },
+      sendJson(json) {
+        this.headers.set('Content-Type', 'application/json; charset=utf-8');
+        this.body = JSON.stringify(json);
+      },
+    };
+    if (process.env.NODE_ENV === 'development') {
+      let data = '================================================================================\n'
+      data += `%c${req.method} ${req.uri.pathname + req.uri.search} HTTP/1.1%c\n`;
+      for (const [key, val] of req.headers) {
+        data += `${key}: ${val}\n`;
+      }
+      if ((req.method === 'POST' || req.method === 'PUT') && req.bodyContent) {
+        data += '\n' + req.bodyContent;
+      }
+      console.log(data.trim() + ' | %o', 'background-color:lightgreen;','color:initial;background-color:initial;', req.bodyContent);
+    }
+    await this.handler(req);
+    const res = req.response;
+    req.response = new window.Response(res.body, {
+      status: res.status,
+      statusText: res.statusText,
+      headers: res.headers,
     });
-    res.url = req.url;
-    res.send = function(data) {
-      this.body = data;
-    };
-    res.json = function(data) {
-      this.body = JSON.stringify(data);
-    };
-    await this.handler(req, res);
-    entries2props(res.headers);
-    res.text = async function() {
-      return this.body;
-    };
-    res.json = async function() {
-      return JSON.parse(this.body);
-    };
-    return res;
+    req.response.bodyContent = res.body;
+    if (process.env.NODE_ENV === 'development') {
+      let data = `%cHTTP/1.1 ${req.response.status} ${req.response.statusText}%c\n`;
+      for (const [key, val] of req.response.headers) {
+        data += `${key}: ${val}\n`;
+      }
+      data += '\n' + req.response.bodyContent;
+      data = data.trim() + ' | %o\n================================================================================';
+      console.log(data, 'background-color:lightblue;','color:initial;background-color:initial;', req.response.bodyContent);
+    }
+    return req.response;
   }
 }
 

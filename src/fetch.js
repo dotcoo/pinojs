@@ -1,27 +1,13 @@
 window.fetchReal = window.fetch;
 
-async function fetch(url, init, ...args) {
-  const req = new window.Request('', {});
-  Object.defineProperties(req, {
-    method: { configurable: true, enumerable: false, value: 'GET', writable: true },
-    url: { configurable: true, enumerable: false, value: '', writable: true },
-    body: { configurable: true, enumerable: false, value: '', writable: true },
-  });
-  req.method = init && init.method.toUpperCase() ? init.method : 'GET';
-  req.uri = new window.URL(url, window.location.href);
-  req.url = req.uri.href;
-
+async function fetch(url, init = {}, ...args) {
+  const req = { url, method: 'GET', headers: new window.Headers(), ...init, response: {} };
   const res = await fetch.handle(req);
-
-  if (res === false || (res && res.status === 404)) {
-    return window.fetchReal(url, init, ...args);
-  }
-
-  return res;
+  return res.status === 444 ? window.fetchReal(url, init, ...args) : res;
 }
 
 fetch.handle = async function(req) {
-  return false;
+  req.response.status = 444;
 };
 
 module.exports = fetch;

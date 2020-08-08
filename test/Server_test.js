@@ -1,45 +1,47 @@
 // const app = new pino.Server();
 const app = pino.server;
 
-app.use(async(req, res, next) => {
+app.use(async(req, next) => {
   req.haha = 'm1';
-  await next(req, res);
+  await next(req);
 });
 
-app.use(async(req, res, next) => {
+app.use(async(req, next) => {
   req.haha += 'm2';
-  await next(req, res);
+  await next(req);
 });
 
-app.get('/blog/:bid/comment/:cid', async(req, res, next) => {
+app.get('/blog/:bid/comment/:cid', async(req) => {
+  const res = req.response;
   req.haha += 'blog_comment';
+  res.headers.set('Content-Type', 'text/html');
   res.send(`blog_comment, bid: ${req.params.bid}, cid: ${req.params.cid}`);
 });
 
-app.get('/blog/:bid', async(req, res, next) => {
+app.get('/blog/:bid', async(req) => {
+  const res = req.response;
   req.haha += 'blog';
-  res.send(`blog, bid: ${req.params.bid}`);
-});
-
-app.post('/blog/:bid', async(req, res, next) => {
-  req.haha += 'post blog';
-  res.json({
+  res.headers.set('Content-Type', 'application/json');
+  res.sendJson({
     request: 'post blog',
-    params: {
-      bid: req.params.bid,
-    },
-    query: {
-      name: req.query.name,
-      site: req.query.site,
-    },
-    form: {
-      username: req.form.username,
-      password: req.form.password,
-    },
+    params: req.params,
+    query: req.query,
+    form: req.form,
+    formData: req.formData,
+    json: req.json,
   });
 });
 
-// (async() => {
-//   console.log((await app.handle(new Request('/blog/1'))).body);
-//   console.log((await app.handle(new Request('/blog/2/comment/1'))).body);
-// })();
+app.post('/blog/:bid', async(req) => {
+  const res = req.response;
+  req.haha += 'post blog';
+  res.headers.set('Content-Type', 'application/json');
+  res.sendJson({
+    request: 'post blog',
+    params: req.params,
+    query: req.query,
+    form: req.form,
+    formData: req.formData,
+    json: req.json,
+  });
+});

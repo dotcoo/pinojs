@@ -209,10 +209,9 @@ pino.locale(require('./providers/zh_CN'));
 if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.cookie !== 'undefined') {
   // ====== Server ======
 
-  const Server = require('./Server');
+  pino.Server = require('./Server');
 
-  pino.server = new Server();
-
+  pino.server = new pino.Server();
   pino.use = pino.server.use.bind(pino.server);
   pino.get = pino.server.get.bind(pino.server);
   pino.post = pino.server.post.bind(pino.server);
@@ -223,35 +222,38 @@ if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && t
   pino.servers = [pino.server];
 
   pino.addServer = function(server) {
-    pino.servers.push(server);
+    this.servers.push(server);
   };
 
   pino.handle = async function(req) {
-    for (const server of pino.servers) {
-      if (server.isHost(req.uri.host)) {
+    for (const server of this.servers) {
+      if (server.isHost(new window.URL(req.url, window.location.href).host)) {
         return await server.handle(req);
       }
     }
-    return false;
+    return { status: 444 };
   };
 
   // ====== fetch ======
 
-  const fetch = require('./fetch');
-
-  pino.fetch = fetch;
-  pino.fetch.handle = pino.handle;
+  pino.fetch = require('./fetch');
+  pino.fetch.handle = pino.handle.bind(pino);
 
   // ====== XMLHttpRequest ======
 
-  const XMLHttpRequest = require('./XMLHttpRequest');
+  pino.XMLHttpRequest = require('./XMLHttpRequest');
+  pino.XMLHttpRequest.handle = pino.handle.bind(pino);
 
-  pino.XMLHttpRequest = XMLHttpRequest;
-  pino.XMLHttpRequest.handle = pino.handle;
+  // ====== install ======
 
-  pino.setup = function() {
-    window.XMLHttpRequest = XMLHttpRequest;
-    window.fetch = fetch;
+  pino.install = function() {
+    window.XMLHttpRequest = pino.XMLHttpRequest;
+    window.fetch = pino.fetch;
+  };
+
+  pino.uninstall = function() {
+    window.fetch = window.fetchReal;
+    window.XMLHttpRequest = window.XMLHttpRequestReal;
   };
 }
 

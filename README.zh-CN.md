@@ -412,56 +412,152 @@ console.log(pino.range(10, pino.phone));
 // 请求处理
 
 // middleware1
-pino.use(async (req, res, next) => {
+pino.use(async (req, next) => {
   req.haha = 'm1';
-  await next(req, res);
+  await next(req);
 });
 
 // middleware2
-pino.use(async (req, res, next) => {
+pino.use(async (req, next) => {
   req.haha += 'm2';
-  await next(req, res);
+  await next(req);
 });
 
-// get
-pino.get('/blog/:bid/comment/:cid', async (req, res, next) => {
-  req.haha += 'blog_comment';
-  res.send(`blog_comment, bid: ${req.params.bid}, cid: ${req.params.cid}`);
+pino.get('/blog/:bid', async(req) => {
+  req.haha += 'get blog';
+  const res = req.response; // 获取响应
+  res.status = 200;
+  res.statusText = 'OK';
+  res.headers.set('Content-Type', 'application/json');
+  res.send(JSON.stringify({ // 响应数据
+    request: 'get blog',
+    params: req.params, // url路径参数
+    query: req.query, // get 参数
+    form: req.form, // post 参数
+    formData: req.formData, // 文件上传 参数
+    json: req.json, // json 参数
+  }));
 });
 
-// get
-pino.get('/blog/:bid', async (req, res, next) => {
-  req.haha += 'blog';
-  res.send(`blog, bid: ${req.params.bid}`);
-});
-
-// post
-pino.post('/blog/:bid', async (req, res, next) => {
+pino.post('/blog/:bid', async(req) => {
   req.haha += 'post blog';
-  res.json({
+  const res = req.response;
+  res.status = 200;
+  res.statusText = 'OK';
+  res.headers.set('Content-Type', 'application/json');
+  res.sendJson({ // 响应JSON数据
     request: 'post blog',
-    params: {
-      bid: req.params.bid,
-    },
-    query: {
-      name: req.query.name,
-      site: req.query.site,
-    },
-    form: {
-      username: req.form.username,
-      password: req.form.password,
-    },
+    params: req.params, // url路径参数
+    query: req.query, // get 参数
+    form: req.form, // post 参数
+    formData: req.formData, // 文件上传 参数
+    json: req.json, // json 参数
   });
 });
 
-// 劫持 XMLHttpRequest 和 fetch
-pino.setup();
+// 替换 XMLHttpRequest 和 fetch
+pino.install();
 
-// ajax 请求
-$.getJSON({ url: '/blog/1' });
+// 恢复 XMLHttpRequest 和 fetch
+pino.uninstall();
+```
 
-// fetch 请求
-fetch('/blog/1');
+### fetch 发起请求
+
+``` js
+// post form
+const res3 = await fetch('/blog/1000?name=dotcoo&site=dotcoo.com', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: 'username=dotcoo&password=dotcoo123',
+});
+const data3 = await res3.json();
+console.log(data3);
+
+// post form
+const res31 = await fetch('/blog/1000?name=dotcoo&site=dotcoo.com', {
+  method: 'POST',
+  body: new URLSearchParams('username=dotcoo&password=dotcoo123'),
+});
+const data31 = await res31.json();
+console.log(data31);
+
+// post formData
+const fd4 = new FormData();
+fd4.append('username', 'dotcoo');
+fd4.append('password', 'dotcoo123');
+const res4 = await fetch('/blog/1000?name=dotcoo&site=dotcoo.com', {
+  method: 'POST',
+  body: fd4,
+});
+const data4 = await res4.json();
+console.log(data4);
+
+// post json
+const res5 = await fetch('/blog/1000?name=dotcoo&site=dotcoo.com', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username: 'dotcoo', password: 'dotcoo123' }),
+});
+const data5 = await res5.json();
+console.log(data5);
+```
+
+### ajax 发起请求
+
+``` js
+const xhr3 = new XMLHttpRequest();
+xhr3.open('POST', '/blog/1000?name=dotcoo&site=dotcoo.com', true);
+xhr3.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+xhr3.send('username=dotcoo&password=dotcoo123');
+xhr3.onreadystatechange = function() {
+  if (this.readyState === 4) {
+    console.log('readyState:', this.readyState);
+    console.log('status:', this.status);
+    console.log('statusText:', this.statusText);
+    console.log('responseText:', this.responseText);
+  }
+};
+
+const xhr31 = new XMLHttpRequest();
+xhr31.open('POST', '/blog/1000?name=dotcoo&site=dotcoo.com', true);
+xhr31.send(new URLSearchParams('username=dotcoo&password=dotcoo123'));
+xhr31.onreadystatechange = function() {
+  if (this.readyState === 4) {
+    console.log('readyState:', this.readyState);
+    console.log('status:', this.status);
+    console.log('statusText:', this.statusText);
+    console.log('responseText:', this.responseText);
+  }
+};
+
+const fd4 = new FormData();
+fd4.append('username', 'dotcoo');
+fd4.append('password', 'dotcoo123');
+const xhr4 = new XMLHttpRequest();
+xhr4.open('POST', '/blog/1000?name=dotcoo&site=dotcoo.com', true);
+xhr4.send(fd4);
+xhr4.onreadystatechange = function() {
+  if (this.readyState === 4) {
+    console.log('readyState:', this.readyState);
+    console.log('status:', this.status);
+    console.log('statusText:', this.statusText);
+    console.log('responseText:', this.responseText);
+  }
+};
+
+const xhr5 = new XMLHttpRequest();
+xhr5.open('POST', '/blog/1000?name=dotcoo&site=dotcoo.com', true);
+xhr5.setRequestHeader('Content-Type', 'application/json');
+xhr5.send(JSON.stringify({ username: 'dotcoo', password: 'dotcoo123' }));
+xhr5.onreadystatechange = function() {
+  if (this.readyState === 4) {
+    console.log('readyState:', this.readyState);
+    console.log('status:', this.status);
+    console.log('statusText:', this.statusText);
+    console.log('responseText:', this.responseText);
+  }
+};
 ```
 
 ## License
