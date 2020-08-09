@@ -22,7 +22,7 @@ app.get('/blog/:bid', async(req) => {
   const res = req.response;
   req.haha += 'blog';
   res.headers.set('Content-Type', 'application/json');
-  res.sendJson({
+  res.json({
     request: 'post blog',
     params: req.params,
     query: req.query,
@@ -36,7 +36,7 @@ app.post('/blog/:bid', async(req) => {
   const res = req.response;
   req.haha += 'post blog';
   res.headers.set('Content-Type', 'application/json');
-  res.sendJson({
+  res.json({
     request: 'post blog',
     params: req.params,
     query: req.query,

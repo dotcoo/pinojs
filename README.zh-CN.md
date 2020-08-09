@@ -445,7 +445,7 @@ pino.post('/blog/:bid', async(req) => {
   res.status = 200;
   res.statusText = 'OK';
   res.headers.set('Content-Type', 'application/json');
-  res.sendJson({ // 响应JSON数据
+  res.json({ // 响应JSON数据
     request: 'post blog',
     params: req.params, // url路径参数
     query: req.query, // get 参数
@@ -562,8 +562,6 @@ xhr5.onreadystatechange = function() {
 
 ## License
 
-```
 [MIT](https://github.com/wee9/pinojs/blob/master/LICENSE) license.
 
 Copyright (c) 2020-present dotcoo zhao
-```

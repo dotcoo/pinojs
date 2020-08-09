@@ -209,7 +209,11 @@ pino.locale(require('./providers/zh_CN'));
 if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.cookie !== 'undefined') {
   // ====== Server ======
 
-  pino.Server = require('./Server');
+  const { Request, Response, Server } = require('./Server');
+
+  pino.Request = Request;
+  pino.Response = Response;
+  pino.Server = Server;
 
   pino.server = new pino.Server();
   pino.use = pino.server.use.bind(pino.server);

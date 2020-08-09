@@ -32,7 +32,7 @@ const person_last_names_pinyin = [
   'fu', 'yuan', 'guang', 'guan', 'dong', 'feng', 'leng', 'dao', 'diao', 'liu',
   'gang', 'qu', 'ban', 'hua', 'dan', 'bu', 'lu', 'gu', 'ke', 'ye', 'hou',
   'lv', 'han', 'wu', 'zhou', 'hu', 'he', 'yong', 'pin', 'gen', 'tang', 'hui',
-  'kun', 'xia', 'duo', 'ye', 'da', 'qi', 'jiang', 'wei', 'kong', 'sun', 'meng',
+  'kun', 'xia', 'duo', 'ye', 'long', 'qi', 'jiang', 'wei', 'kong', 'sun', 'meng',
   'ning', 'yu', 'an', 'song', 'guan', 'you', 'jia', 'mei', 'you', 'yao', 'yin',
   'tu', 'yue', 'cui', 'chuan', 'zuo', 'wu', 'chang', 'ping', 'ying', 'pang',
   'kang', 'yu', 'liao', 'zhang', 'xian', 'zhang', 'peng', 'xu', 'de', 'heng',
@@ -53,7 +53,7 @@ const person_last_names_pinyin = [
   'hao', 'guo', 'ku', 'shi', 'jin', 'zhong', 'qin', 'niu', 'gao', 'yan', 'yan',
   'kan', 'ruan', 'yang', 'a', 'lu', 'chen', 'tao', 'yu', 'lei', 'huo', 'wei',
   'han', 'gu', 'yan', 'rao', 'man', 'ma', 'luo', 'gao', 'wei', 'lu', 'bao',
-  'hong', 'peng', 'lu', 'mai', 'huang', 'li', 'hei', 'qi', 'long',
+  'hong', 'peng', 'lu', 'mai', 'huang', 'li', 'hei', 'qi',
 ];
 
 const person_first_names_male = [
@@ -100,7 +100,7 @@ const person_first_names_male_pinyin = [
   'jiacheng', 'wa', 'jue', 'zitao', 'geye', 'yin', 'zuming', 'weiren', 'haokang',
   'gang', 'dongjun', 'fangyuan', 'guohao', 'minyou', 'xi', 'mingyang', 'zhijian',
   'jihan', 'zheming', 'shengqiang', 'kun', 'guofeng', 'ziyang', 'zhentang', 'jicong',
-  'jiang', 'chongzheng', 'hu', 'xishui', 'zhangwei', 'tu', 'zhongping', 'dezhong',
+  'jiang', 'chongzheng', 'hu', 'xishui', 'weijian', 'tu', 'zhongping', 'dezhong',
   'hansheng', 'dunhao', 'jiling', 'chengguang', 'shixian', 'jinhao', 'xiezhi',
   'zhiping', 'chuanhui', 'qitian', 'sheng', 'tanghao', 'genghong', 'jianglong',
   'wensen', 'tianshuo', 'zhian', 'yueting', 'shaosheng', 'yundi', 'kun', 'qi',
@@ -116,7 +116,7 @@ const person_first_names_male_pinyin = [
   'jianhui', 'yida', 'guojing', 'chengming', 'zhicheng', 'ming', 'minghan', 'wencheng',
   'zihua', 'mao', 'yijie', 'yuanzhe', 'chen', 'jiaying', 'geng', 'yipeng', 'zhihao',
   'shiwei', 'shanwei', 'ti', 'buyi', 'shuquan', 'ruoyun', 'shuang', 'qi', 'sheng',
-  'rui', 'chengang', 'zongze', 'junlong', 'zun', 'zhengxiao', 'huanyu', 'weijian',
+  'rui', 'chengang', 'zongze', 'junlong', 'zun', 'zhengxiao', 'huanyu',
 ];
 
 const person_first_names_female = [

@@ -91,11 +91,221 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+function entries2props(vals) {
+  if (vals.entries) {
+    for (const [name, value] of vals.entries()) {
+      vals[name] = value;
+    }
+  }
+  return vals;
+}
+
+class Request {
+  constructor(url, init = {}) {
+    this.method = init.method ? init.method.toUpperCase() : 'GET';
+    this.uri = new window.URL(url, window.location.href);
+    this.url = this.uri.href;
+    this.headers = new window.Headers(init.headers || {});
+    this.body = init.body || '';
+    this.init = init;
+    this.response = null;
+  }
+
+  get bodyContent() {
+    return this.body;
+  }
+
+  async toRequest() {
+    const init = {
+      ...this.init,
+      method: this.method,
+      headers: this.headers,
+    };
+    if (this.method === 'POST' || this.method === 'PUT') {
+      init.body = this.body;
+    }
+    const request = new window.Request(this.url, init);
+    request.uri = this.uri;
+    request.bodyContent = this.body;
+    request.params = new window.URLSearchParams();
+    request.query = entries2props(new window.URLSearchParams(request.uri.search));
+    if ((request.method === 'POST' || request.method === 'PUT') && request.headers.get('Content-Type')) {
+      if (request.headers.get('Content-Type').startsWith('application/x-www-form-urlencoded')) {
+        request.form = entries2props(new window.URLSearchParams(await request.text()));
+      } else {
+        request.form = new window.URLSearchParams();
+      }
+      if (request.headers.get('Content-Type').startsWith('multipart/form-data')) {
+        request.formData = await request.formData();
+      } else {
+        request.formData = new FormData();
+      }
+      if (request.headers.get('Content-Type').startsWith('application/json')) {
+        request.json = await request.json();
+      } else {
+        request.json = {};
+      }
+    } else {
+      request.form = new window.URLSearchParams();
+      request.formData = new FormData();
+      request.json = {};
+    }
+    request.response = new Response();
+    return request;
+  }
+
+  log(req = null) {
+    req = req === null ? this : req;
+    let data = '================================================================================\n'
+    data += `%c${req.method} ${req.uri.pathname + req.uri.search} HTTP/1.1%c\n`;
+    for (const [key, val] of req.headers) {
+      data += `${key}: ${val}\n`;
+    }
+    if ((req.method === 'POST' || req.method === 'PUT') && req.bodyContent) {
+      data += '\n' + req.bodyContent;
+    }
+    console.log(data.trim() + ' | %o', 'background-color:lightgreen;','color:initial;background-color:initial;', req.bodyContent);
+  }
+}
+
+class Response {
+  constructor() {
+    this.status = 200;
+    this.statusText = 'OK';
+    this.headers = new window.Headers();
+    this.body = '';
+  }
+
+  get bodyContent() {
+    return this.body;
+  }
+
+  send(body) {
+    this.body = body;
+  }
+
+  json(json) {
+    this.headers.set('Content-Type', 'application/json; charset=utf-8');
+    this.body = JSON.stringify(json);
+  }
+
+  async toResponse() {
+    const response = new window.Response(this.body, {
+      status: this.status,
+      statusText: this.statusText,
+      headers: this.headers,
+    });
+    response.bodyContent = this.body;
+    return response;
+  }
+
+  log(res = null) {
+    res = res === null ? this : res;
+    let data = `%cHTTP/1.1 ${res.status} ${res.statusText}%c\n`;
+    for (const [key, val] of res.headers) {
+      data += `${key}: ${val}\n`;
+    }
+    data += '\n' + res.bodyContent;
+    data = data.trim() + ' | %o\n================================================================================';
+    console.log(data, 'background-color:lightblue;','color:initial;background-color:initial;', res.bodyContent);
+  }
+}
+
+class Server {
+  constructor(host = null) {
+    this.host = host ? host : window.location.host;
+    this.middlewares = [];
+    this.handler = null;
+  }
+
+  use(middleware) {
+    this.middlewares.push(middleware);
+  }
+
+  isHost(host) {
+    return this.host.constructor === RegExp ? this.host.test(host) : this.host === host;
+  }
+
+  get(path, handle) {
+    this.route('GET', path, handle);
+  }
+
+  post(path, handle) {
+    this.route('POST', path, handle);
+  }
+
+  put(path, handle) {
+    this.route('PUT', path, handle);
+  }
+
+  delete(path, handle) {
+    this.route('DELETE', path, handle);
+  }
+
+  path2regexp(path) {
+    if (path.constructor === RegExp) {
+      return path;
+    }
+    const paramsNames = [...path.matchAll(/:([a-z_][a-z0-9_]*)/ig)].map(v => v[1]);
+    let pathRegStr = '^' + path.replace(/\//g, '\\/') + '$';
+    for (const name of paramsNames) {
+      pathRegStr = pathRegStr.replace(':' + name, `(?<${name}>[a-z0-9_]+)`);
+    }
+    return new RegExp(pathRegStr, 'ig');
+  }
+
+  route(method, path, handle) {
+    const pathReg = this.path2regexp(path);
+    this.use(async(req, next) => {
+      if (req.method !== method || !new RegExp(pathReg.source, pathReg.flags).test(req.uri.pathname)) {
+        return await next(req);
+      }
+      req.params = entries2props(new window.URLSearchParams([...req.uri.pathname.matchAll(new RegExp(pathReg.source, pathReg.flags))].pop().groups));
+      await handle(req, next);
+    });
+  }
+
+  getHandler() {
+    let nextMiddleware = async(req) => {
+      req.response.status = 444;
+    };
+    for (let i = this.middlewares.length - 1; i >= 0; i--) {
+      const middleware = this.middlewares[i];
+      const next = nextMiddleware;
+      nextMiddleware = async (req) => await middleware(req, next);
+    }
+    return nextMiddleware;
+  }
+
+  async handle(req) {
+    if (this.handler === null) {
+      this.handler = this.getHandler();
+    }
+    const request = await req.toRequest();
+    const res = request.response;
+    if (false) {}
+    await this.handler(request);
+    req.response = await request.response.toResponse();
+    if (false) {}
+  }
+}
+
+module.exports = {
+  Request,
+  Response,
+  Server,
+};
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // ====== constant ======
@@ -302,14 +512,18 @@ pino.locale = function(locale) {
   locale(pino);
 };
 
-pino.locale(__webpack_require__(1));
+pino.locale(__webpack_require__(2));
 
 // ====== Server fetch XMLHttpRequest ======
 
 if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.cookie !== 'undefined') {
   // ====== Server ======
 
-  pino.Server = __webpack_require__(11);
+  const { Request, Response, Server } = __webpack_require__(0);
+
+  pino.Request = Request;
+  pino.Response = Response;
+  pino.Server = Server;
 
   pino.server = new pino.Server();
   pino.use = pino.server.use.bind(pino.server);
@@ -363,18 +577,18 @@ module.exports = pino;
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const address = __webpack_require__(2);
-const automotive = __webpack_require__(3);
-const color = __webpack_require__(4);
-const company = __webpack_require__(5);
-const date = __webpack_require__(6);
-const image = __webpack_require__(7);
-const internet = __webpack_require__(8);
-const lorem = __webpack_require__(9);
-const person = __webpack_require__(10);
+const address = __webpack_require__(3);
+const automotive = __webpack_require__(4);
+const color = __webpack_require__(5);
+const company = __webpack_require__(6);
+const date = __webpack_require__(7);
+const image = __webpack_require__(8);
+const internet = __webpack_require__(9);
+const lorem = __webpack_require__(10);
+const person = __webpack_require__(11);
 
 module.exports = function(pino) {
   address(pino);
@@ -390,7 +604,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 const address_countries = [
@@ -658,7 +872,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 const automotive_provinces = {
@@ -729,7 +943,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 const color_names = [
@@ -836,7 +1050,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 // const pinyin = require('node-pinyin');
@@ -929,7 +1143,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 function date_expr(expr, date = new Date()) {
@@ -984,7 +1198,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function image_url(options) {
@@ -1113,7 +1327,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 const internet_free_email_domains = [
@@ -1256,7 +1470,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 const lorem_words = [
@@ -1317,7 +1531,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 // const pinyin = require('node-pinyin');
@@ -1354,7 +1568,7 @@ const person_last_names_pinyin = [
   'fu', 'yuan', 'guang', 'guan', 'dong', 'feng', 'leng', 'dao', 'diao', 'liu',
   'gang', 'qu', 'ban', 'hua', 'dan', 'bu', 'lu', 'gu', 'ke', 'ye', 'hou',
   'lv', 'han', 'wu', 'zhou', 'hu', 'he', 'yong', 'pin', 'gen', 'tang', 'hui',
-  'kun', 'xia', 'duo', 'ye', 'da', 'qi', 'jiang', 'wei', 'kong', 'sun', 'meng',
+  'kun', 'xia', 'duo', 'ye', 'long', 'qi', 'jiang', 'wei', 'kong', 'sun', 'meng',
   'ning', 'yu', 'an', 'song', 'guan', 'you', 'jia', 'mei', 'you', 'yao', 'yin',
   'tu', 'yue', 'cui', 'chuan', 'zuo', 'wu', 'chang', 'ping', 'ying', 'pang',
   'kang', 'yu', 'liao', 'zhang', 'xian', 'zhang', 'peng', 'xu', 'de', 'heng',
@@ -1375,7 +1589,7 @@ const person_last_names_pinyin = [
   'hao', 'guo', 'ku', 'shi', 'jin', 'zhong', 'qin', 'niu', 'gao', 'yan', 'yan',
   'kan', 'ruan', 'yang', 'a', 'lu', 'chen', 'tao', 'yu', 'lei', 'huo', 'wei',
   'han', 'gu', 'yan', 'rao', 'man', 'ma', 'luo', 'gao', 'wei', 'lu', 'bao',
-  'hong', 'peng', 'lu', 'mai', 'huang', 'li', 'hei', 'qi', 'long',
+  'hong', 'peng', 'lu', 'mai', 'huang', 'li', 'hei', 'qi',
 ];
 
 const person_first_names_male = [
@@ -1422,7 +1636,7 @@ const person_first_names_male_pinyin = [
   'jiacheng', 'wa', 'jue', 'zitao', 'geye', 'yin', 'zuming', 'weiren', 'haokang',
   'gang', 'dongjun', 'fangyuan', 'guohao', 'minyou', 'xi', 'mingyang', 'zhijian',
   'jihan', 'zheming', 'shengqiang', 'kun', 'guofeng', 'ziyang', 'zhentang', 'jicong',
-  'jiang', 'chongzheng', 'hu', 'xishui', 'zhangwei', 'tu', 'zhongping', 'dezhong',
+  'jiang', 'chongzheng', 'hu', 'xishui', 'weijian', 'tu', 'zhongping', 'dezhong',
   'hansheng', 'dunhao', 'jiling', 'chengguang', 'shixian', 'jinhao', 'xiezhi',
   'zhiping', 'chuanhui', 'qitian', 'sheng', 'tanghao', 'genghong', 'jianglong',
   'wensen', 'tianshuo', 'zhian', 'yueting', 'shaosheng', 'yundi', 'kun', 'qi',
@@ -1438,7 +1652,7 @@ const person_first_names_male_pinyin = [
   'jianhui', 'yida', 'guojing', 'chengming', 'zhicheng', 'ming', 'minghan', 'wencheng',
   'zihua', 'mao', 'yijie', 'yuanzhe', 'chen', 'jiaying', 'geng', 'yipeng', 'zhihao',
   'shiwei', 'shanwei', 'ti', 'buyi', 'shuquan', 'ruoyun', 'shuang', 'qi', 'sheng',
-  'rui', 'chengang', 'zongze', 'junlong', 'zun', 'zhengxiao', 'huanyu', 'weijian',
+  'rui', 'chengang', 'zongze', 'junlong', 'zun', 'zhengxiao', 'huanyu',
 ];
 
 const person_first_names_female = [
@@ -1632,154 +1846,18 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-function entries2props(vals) {
-  if (vals.entries) {
-    for (const [name, value] of vals.entries()) {
-      vals[name] = value;
-    }
-  }
-  return vals;
-}
-
-class Server {
-  constructor(host = null) {
-    this.host = host ? host : window.location.host;
-    this.middlewares = [];
-    this.handler = null;
-  }
-
-  use(middleware) {
-    this.middlewares.push(middleware);
-  }
-
-  isHost(host) {
-    return this.host.constructor === RegExp ? this.host.test(host) : this.host === host;
-  }
-
-  get(path, handle) {
-    this.route('GET', path, handle);
-  }
-
-  post(path, handle) {
-    this.route('POST', path, handle);
-  }
-
-  put(path, handle) {
-    this.route('PUT', path, handle);
-  }
-
-  delete(path, handle) {
-    this.route('DELETE', path, handle);
-  }
-
-  route(method, path, handle) {
-    let pathReg = path;
-    if (path.constructor === String) {
-      const paramsNames = [...path.matchAll(/:([a-z_][a-z0-9_]*)/ig)].map(v => v[1]);
-      let pathRegStr = '^' + path.replace(/\//g, '\\/') + '$';
-      for (const name of paramsNames) {
-        pathRegStr = pathRegStr.replace(':' + name, `(?<${name}>[a-z0-9_]+)`);
-      }
-      pathReg = new RegExp(pathRegStr, 'ig');
-    }
-    this.use(async(req, next) => {
-      if (req.method !== method || !new RegExp(pathReg.source, pathReg.flags).test(req.uri.pathname)) {
-        await next(req);
-        return;
-      }
-      req.params = entries2props(new window.URLSearchParams([...req.uri.pathname.matchAll(new RegExp(pathReg.source, pathReg.flags))].pop().groups));
-      await handle(req, next);
-    });
-  }
-
-  getHandler() {
-    let nextMiddleware = async(req) => {
-      req.response.status = 444;
-    };
-    for (let i = this.middlewares.length - 1; i >= 0; i--) {
-      const middleware = this.middlewares[i];
-      const next = nextMiddleware;
-      nextMiddleware = async (req) => await middleware(req, next);
-    }
-    return nextMiddleware;
-  }
-
-  async handle(req) {
-    if (this.handler === null) {
-      this.handler = this.getHandler();
-    }
-    const init = req;
-    init.method = init.method ? init.method.toUpperCase() : 'GET';
-    const uri = new window.URL(init.url, window.location.href);
-    init.headers = new window.Headers(req.headers ? req.headers : {});
-    req = new window.Request(req.url, req);
-    req.uri = uri;
-    req.bodyContent = init.body || '';
-    req.params = new window.URLSearchParams();
-    req.query = entries2props(new window.URLSearchParams(req.uri.search));
-    if ((req.method === 'POST' || req.method === 'PUT') && req.headers.get('Content-Type')) {
-      if (req.headers.get('Content-Type').startsWith('application/x-www-form-urlencoded')) {
-        req.form = entries2props(new window.URLSearchParams(await req.text()));
-      } else {
-        req.form = new window.URLSearchParams();
-      }
-      if (req.headers.get('Content-Type').startsWith('multipart/form-data')) {
-        req.formData = await req.formData();
-      } else {
-        req.formData = new FormData();
-      }
-      if (req.headers.get('Content-Type').startsWith('application/json')) {
-        req.json = await req.json();
-      } else {
-        req.json = {};
-      }
-    } else {
-      req.form = new window.URLSearchParams();
-      req.formData = new FormData();
-      req.json = {};
-    }
-    req.response = {
-      status: 200,
-      statusText: 'OK',
-      headers: new window.Headers(),
-      body: '',
-      send(body) {
-        this.body = body;
-      },
-      sendJson(json) {
-        this.body = JSON.stringify(json);
-      },
-    };
-    if (false) {}
-    await this.handler(req);
-    const res = req.response;
-    req.response = new window.Response(res.body, {
-      status: res.status,
-      statusText: res.statusText,
-      headers: res.headers,
-    });
-    req.response.bodyContent = res.body;
-    if (false) {}
-    return req.response;
-  }
-}
-
-module.exports = Server;
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports) {
+const { Request } = __webpack_require__(0);
 
 window.fetchReal = window.fetch;
 
 async function fetch(url, init = {}, ...args) {
-  const req = { url, method: 'GET', headers: new window.Headers(), ...init, response: {} };
-  const res = await fetch.handle(req);
-  return res.status === 444 ? window.fetchReal(url, init, ...args) : res;
+  const req = new Request(url, init, ...args);
+  await fetch.handle(req);
+  const response = req.response;
+  return response.status === 444 ? window.fetchReal(url, init, ...args) : response;
 }
 
 fetch.handle = async function(req) {
@@ -1791,7 +1869,9 @@ module.exports = fetch;
 
 /***/ }),
 /* 13 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+const { Request } = __webpack_require__(0);
 
 window.XMLHttpRequestReal = window.XMLHttpRequest;
 
@@ -1800,37 +1880,30 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
     super();
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Request
-    this.req = {
-      uri: null,
-      url: '',
-      method: 'GET',
-      headers: new window.Headers(),
-    };
+    this.req = null;
   }
 
   getAllResponseHeaders() {
-    if (this.req.response === false) {
+    if (this.req.response.status === 444) {
       return super.getAllResponseHeaders();
     }
     let headers = '';
-    for (const [name, value] of this.res.headers.entries()) {
+    for (const [name, value] of this.req.response.headers.entries()) {
       headers += `${name}: ${value}\r\n`;
     }
     return headers;
   }
 
   getResponseHeader(name) {
-    if (this.req.response === false) {
+    if (this.req.response.status === 444) {
       return super.getResponseHeader(name);
     }
-    return this.req.headers.get(name);
+    return this.req.response.headers.get(name);
   }
 
   open(method, url, async = true, ...args) {
     super.open(method, url, async, ...args);
-    this.req.uri = new window.URL(url, window.location.href);
-    this.req.url = this.req.uri.href;
-    this.req.method = method.toUpperCase();
+    this.req = new Request(url, { method });
   }
 
   setRequestHeader(name, value) {
@@ -1839,20 +1912,23 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
   }
 
   async send(value = '') {
+    const req = this.req;
+
     this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    this.req.headers.set('Host', this.req.uri.host);
-    this.req.headers.set('User-Agent', window.navigator.userAgent);
-    this.req.headers.set('Accept', '*/*');
-    this.req.headers.set('Referer', window.location.href);
-    this.req.headers.set('Accept-Language', window.navigator.language);
-    this.req.headers.set('Cookie', window.document.cookie);
-    if (this.req.method === 'POST' || this.req.method === 'PUT') {
-      this.req.body = value;
+    req.headers.set('Host', req.uri.host);
+    req.headers.set('User-Agent', window.navigator.userAgent);
+    req.headers.set('Accept', '*/*');
+    req.headers.set('Referer', window.location.href);
+    req.headers.set('Accept-Language', window.navigator.language);
+    req.headers.set('Cookie', window.document.cookie);
+    if (req.method === 'POST' || req.method === 'PUT') {
+      req.body = value;
     }
 
-    this.res = await XMLHttpRequest.handle(this.req);
+    await XMLHttpRequest.handle(req);
 
-    if (this.res.status === 444) {
+    const response = req.response;
+    if (response.status === 444) {
       return super.send(value);
     }
     
@@ -1869,9 +1945,9 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
     });
 
     this.readyState = 4;
-    this.status = this.res.status;
-    this.statusText = this.res.statusText;
-    this.responseText = await this.res.text();
+    this.status = response.status;
+    this.statusText = response.statusText;
+    this.responseText = await response.text();
 
     setTimeout(() => {
       if (this.onload) {
@@ -1879,7 +1955,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
       } else if (this.onreadystatechange) {
         this.onreadystatechange();
       } else {
-        this.dispatchEvent(new Event('load'))
+        this.dispatchEvent(new Event('load'));
       }
     }, XMLHttpRequest.delay);
   }

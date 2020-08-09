@@ -1,3 +1,5 @@
+const { Request } = require('./Server');
+
 window.XMLHttpRequestReal = window.XMLHttpRequest;
 
 class XMLHttpRequest extends window.XMLHttpRequestReal {
@@ -5,37 +7,30 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
     super();
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Request
-    this.req = {
-      uri: null,
-      url: '',
-      method: 'GET',
-      headers: new window.Headers(),
-    };
+    this.req = null;
   }
 
   getAllResponseHeaders() {
-    if (this.req.response === false) {
+    if (this.req.response.status === 444) {
       return super.getAllResponseHeaders();
     }
     let headers = '';
-    for (const [name, value] of this.res.headers.entries()) {
+    for (const [name, value] of this.req.response.headers.entries()) {
       headers += `${name}: ${value}\r\n`;
     }
     return headers;
   }
 
   getResponseHeader(name) {
-    if (this.req.response === false) {
+    if (this.req.response.status === 444) {
       return super.getResponseHeader(name);
     }
-    return this.req.headers.get(name);
+    return this.req.response.headers.get(name);
   }
 
   open(method, url, async = true, ...args) {
     super.open(method, url, async, ...args);
-    this.req.uri = new window.URL(url, window.location.href);
-    this.req.url = this.req.uri.href;
-    this.req.method = method.toUpperCase();
+    this.req = new Request(url, { method });
   }
 
   setRequestHeader(name, value) {
@@ -44,20 +39,23 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
   }
 
   async send(value = '') {
+    const req = this.req;
+
     this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    this.req.headers.set('Host', this.req.uri.host);
-    this.req.headers.set('User-Agent', window.navigator.userAgent);
-    this.req.headers.set('Accept', '*/*');
-    this.req.headers.set('Referer', window.location.href);
-    this.req.headers.set('Accept-Language', window.navigator.language);
-    this.req.headers.set('Cookie', window.document.cookie);
-    if (this.req.method === 'POST' || this.req.method === 'PUT') {
-      this.req.body = value;
+    req.headers.set('Host', req.uri.host);
+    req.headers.set('User-Agent', window.navigator.userAgent);
+    req.headers.set('Accept', '*/*');
+    req.headers.set('Referer', window.location.href);
+    req.headers.set('Accept-Language', window.navigator.language);
+    req.headers.set('Cookie', window.document.cookie);
+    if (req.method === 'POST' || req.method === 'PUT') {
+      req.body = value;
     }
 
-    this.res = await XMLHttpRequest.handle(this.req);
+    await XMLHttpRequest.handle(req);
 
-    if (this.res.status === 444) {
+    const response = req.response;
+    if (response.status === 444) {
       return super.send(value);
     }
     
@@ -74,9 +72,9 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
     });
 
     this.readyState = 4;
-    this.status = this.res.status;
-    this.statusText = this.res.statusText;
-    this.responseText = await this.res.text();
+    this.status = response.status;
+    this.statusText = response.statusText;
+    this.responseText = await response.text();
 
     setTimeout(() => {
       if (this.onload) {
@@ -84,7 +82,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
       } else if (this.onreadystatechange) {
         this.onreadystatechange();
       } else {
-        this.dispatchEvent(new Event('load'))
+        this.dispatchEvent(new Event('load'));
       }
     }, XMLHttpRequest.delay);
   }
