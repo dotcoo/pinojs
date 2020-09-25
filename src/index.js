@@ -204,63 +204,12 @@ pino.locale = function(locale) {
 
 pino.locale(require('./providers/zh_CN'));
 
-// ====== Server fetch XMLHttpRequest ======
+// ====== extension ======
 
-if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.cookie !== 'undefined') {
-  // ====== Server ======
-
-  const { Request, Response, Server } = require('./Server');
-
-  pino.Request = Request;
-  pino.Response = Response;
-  pino.Server = Server;
-
-  pino.server = new pino.Server();
-  pino.use = pino.server.use.bind(pino.server);
-  pino.get = pino.server.get.bind(pino.server);
-  pino.post = pino.server.post.bind(pino.server);
-  pino.put = pino.server.put.bind(pino.server);
-  pino.delete = pino.server.delete.bind(pino.server);
-  pino.route = pino.server.route.bind(pino.server);
-
-  pino.servers = [pino.server];
-
-  pino.addServer = function(server) {
-    this.servers.push(server);
-  };
-
-  pino.handle = async function(req) {
-    for (const server of this.servers) {
-      if (server.isHost(new window.URL(req.url, window.location.href).host)) {
-        return await server.handle(req);
-      }
-    }
-    return { status: 444 };
-  };
-
-  // ====== fetch ======
-
-  pino.fetch = require('./fetch');
-  pino.fetch.handle = pino.handle.bind(pino);
-
-  // ====== XMLHttpRequest ======
-
-  pino.XMLHttpRequest = require('./XMLHttpRequest');
-  pino.XMLHttpRequest.handle = pino.handle.bind(pino);
-
-  // ====== install ======
-
-  pino.install = function() {
-    window.XMLHttpRequest = pino.XMLHttpRequest;
-    window.fetch = pino.fetch;
-  };
-
-  pino.uninstall = function() {
-    window.fetch = window.fetchReal;
-    window.XMLHttpRequest = window.XMLHttpRequestReal;
-  };
-}
+pino.use = function(func) {
+  func(pino);
+};
 
 // ====== export ======
 
-module.exports = pino;
+export default pino;

@@ -1,5 +1,3 @@
-pino.install();
-
 (async() => {
   // get
   const res1 = await fetch('/blog/1000/comment/1111');

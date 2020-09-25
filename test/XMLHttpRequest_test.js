@@ -1,5 +1,3 @@
-pino.install();
-
 // ====== XMLHttpRequest ======
 
 const xhr1 = new XMLHttpRequest();

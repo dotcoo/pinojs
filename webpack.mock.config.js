@@ -6,14 +6,14 @@ const TerserPlugin = require('terser-webpack-plugin');
 const config = {
   mode: 'development',
   entry: {
-    'pino': path.join(__dirname, './src/index.js'),
-    'pino.min': path.join(__dirname, './src/index.js'),
+    'pino.mock': path.join(__dirname, './src/mock/index.js'),
+    'pino.mock.min': path.join(__dirname, './src/mock/index.js'),
   },
   output: {
     path: path.join(__dirname, './dist'),
     filename: '[name].js',
     globalObject: 'this',
-    library: 'pino',
+    library: 'pinomock',
     libraryTarget: 'umd',
     libraryExport: 'default',
   },

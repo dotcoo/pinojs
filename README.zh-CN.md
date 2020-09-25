@@ -1,8 +1,8 @@
-[English](https://github.com/wee9/pinojs/blob/master/README.md) | 简体中文
+[English](https://github.com/wuyawl/pinojs/blob/master/README.md) | 简体中文
 
 ## 简介
 
-[pinojs](https://github.com/wee9/pinojs)， 拦截ajax请求并响应假数据。
+[pinojs](https://github.com/wuyawl/pinojs)， 拦截ajax请求并响应假数据。
 
 ## 安装
 
@@ -412,15 +412,13 @@ console.log(pino.range(10, pino.phone));
 // 请求处理
 
 // middleware1
-pino.use(async (req, next) => {
+pino.addRequestMiddleware(async(req) => {
   req.haha = 'm1';
-  await next(req);
 });
 
 // middleware2
-pino.use(async (req, next) => {
+pino.addRequestMiddleware(async (req) => {
   req.haha += 'm2';
-  await next(req);
 });
 
 pino.get('/blog/:bid', async(req) => {
@@ -428,7 +426,7 @@ pino.get('/blog/:bid', async(req) => {
   const res = req.response; // 获取响应
   res.status = 200;
   res.statusText = 'OK';
-  res.headers.set('Content-Type', 'application/json');
+  res.headers['Content-Type'], 'application/json';
   res.send(JSON.stringify({ // 响应数据
     request: 'get blog',
     params: req.params, // url路径参数
@@ -444,7 +442,7 @@ pino.post('/blog/:bid', async(req) => {
   const res = req.response;
   res.status = 200;
   res.statusText = 'OK';
-  res.headers.set('Content-Type', 'application/json');
+  res.headers['Content-Type'], 'application/json';
   res.json({ // 响应JSON数据
     request: 'post blog',
     params: req.params, // url路径参数
@@ -456,10 +454,10 @@ pino.post('/blog/:bid', async(req) => {
 });
 
 // 替换 XMLHttpRequest 和 fetch
-pino.install();
+pino.intercept();
 
 // 恢复 XMLHttpRequest 和 fetch
-pino.uninstall();
+pino.unintercept();
 ```
 
 ### fetch 发起请求
@@ -562,6 +560,6 @@ xhr5.onreadystatechange = function() {
 
 ## License
 
-[MIT](https://github.com/wee9/pinojs/blob/master/LICENSE) license.
+[MIT](https://github.com/wuyawl/pinojs/blob/master/LICENSE) license.
 
 Copyright (c) 2020-present dotcoo zhao

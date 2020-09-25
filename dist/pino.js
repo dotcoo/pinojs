@@ -7,7 +7,7 @@
 		exports["pino"] = factory();
 	else
 		root["pino"] = factory();
-})(window, function() {
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -91,223 +91,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-function entries2props(vals) {
-  if (vals.entries) {
-    for (const [name, value] of vals.entries()) {
-      vals[name] = value;
-    }
-  }
-  return vals;
-}
-
-class Request {
-  constructor(url, init = {}) {
-    this.method = init.method ? init.method.toUpperCase() : 'GET';
-    this.uri = new window.URL(url, window.location.href);
-    this.url = this.uri.href;
-    this.headers = new window.Headers(init.headers || {});
-    this.body = init.body || '';
-    this.init = init;
-    this.response = null;
-  }
-
-  get bodyContent() {
-    return this.body;
-  }
-
-  async toRequest() {
-    const init = {
-      ...this.init,
-      method: this.method,
-      headers: this.headers,
-    };
-    if (this.method === 'POST' || this.method === 'PUT') {
-      init.body = this.body;
-    }
-    const request = new window.Request(this.url, init);
-    request.uri = this.uri;
-    request.bodyContent = this.body;
-    request.params = new window.URLSearchParams();
-    request.query = entries2props(new window.URLSearchParams(request.uri.search));
-    if ((request.method === 'POST' || request.method === 'PUT') && request.headers.get('Content-Type')) {
-      if (request.headers.get('Content-Type').startsWith('application/x-www-form-urlencoded')) {
-        request.form = entries2props(new window.URLSearchParams(await request.text()));
-      } else {
-        request.form = new window.URLSearchParams();
-      }
-      if (request.headers.get('Content-Type').startsWith('multipart/form-data')) {
-        request.formData = await request.formData();
-      } else {
-        request.formData = new FormData();
-      }
-      if (request.headers.get('Content-Type').startsWith('application/json')) {
-        request.json = await request.json();
-      } else {
-        request.json = {};
-      }
-    } else {
-      request.form = new window.URLSearchParams();
-      request.formData = new FormData();
-      request.json = {};
-    }
-    request.response = new Response();
-    return request;
-  }
-
-  log(req = null) {
-    req = req === null ? this : req;
-    let data = '================================================================================\n'
-    data += `%c${req.method} ${req.uri.pathname + req.uri.search} HTTP/1.1%c\n`;
-    for (const [key, val] of req.headers) {
-      data += `${key}: ${val}\n`;
-    }
-    if ((req.method === 'POST' || req.method === 'PUT') && req.bodyContent) {
-      data += '\n' + req.bodyContent;
-    }
-    console.log(data.trim() + ' | %o', 'background-color:lightgreen;','color:initial;background-color:initial;', req.bodyContent);
-  }
-}
-
-class Response {
-  constructor() {
-    this.status = 200;
-    this.statusText = 'OK';
-    this.headers = new window.Headers();
-    this.body = '';
-  }
-
-  get bodyContent() {
-    return this.body;
-  }
-
-  send(body) {
-    this.body = body;
-  }
-
-  json(json) {
-    this.headers.set('Content-Type', 'application/json; charset=utf-8');
-    this.body = JSON.stringify(json);
-  }
-
-  async toResponse() {
-    const response = new window.Response(this.body, {
-      status: this.status,
-      statusText: this.statusText,
-      headers: this.headers,
-    });
-    response.bodyContent = this.body;
-    return response;
-  }
-
-  log(res = null) {
-    res = res === null ? this : res;
-    let data = `%cHTTP/1.1 ${res.status} ${res.statusText}%c\n`;
-    for (const [key, val] of res.headers) {
-      data += `${key}: ${val}\n`;
-    }
-    data += '\n' + res.bodyContent;
-    data = data.trim() + ' | %o\n================================================================================';
-    console.log(data, 'background-color:lightblue;','color:initial;background-color:initial;', res.bodyContent);
-  }
-}
-
-class Server {
-  constructor(host = null) {
-    this.host = host ? host : window.location.host;
-    this.middlewares = [];
-    this.handler = null;
-  }
-
-  use(middleware) {
-    this.middlewares.push(middleware);
-  }
-
-  isHost(host) {
-    return this.host.constructor === RegExp ? this.host.test(host) : this.host === host;
-  }
-
-  get(path, handle) {
-    this.route('GET', path, handle);
-  }
-
-  post(path, handle) {
-    this.route('POST', path, handle);
-  }
-
-  put(path, handle) {
-    this.route('PUT', path, handle);
-  }
-
-  delete(path, handle) {
-    this.route('DELETE', path, handle);
-  }
-
-  path2regexp(path) {
-    if (path.constructor === RegExp) {
-      return path;
-    }
-    const paramsNames = [...path.matchAll(/:([a-z_][a-z0-9_]*)/ig)].map(v => v[1]);
-    let pathRegStr = '^' + path.replace(/\//g, '\\/') + '$';
-    for (const name of paramsNames) {
-      pathRegStr = pathRegStr.replace(':' + name, `(?<${name}>[a-z0-9_]+)`);
-    }
-    return new RegExp(pathRegStr, 'ig');
-  }
-
-  route(method, path, handle) {
-    const pathReg = this.path2regexp(path);
-    this.use(async(req, next) => {
-      if (req.method !== method || !new RegExp(pathReg.source, pathReg.flags).test(req.uri.pathname)) {
-        return await next(req);
-      }
-      req.params = entries2props(new window.URLSearchParams([...req.uri.pathname.matchAll(new RegExp(pathReg.source, pathReg.flags))].pop().groups));
-      await handle(req, next);
-    });
-  }
-
-  getHandler() {
-    let nextMiddleware = async(req) => {
-      req.response.status = 444;
-    };
-    for (let i = this.middlewares.length - 1; i >= 0; i--) {
-      const middleware = this.middlewares[i];
-      const next = nextMiddleware;
-      nextMiddleware = async (req) => await middleware(req, next);
-    }
-    return nextMiddleware;
-  }
-
-  async handle(req) {
-    if (this.handler === null) {
-      this.handler = this.getHandler();
-    }
-    const request = await req.toRequest();
-    const res = request.response;
-    if (false) {}
-    await this.handler(request);
-    req.response = await request.response.toResponse();
-    if (false) {}
-  }
-}
-
-module.exports = {
-  Request,
-  Response,
-  Server,
-};
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
+"use strict";
+__webpack_require__.r(__webpack_exports__);
 // ====== constant ======
 
 const MIN_BYTE = -128;
@@ -512,83 +304,32 @@ pino.locale = function(locale) {
   locale(pino);
 };
 
-pino.locale(__webpack_require__(2));
+pino.locale(__webpack_require__(1));
 
-// ====== Server fetch XMLHttpRequest ======
+// ====== extension ======
 
-if (typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.cookie !== 'undefined') {
-  // ====== Server ======
-
-  const { Request, Response, Server } = __webpack_require__(0);
-
-  pino.Request = Request;
-  pino.Response = Response;
-  pino.Server = Server;
-
-  pino.server = new pino.Server();
-  pino.use = pino.server.use.bind(pino.server);
-  pino.get = pino.server.get.bind(pino.server);
-  pino.post = pino.server.post.bind(pino.server);
-  pino.put = pino.server.put.bind(pino.server);
-  pino.delete = pino.server.delete.bind(pino.server);
-  pino.route = pino.server.route.bind(pino.server);
-
-  pino.servers = [pino.server];
-
-  pino.addServer = function(server) {
-    this.servers.push(server);
-  };
-
-  pino.handle = async function(req) {
-    for (const server of this.servers) {
-      if (server.isHost(new window.URL(req.url, window.location.href).host)) {
-        return await server.handle(req);
-      }
-    }
-    return { status: 444 };
-  };
-
-  // ====== fetch ======
-
-  pino.fetch = __webpack_require__(12);
-  pino.fetch.handle = pino.handle.bind(pino);
-
-  // ====== XMLHttpRequest ======
-
-  pino.XMLHttpRequest = __webpack_require__(13);
-  pino.XMLHttpRequest.handle = pino.handle.bind(pino);
-
-  // ====== install ======
-
-  pino.install = function() {
-    window.XMLHttpRequest = pino.XMLHttpRequest;
-    window.fetch = pino.fetch;
-  };
-
-  pino.uninstall = function() {
-    window.fetch = window.fetchReal;
-    window.XMLHttpRequest = window.XMLHttpRequestReal;
-  };
-}
+pino.use = function(func) {
+  func(pino);
+};
 
 // ====== export ======
 
-module.exports = pino;
+/* harmony default export */ __webpack_exports__["default"] = (pino);
 
 
 /***/ }),
-/* 2 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const address = __webpack_require__(3);
-const automotive = __webpack_require__(4);
-const color = __webpack_require__(5);
-const company = __webpack_require__(6);
-const date = __webpack_require__(7);
-const image = __webpack_require__(8);
-const internet = __webpack_require__(9);
-const lorem = __webpack_require__(10);
-const person = __webpack_require__(11);
+const address = __webpack_require__(2);
+const automotive = __webpack_require__(3);
+const color = __webpack_require__(4);
+const company = __webpack_require__(5);
+const date = __webpack_require__(6);
+const image = __webpack_require__(7);
+const internet = __webpack_require__(8);
+const lorem = __webpack_require__(9);
+const person = __webpack_require__(10);
 
 module.exports = function(pino) {
   address(pino);
@@ -604,7 +345,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports) {
 
 const address_countries = [
@@ -872,7 +613,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports) {
 
 const automotive_provinces = {
@@ -943,7 +684,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports) {
 
 const color_names = [
@@ -1050,7 +791,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports) {
 
 // const pinyin = require('node-pinyin');
@@ -1143,7 +884,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports) {
 
 function date_expr(expr, date = new Date()) {
@@ -1165,7 +906,7 @@ function date_expr(expr, date = new Date()) {
       args['ymdhis'.indexOf(unit)] += number - 0;
     }
     return new Date(...args);
-  } else if (typeof expr === 'string' && expr === 'today') {
+  } else if (typeof expr === 'string' && (expr === 'today' || expr === 'now')) {
     return new Date();
   } else if (typeof expr === 'string') {
     return new Date(expr);
@@ -1175,14 +916,16 @@ function date_expr(expr, date = new Date()) {
 }
 
 function date_format(date, format = 'y-m-d h:i:s') {
-  const y = date.getFullYear().toString().padStart(2, 0);
-  const m = (date.getMonth() + 1).toString().padStart(2, 0);
-  const d = date.getDate().toString().padStart(2, 0);
-  const h = date.getHours().toString().padStart(2, 0);
-  const i = date.getMinutes().toString().padStart(2, 0);
-  const s = date.getSeconds().toString().padStart(2, 0);
-  return format.replace(/y/ig, y).replace(/m/ig, m).replace(/d/ig, d).replace(/h/ig, h).replace(/i/ig, i).replace(/s/ig, s);
-}
+  const dates = {
+    y: date.getFullYear(),
+    m: date.getMonth() + 1,
+    d: date.getDate(),
+    h: date.getHours(),
+    i: date.getMinutes(),
+    s: date.getSeconds(),
+  };
+  return format.replace(/([ymdhis]+)/ig, (match, key) => dates[key.toLowerCase()].toString().padStart(2, '0'));
+};
 
 function date(start = 0, end = 4294967295000, format = 'y-m-d h:i:s') {
   start = this.date_expr(start);
@@ -1198,7 +941,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function image_url(options) {
@@ -1327,7 +1070,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports) {
 
 const internet_free_email_domains = [
@@ -1470,7 +1213,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports) {
 
 const lorem_words = [
@@ -1531,7 +1274,7 @@ module.exports = function(pino) {
 
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports) {
 
 // const pinyin = require('node-pinyin');
@@ -1845,132 +1588,7 @@ module.exports = function(pino) {
 };
 
 
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const { Request } = __webpack_require__(0);
-
-window.fetchReal = window.fetch;
-
-async function fetch(url, init = {}, ...args) {
-  const req = new Request(url, init, ...args);
-  await fetch.handle(req);
-  const response = req.response;
-  return response.status === 444 ? window.fetchReal(url, init, ...args) : response;
-}
-
-fetch.handle = async function(req) {
-  req.response.status = 444;
-};
-
-module.exports = fetch;
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const { Request } = __webpack_require__(0);
-
-window.XMLHttpRequestReal = window.XMLHttpRequest;
-
-class XMLHttpRequest extends window.XMLHttpRequestReal {
-  constructor() {
-    super();
-
-    // https://developer.mozilla.org/en-US/docs/Web/API/Request
-    this.req = null;
-  }
-
-  getAllResponseHeaders() {
-    if (this.req.response.status === 444) {
-      return super.getAllResponseHeaders();
-    }
-    let headers = '';
-    for (const [name, value] of this.req.response.headers.entries()) {
-      headers += `${name}: ${value}\r\n`;
-    }
-    return headers;
-  }
-
-  getResponseHeader(name) {
-    if (this.req.response.status === 444) {
-      return super.getResponseHeader(name);
-    }
-    return this.req.response.headers.get(name);
-  }
-
-  open(method, url, async = true, ...args) {
-    super.open(method, url, async, ...args);
-    this.req = new Request(url, { method });
-  }
-
-  setRequestHeader(name, value) {
-    super.setRequestHeader(name, value);
-    this.req.headers.set(name, value);
-  }
-
-  async send(value = '') {
-    const req = this.req;
-
-    this.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    req.headers.set('Host', req.uri.host);
-    req.headers.set('User-Agent', window.navigator.userAgent);
-    req.headers.set('Accept', '*/*');
-    req.headers.set('Referer', window.location.href);
-    req.headers.set('Accept-Language', window.navigator.language);
-    req.headers.set('Cookie', window.document.cookie);
-    if (req.method === 'POST' || req.method === 'PUT') {
-      req.body = value;
-    }
-
-    await XMLHttpRequest.handle(req);
-
-    const response = req.response;
-    if (response.status === 444) {
-      return super.send(value);
-    }
-    
-    // remove readonly
-    Object.defineProperties(this, {
-      readyState: { value: 4, configurable: true, enumerable: true, writable: true },
-      status: { value: 200, configurable: true, enumerable: true, writable: true },
-      statusText: { value: 'OK', configurable: true, enumerable: true, writable: true },
-      responseText: { value: '', configurable: true, enumerable: true, writable: true },
-      // response: { value: null, configurable: true, enumerable: true, writable: true },
-      // responseURL: { value: window.location.href, configurable: true, enumerable: true, writable: true },
-      // responseXML: { value: null, configurable: true, enumerable: true, writable: true },
-      // upload: { value: null, configurable: true, enumerable: true, writable: true },
-    });
-
-    this.readyState = 4;
-    this.status = response.status;
-    this.statusText = response.statusText;
-    this.responseText = await response.text();
-
-    setTimeout(() => {
-      if (this.onload) {
-        this.onload();
-      } else if (this.onreadystatechange) {
-        this.onreadystatechange();
-      } else {
-        this.dispatchEvent(new Event('load'));
-      }
-    }, XMLHttpRequest.delay);
-  }
-}
-
-XMLHttpRequest.delay = 200;
-
-XMLHttpRequest.handle = async function(req) {
-  req.response.status = 444;
-};
-
-module.exports = XMLHttpRequest;
-
-
 /***/ })
-/******/ ]);
+/******/ ])["default"];
 });
 //# sourceMappingURL=pino.js.map

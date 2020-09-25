@@ -1,6 +1,9 @@
-const pino = require('../src');
+import pino from '../src';
+import pinomock from '../src/mock';
+
+pino.use(pinomock);
+
 window.pino = pino;
-pino.install();
 
 window.axios = require('axios');
 window.$ = require('jquery');

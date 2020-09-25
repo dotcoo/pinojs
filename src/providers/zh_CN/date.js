@@ -17,7 +17,7 @@ function date_expr(expr, date = new Date()) {
       args['ymdhis'.indexOf(unit)] += number - 0;
     }
     return new Date(...args);
-  } else if (typeof expr === 'string' && expr === 'today') {
+  } else if (typeof expr === 'string' && (expr === 'today' || expr === 'now')) {
     return new Date();
   } else if (typeof expr === 'string') {
     return new Date(expr);
@@ -27,14 +27,16 @@ function date_expr(expr, date = new Date()) {
 }
 
 function date_format(date, format = 'y-m-d h:i:s') {
-  const y = date.getFullYear().toString().padStart(2, 0);
-  const m = (date.getMonth() + 1).toString().padStart(2, 0);
-  const d = date.getDate().toString().padStart(2, 0);
-  const h = date.getHours().toString().padStart(2, 0);
-  const i = date.getMinutes().toString().padStart(2, 0);
-  const s = date.getSeconds().toString().padStart(2, 0);
-  return format.replace(/y/ig, y).replace(/m/ig, m).replace(/d/ig, d).replace(/h/ig, h).replace(/i/ig, i).replace(/s/ig, s);
-}
+  const dates = {
+    y: date.getFullYear(),
+    m: date.getMonth() + 1,
+    d: date.getDate(),
+    h: date.getHours(),
+    i: date.getMinutes(),
+    s: date.getSeconds(),
+  };
+  return format.replace(/([ymdhis]+)/ig, (match, key) => dates[key.toLowerCase()].toString().padStart(2, '0'));
+};
 
 function date(start = 0, end = 4294967295000, format = 'y-m-d h:i:s') {
   start = this.date_expr(start);
