@@ -65,7 +65,7 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
       status: { value: 200, configurable: true, enumerable: true, writable: true },
       statusText: { value: 'OK', configurable: true, enumerable: true, writable: true },
       responseText: { value: '', configurable: true, enumerable: true, writable: true },
-      // response: { value: null, configurable: true, enumerable: true, writable: true },
+      response: { value: null, configurable: true, enumerable: true, writable: true },
       // responseURL: { value: window.location.href, configurable: true, enumerable: true, writable: true },
       // responseXML: { value: null, configurable: true, enumerable: true, writable: true },
       // upload: { value: null, configurable: true, enumerable: true, writable: true },
@@ -74,7 +74,10 @@ class XMLHttpRequest extends window.XMLHttpRequestReal {
     this.readyState = 4;
     this.status = response.status;
     this.statusText = response.statusText;
-    this.responseText = await response.text();
+    this.response = this.responseText = await response.text();
+    if (this.responseType === 'json' ) {
+      this.response = JSON.parse(this.responseText);
+    }
 
     setTimeout(() => {
       if (this.onload) {
