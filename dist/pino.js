@@ -164,15 +164,40 @@ pino.string = function(len = 8, chars = '0123456789abcdefghijklmnopqrstuvwxyzABC
 pino.string.currying = pino.currying;
 pino.string.unique = pino.unique;
 
-pino.number = function(min = MIN_INT, max = MAX_INT, decimal = -1) {
-  let n = min + Math.random() * (max - min);
-  if (decimal > -1) {
-    n = n.toFixed(decimal) - 0;
-  }
-  return n;
-};
-pino.number.currying = pino.currying;
-pino.number.unique = pino.unique;
+function number2default(defmin = MIN_INT, defmax = MAX_INT, defdecimal = -1) {
+  const func = function(min = defmin, max = defmax, decimal = defdecimal) {
+    let n = min + Math.random() * (max - min);
+    if (decimal > -1) {
+      n = n.toFixed(decimal) - 0;
+    }
+    return n;
+  };
+  func.currying = pino.currying;
+  func.unique = pino.unique;
+  return func;
+}
+
+pino.number = number2default(MIN_INT, MAX_INT, 0);
+pino.int = number2default(MIN_INT, MAX_INT, 0);
+pino.int8 = number2default(MIN_BYTE, MAX_BYTE, 0);
+pino.int16 = number2default(MIN_SHORT, MAX_SHORT, 0);
+pino.int32 = number2default(MIN_INT, MAX_INT, 0);
+pino.int64 = number2default(MIN_BIGINT, MAX_BIGINT, 0);
+pino.uint = number2default(0, MAX_UINT, 0);
+pino.uint8 = number2default(0, MAX_UBYTE, 0);
+pino.uint16 = number2default(0, MAX_USHORT, 0);
+pino.uint32 = number2default(0, MAX_UINT, 0);
+pino.uint64 = number2default(0, MAX_UBIGINT, 0);
+pino.float = number2default(MIN_INT, MAX_INT, 1);
+pino.float8 = number2default(MIN_BYTE, MAX_BYTE, 1);
+pino.float16 = number2default(MIN_SHORT, MAX_SHORT, 1);
+pino.float32 = number2default(MIN_INT, MAX_INT, 1);
+pino.float64 = number2default(MIN_BIGINT, MAX_BIGINT, 1);
+pino.ufloat = number2default(0, MAX_UINT, 1);
+pino.ufloat8 = number2default(0, MAX_UBYTE, 1);
+pino.ufloat16 = number2default(0, MAX_USHORT, 1);
+pino.ufloat32 = number2default(0, MAX_UINT, 1);
+pino.ufloat64 = number2default(0, MAX_UBIGINT, 1);
 
 pino.pick = function(...args) {
   args = args.flat();
@@ -249,48 +274,6 @@ pino.probability = function(...args) {
     return value && value.constructor === Function ? value(i, arr) : value;
   };
 };
-
-// ====== quick ======
-
-pino.float = pino.number.currying(MIN_INT, MAX_INT, -1);
-
-pino.float8 = pino.number.currying(MIN_BYTE, MAX_BYTE, -1);
-
-pino.float16 = pino.number.currying(MIN_SHORT, MAX_SHORT, -1);
-
-pino.float32 = pino.number.currying(MIN_INT, MAX_INT, -1);
-
-pino.float64 = pino.number.currying(MIN_BIGINT, MAX_BIGINT, -1);
-
-pino.ufloat = pino.number.currying(0, MAX_UINT, -1);
-
-pino.ufloat8 = pino.number.currying(0, MAX_UBYTE, -1);
-
-pino.ufloat16 = pino.number.currying(0, MAX_USHORT, -1);
-
-pino.ufloat32 = pino.number.currying(0, MAX_UINT, -1);
-
-pino.ufloat64 = pino.number.currying(0, MAX_UBIGINT, -1);
-
-pino.int = pino.number.currying(MIN_INT, MAX_INT, 0);
-
-pino.int8 = pino.number.currying(MIN_BYTE, MAX_BYTE, 0);
-
-pino.int16 = pino.number.currying(MIN_SHORT, MAX_SHORT, 0);
-
-pino.int32 = pino.number.currying(MIN_INT, MAX_INT, 0);
-
-pino.int64 = pino.number.currying(MIN_BIGINT, MAX_BIGINT, 0);
-
-pino.uint = pino.number.currying(0, MAX_UINT, 0);
-
-pino.uint8 = pino.number.currying(0, MAX_UBYTE, 0);
-
-pino.uint16 = pino.number.currying(0, MAX_USHORT, 0);
-
-pino.uint32 = pino.number.currying(0, MAX_UINT, 0);
-
-pino.uint64 = pino.number.currying(0, MAX_UBIGINT, 0);
 
 // ====== providers ======
 
