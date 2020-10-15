@@ -415,6 +415,12 @@ console.log(pino.range(10, pino.phone));
 ### Intercepts Ajax and fetch
 
 ``` js
+// handle request
+import pino from 'pino';
+import pinomock from 'pino/dist/pino.mock';
+
+pino.use(pinomock);
+
 // middleware1
 pino.addRequestMiddleware(async(req) => {
   req.haha = 'm1';
@@ -458,12 +464,6 @@ pino.post('/blog/:bid', async(req) => {
     json: req.json, // json params
   });
 });
-
-// replace XMLHttpRequest and fetch
-pino.intercept();
-
-// restore XMLHttpRequest and fetch
-pino.unintercept();
 ```
 
 ### fetch reqeust

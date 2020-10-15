@@ -410,6 +410,10 @@ console.log(pino.range(10, pino.phone));
 
 ``` js
 // 请求处理
+import pino from 'pino';
+import pinomock from 'pino/dist/pino.mock';
+
+pino.use(pinomock);
 
 // middleware1
 pino.addRequestMiddleware(async(req) => {
@@ -452,12 +456,6 @@ pino.post('/blog/:bid', async(req) => {
     json: req.json, // json 参数
   });
 });
-
-// 替换 XMLHttpRequest 和 fetch
-pino.intercept();
-
-// 恢复 XMLHttpRequest 和 fetch
-pino.unintercept();
 ```
 
 ### fetch 发起请求
