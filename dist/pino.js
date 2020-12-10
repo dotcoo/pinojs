@@ -1302,8 +1302,12 @@ function name_pinyin(name = this.name()) {
   return this.last_name_pinyin(name.substr(0, 1)) + this.first_name_pinyin(name.substr(1));
 }
 
-function username() {
-  return this.name_pinyin();
+function gender(name = this.name(), female = 0, male = 1) {
+  return name.substr(1) in this._person_first_names_female_data ? female : male;
+}
+
+function username(name = this.name()) {
+  return this.name_pinyin(name);
 }
 
 function password() {
@@ -1338,6 +1342,7 @@ module.exports = function(pino) {
   pino.register('name_male', name_male);
   pino.register('name_female', name_female);
   pino.register('name_pinyin', name_pinyin);
+  pino.register('gender', gender);
   pino.register('username', username);
   pino.register('password', password);
   pino.register('job', job);

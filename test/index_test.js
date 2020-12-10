@@ -353,6 +353,9 @@ const name_females = pino.range(10, pino.name_female);
 console.log(name_females);
 // console.log(name_females.map(v => pino.name_female_pinyin(v)));
 
+console.log('邢林旭', pino.gender('邢林旭'));
+console.log('季婷文', pino.gender('季婷文'));
+
 console.log(pino.range(10, pino.job));
 
 console.log(pino.range(10, pino.phone));
