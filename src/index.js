@@ -195,4 +195,4 @@ pino.use = function(func) {
 
 // ====== export ======
 
-export default pino;
+module.exports = pino;
