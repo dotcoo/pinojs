@@ -35,7 +35,7 @@ function date_format(date, format = 'y-m-d h:i:s') {
     i: date.getMinutes(),
     s: date.getSeconds(),
   };
-  return format.replace(/([ymdhis]+)/ig, (match, key) => dates[key.toLowerCase()].toString().padStart(2, '0'));
+  return format.replace(/([ymdhis])/ig, (match, key) => dates[key.toLowerCase()].toString().padStart(2, '0'));
 };
 
 function date(start = 0, end = 4294967295000, format = 'y-m-d h:i:s') {

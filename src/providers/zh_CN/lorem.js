@@ -1,4 +1,4 @@
-const lorem_words = [
+const _lorem_words = [
   '活动', '重要', '显示', '大小', '使用', '最后', '系列', '注意', '一些', '其中',
   '我的', '怎么', '最新', '只要', '为了', '一下', '位置', '组织', '日期', '成功',
   '男人', '那些', '需要', '对于', '城市', '成为', '电影', '简介', '免费', '软件',
@@ -35,7 +35,7 @@ const lorem_words = [
 ];
 
 function word() {
-  return this.pick(this.lorem_words);
+  return this.pick(this._lorem_words);
 }
 
 function text(len = 200) {
@@ -48,7 +48,7 @@ function text(len = 200) {
 }
 
 module.exports = function(pino) {
-  pino.lorem_words = lorem_words;
+  pino._lorem_words = _lorem_words;
 
   pino.register('word', word);
   pino.register('text', text);

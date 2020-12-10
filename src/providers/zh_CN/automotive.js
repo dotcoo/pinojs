@@ -1,4 +1,4 @@
-const automotive_provinces = {
+const _automotive_provinces = {
   北京: '京',
   天津: '津',
   河北: '冀',
@@ -32,18 +32,18 @@ const automotive_provinces = {
   新疆: '新',
 };
 
-const automotive_names = [
+const _automotive_names = [
   '京', '津', '冀', '晋', '蒙', '辽', '吉', '黑', '沪', '苏', '浙', '皖',
   '闽', '赣', '鲁', '豫', '鄂', '湘', '粤', '桂', '琼', '渝', '川', '贵',
   '云', '藏', '陕', '甘', '青', '宁', '新',
 ];
 
 function license_plate_p2n(province) {
-  return this.automotive_names[province.substring(0, 2)];
+  return this._automotive_names[province.substring(0, 2)];
 }
 
 function license_plate_province() {
-  return this.pick(this.automotive_names);
+  return this.pick(this._automotive_names);
 }
 
 function license_plate_city() {
@@ -51,12 +51,12 @@ function license_plate_city() {
 }
 
 function license_plate() {
-  return this.pick(this.automotive_names) + this.string(1, 'ABCDEFGHJKLMNPQRSTUVWXYZ') + this.string(5, 'ABCDEFGHJKLMNPQRSTUVWXYZ01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789');
+  return this.pick(this._automotive_names) + this.string(1, 'ABCDEFGHJKLMNPQRSTUVWXYZ') + this.string(5, 'ABCDEFGHJKLMNPQRSTUVWXYZ01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789');
 }
 
 module.exports = function(pino) {
-  pino.automotive_provinces = automotive_provinces;
-  pino.automotive_names = automotive_names;
+  pino._automotive_provinces = _automotive_provinces;
+  pino._automotive_names = _automotive_names;
 
   pino.register('license_plate_p2n', license_plate_p2n);
   pino.register('license_plate_province', license_plate_province);

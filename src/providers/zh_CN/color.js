@@ -1,4 +1,4 @@
-const color_names = [
+const _color_names = [
   'AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque',
   'Black', 'BlanchedAlmond', 'Blue', 'BlueViolet', 'Brown', 'BurlyWood', 'CadetBlue',
   'Chartreuse', 'Chocolate', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Crimson',
@@ -26,7 +26,7 @@ const color_names = [
 ];
 
 function color_name() {
-  return this.pick(this.color_names);
+  return this.pick(this._color_names);
 }
 
 function color() {
@@ -85,7 +85,7 @@ function rgba_colorful() {
 }
 
 module.exports = function(pino) {
-  pino.color_names = color_names;
+  pino._color_names = _color_names;
 
   pino.register('color_name', color_name);
   pino.register('color', color);

@@ -1,82 +1,44 @@
-// const pinyin = require('node-pinyin');
+const _company_names_data = {
+  '超艺':'chaoyi','和泰':'hetai','九方':'jiufang','鑫博':'xinbo','腾飞':'tengfei','戴硕':'daishuo','亿次元':'yiciyuan','海创':'haichuang','创联世纪':'chuanglianshiji','凌云':'lingyun','泰麒麟':'taiqilin','彩虹':'caihong','兰金':'lanjin','晖来':'huilai','天益':'tianyi','恒聪百汇':'hengcongbaihui','菊风':'jufeng','惠派':'huipai','宇通':'yutong','创汇':'chuanghui','思优':'siyou','时空盒数字':'shikongheshuzi','易动力':'yidongli','飞海':'feihai','华泰通安':'huataitongan','盟新':'mengxin','商软冠联':'shangruanguanlian','图龙信息':'tulongxinxi','易动力':'yidongli','华远软件':'huayuanruanjian','创亿':'chuangyi','时刻':'shike','世创':'shichuang','明腾':'mingteng','良诺':'liangnuo','天开':'tiankai','毕博诚':'bibocheng','快讯':'kuaixun','凌颖信息':'lingyingxinxi','黄石金承':'huangshijincheng','恩悌':'enti','雨林木风':'yulinmufeng','双敏':'shuangmin','维旺明':'weiwangming','网新恒天':'wangxinhengtian','铭泰':'mingtai','飞利信':'feilixin','立信':'lixin','联通时科':'liantongshike','建业':'jianye','新格林耐特':'xingelinnaite','宇龙':'yulong','浙大万朋':'zhedawanpeng','讯飞':'xunfei','太能':'taineng','昂歌':'angge','万迅':'wanxun','方正':'fangzheng','联软':'lianruan','七喜':'qixi','南康':'nankang','银嘉':'yinjia','巨奥':'juao','佳禾':'jiahe','国讯':'guoxun','信诚致远':'xinchengzhiyuan','浦华众城':'puhuazhongcheng','迪摩':'dimo','太极':'taiji','群英':'qunying','合联':'helian','同兴万点':'tongxingwandian','博凯':'bokai','精芯':'jingxin','艾提科信':'aitikexin','昊嘉':'haojia','鸿睿思博':'hongruisibo','四通':'sitong','富罳':'fusi','商软冠联':'shangruanguanlian','诺依曼':'nuoyiman','东方峻景':'dongfangjunjing','华成育卓':'huachengyuzhuo','趋势':'qushi','维涛':'weitao','通际名联':'tongjiminglian','五菱':'wuling',
+};
 
-const company_names = [
-  '超艺', '和泰', '九方', '鑫博', '腾飞', '戴硕', '亿次元',
-  '海创', '创联世纪', '凌云', '泰麒麟', '彩虹', '兰金',
-  '晖来', '天益', '恒聪百汇', '菊风', '惠派', '宇通',
-  '创汇', '思优', '时空盒数字', '易动力', '飞海', '华泰通安',
-  '盟新', '商软冠联', '图龙信息', '易动力', '华远软件', '创亿',
-  '时刻', '世创', '明腾', '良诺', '天开', '毕博诚', '快讯',
-  '凌颖信息', '黄石金承', '恩悌', '雨林木风', '双敏',
-  '维旺明', '网新恒天', '铭泰', '飞利信', '立信', '联通时科',
-  '建业', '新格林耐特', '宇龙', '浙大万朋', '讯飞', '太能',
-  '昂歌', '万迅', '方正', '联软', '七喜', '南康', '银嘉',
-  '巨奥', '佳禾', '国讯', '信诚致远', '浦华众城', '迪摩', '太极',
-  '群英', '合联', '同兴万点', '博凯', '精芯', '艾提科信',
-  '昊嘉', '鸿睿思博', '四通', '富罳', '商软冠联', '诺依曼',
-  '东方峻景', '华成育卓', '趋势', '维涛', '通际名联', '五菱',
+const _company_types = [
+  '文化','科技','管理','咨询','服务','传播','传媒','信息','国际','影业','电子商务','品牌','商贸','商务','科贸','贸易','广告','教育','体育','设计','生物','图文','建筑','规划','餐饮','医疗','安全','动画','健康','保险','环境',
 ];
 
-// console.log(JSON.stringify(company_names.map(v => pinyin(v, { style: 'normal' }).flat().join(''))));
-const company_names_pinyin = [
-  'chaoyi', 'hetai', 'jiufang', 'xinbo', 'tengfei', 'daishuo', 'yiciyuan',
-  'haichuang', 'chuanglianshiji', 'lingyun', 'taiqilin', 'caihong',
-  'lanjin', 'huilai', 'tianyi', 'hengcongbaihui', 'jufeng', 'huipai',
-  'yutong', 'chuanghui', 'siyou', 'shikongheshuzi', 'yidongli', 'feihai',
-  'huataitongan', 'mengxin', 'shangruanguanlian', 'tulongxinxi', 'yidongli',
-  'huayuanruanjian', 'chuangyi', 'shike', 'shichuang', 'mingteng',
-  'liangnuo', 'tiankai', 'bibocheng', 'kuaixun', 'lingyingxinxi',
-  'huangshijincheng', 'enti', 'yulinmufeng', 'shuangmin', 'weiwangming',
-  'wangxinhengtian', 'mingtai', 'feilixin', 'lixin', 'liantongshike',
-  'jianye', 'xingelinnaite', 'yulong', 'zhedawanpeng', 'xunfei', 'taineng',
-  'angge', 'wanxun', 'fangzheng', 'lianruan', 'qixi', 'nankang', 'yinjia',
-  'juao', 'jiahe', 'guoxun', 'xinchengzhiyuan', 'puhuazhongcheng', 'dimo',
-  'taiji', 'qunying', 'helian', 'tongxingwandian', 'bokai', 'jingxin',
-  'aitikexin', 'haojia', 'hongruisibo', 'sitong', 'fusi', 'shangruanguanlian',
-  'nuoyiman', 'dongfangjunjing', 'huachengyuzhuo', 'qushi', 'weitao',
-  'tongjiminglian', 'wuling',
-];
-
-const company_types = [
-  '文化', '科技', '管理', '咨询', '服务', '传播', '传媒', '信息', '国际',
-  '影业', '电子商务', '品牌', '商贸', '商务', '科贸', '贸易', '广告',
-  '教育', '体育', '设计', '生物', '图文', '建筑', '规划', '餐饮', '医疗',
-  '安全', '动画', '健康', '保险', '环境',
-];
-
-const company_suffixes = [
+const _company_suffixes = [
   '有限公司', '股份有限公司', '集团公司',
 ];
 
 function company_name() {
-  return this.pick(this.company_names);
+  return this.pick(this._company_names);
 }
 
-function company_name_pinyin(name = null) {
-  return name ? this.company_names_pinyin[this.company_names.indexOf(name)] : this.pick(this.company_names_pinyin);
+function company_name_pinyin(name = this.company_name()) {
+  return this._company_names_data[name] || '';
 }
 
 function company_type() {
-  return this.pick(this.company_types);
+  return this.pick(this._company_types);
 }
 
 function company_suffix() {
-  return this.pick(this.company_suffixes);
+  return this.pick(this._company_suffixes);
 }
 
 function company() {
-  return `${this.city_name()}${this.pick(this.company_names)}${this.pick(this.company_types)}${this.pick(this.company_suffixes)}`;
+  return `${this.city_name()}${this.pick(this._company_names)}${this.pick(this._company_types)}${this.pick(this._company_suffixes)}`;
 }
 
 function company_short() {
-  return `${this.pick(this.company_names)}${this.pick(this.company_types)}`;
+  return `${this.pick(this._company_names)}${this.pick(this._company_types)}`;
 }
 
 module.exports = function(pino) {
-  pino.company_names = company_names;
-  pino.company_names_pinyin = company_names_pinyin;
-  pino.company_types = company_types;
-  pino.company_suffixes = company_suffixes;
+  pino._company_names_data = _company_names_data;
+  pino._company_names = Object.keys(_company_names_data);
+  pino._company_types = _company_types;
+  pino._company_suffixes = _company_suffixes;
 
   pino.register('company_name', company_name);
   pino.register('company_name_pinyin', company_name_pinyin);

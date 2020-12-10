@@ -1,187 +1,16 @@
-// const pinyin = require('node-pinyin');
+const _person_last_names_data = {
+  '丁':'ding','万':'wan','上':'shang','丌':'qi','丘':'qiu','东':'dong','严':'yan','丰':'feng','乌':'wu','乐':'le','乔':'qiao','乜':'mie','习':'xi','于':'yu','云':'yun','五':'wu','井':'jing','亢':'kang','人':'ren','仇':'chou','仉':'zhang','从':'cong','令':'ling','仰':'yang','仲':'zhong','任':'ren','伊':'yi','伍':'wu','伏':'fu','伯':'bo','何':'he','佘':'she','余':'yu','佟':'tong','佴':'er','侯':'hou','俞':'yu','俟':'si','倪':'ni','傅':'fu','储':'chu','元':'yuan','充':'chong','党':'dang','全':'quan','公':'gong','关':'guan','养':'yang','冀':'ji','冉':'ran','农':'nong','冯':'feng','况':'kuang','冶':'ye','冷':'leng','凌':'ling','凤':'feng','刁':'diao','刘':'liu','利':'li','别':'bie','劳':'lao','勾':'gou','包':'bao','匡':'kuang','华':'hua','卓':'zhuo','单':'dan','南':'nan','卜':'bu','卞':'bian','卢':'lu','卫':'wei','印':'yin','危':'wei','卻':'que','厉':'li','厍':'she','双':'shuang','叔':'shu','古':'gu','台':'tai','史':'shi','叶':'ye','司':'si','吉':'ji','后':'hou','向':'xiang','吕':'lv','吴':'wu','周':'zhou','呼':'hu','和':'he','咸':'xian','哈':'ha','唐':'tang','商':'shang','喻':'yu','国':'guo','堵':'du','墨':'mo','壤':'rang','夏':'xia','夔':'kui','太':'tai','夹':'jia','奚':'xi','姓':'xing','姚':'yao','姜':'jiang','姬':'ji','娄':'lou','子':'zi','孔':'kong','孙':'sun','孟':'meng','季':'ji','宁':'ning','宇':'yu','安':'an','宋':'song','宓':'mi','宗':'zong','官':'guan','宣':'xuan','宦':'huan','宫':'gong','宰':'zai','家':'jia','容':'rong','宿':'su','寇':'kou','富':'fu','寿':'shou','封':'feng','尉':'wei','尚':'shang','尤':'you','尹':'yin','居':'ju','屈':'qu','屠':'tu','山':'shan','岑':'cen','岳':'yue','崔':'cui','嵇':'ji','巢':'chao','左':'zuo','巩':'gong','巫':'wu','巴':'ba','帅':'shuai','师':'shi','席':'xi','常':'chang','干':'gan','平':'ping','年':'nian','幸':'xing','广':'guang','庄':'zhuang','应':'ying','庞':'pang','康':'kang','庾':'yu','廉':'lian','廖':'liao','延':'yan','弓':'gong','弘':'hong','张':'zhang','强':'qiang','归':'gui','彭':'peng','徐':'xu','徒':'tu','微':'wei','怀':'huai','惠':'hui','慎':'shen','慕':'mu','戈':'ge','戎':'rong','成':'cheng','戚':'qi','戴':'dai','房':'fang','扈':'hu','扶':'fu','拓':'tuo','支':'zhi','政':'zheng','敖':'ao','文':'wen','方':'fang','於':'yu','施':'shi','时':'shi','昌':'chang','明':'ming','易':'yi','昝':'zan','晁':'chao','晋':'jin','晏':'yan','景':'jing','暨':'ji','暴':'bao','曲':'qu','曹':'cao','曾':'zeng','月':'yue','有':'you','木':'mu','朱':'zhu','权':'quan','李':'li','杜':'du','束':'shu','杨':'yang','杭':'hang','松':'song','林':'lin','柏':'bai','查':'cha','柯':'ke','柳':'liu','柴':'chai','栾':'luan','桂':'gui','桑':'sang','桓':'huan','梁':'liang','梅':'mei','楚':'chu','樊':'fan','欧':'ou','正':'zheng','步':'bu','武':'wu','殳':'shu','段':'duan','殷':'yin','毋':'wu','毕':'bi','毛':'mao','水':'shui','汝':'ru','江':'jiang','池':'chi','汤':'tang','汪':'wang','汲':'ji','沃':'wo','沈':'shen','沙':'sha','法':'fa','洪':'hong','浦':'pu','海':'hai','涂':'tu','淳':'chun','温':'wen','游':'you','湛':'zhan','滑':'hua','滕':'teng','满':'man','漆':'qi','潘':'pan','澹':'dan','濮':'pu','焦':'jiao','熊':'xiong','燕':'yan','爱':'ai','父':'fu','牛':'niu','牟':'mou','牧':'mu','狄':'di','狐':'hu','王':'wang','班':'ban','琴':'qin','璩':'qu','甄':'zhen','甘':'gan','生':'sheng','甫':'fu','田':'tian','申':'shen','白':'bai','百':'bai','皇':'huang','皮':'pi','益':'yi','盖':'gai','盛':'sheng','相':'xiang','督':'du','瞿':'qu','石':'shi','祁':'qi','祖':'zu','祝':'zhu','禄':'lu','福':'fu','禹':'yu','离':'li','秋':'qiu','秦':'qin','程':'cheng','穆':'mu','空':'kong','窦':'dou','章':'zhang','童':'tong','端':'duan','竺':'zhu','符':'fu','笪':'da','第':'di','简':'jian','管':'guan','籍':'ji','米':'mi','糜':'mi','索':'suo','红':'hong','纪':'ji','终':'zhong','经':'jing','缑':'gou','缪':'mou','罗':'luo','羊':'yang','羿':'yi','翁':'weng','翟':'di','耿':'geng','聂':'nie','胡':'hu','胥':'xu','能':'neng','臧':'zang','舌':'she','舒':'shu','良':'liang','艾':'ai','芮':'rui','花':'hua','苍':'cang','苏':'su','苗':'miao','范':'fan','茅':'mao','茹':'ru','荀':'xun','荆':'jing','荣':'rong','莘':'shen','莫':'mo','萧':'xiao','葛':'ge','董':'dong','蒋':'jiang','蒙':'meng','蒯':'kuai','蒲':'pu','蓝':'lan','蓟':'ji','蓬':'peng','蔚':'wei','蔡':'cai','蔺':'lin','薄':'bao','薛':'xue','虞':'yu','融':'rong','衡':'heng','袁':'yuan','裘':'qiu','裴':'pei','褚':'zhu','西':'xi','解':'jie','言':'yan','訾':'zi','詹':'zhan','计':'ji','许':'xu','诸':'zhu','谈':'tan','谢':'xie','谭':'tan','谯':'qiao','谷':'gu','贝':'bei','贡':'gong','贲':'bi','费':'fei','贺':'he','贾':'gu','赏':'shang','赖':'lai','赫':'he','赵':'zhao','越':'yue','跋':'ba','路':'lu','车':'che','轩':'xuan','辕':'yuan','辛':'xin','边':'bian','连':'lian','迟':'chi','逄':'pang','通':'tong','逯':'lu','邓':'deng','邢':'xing','那':'na','邬':'wu','邰':'tai','邱':'qiu','邴':'bing','邵':'shao','邹':'zou','郁':'yu','郈':'hou','郎':'lang','郏':'jia','郑':'zheng','郗':'xi','郜':'gao','郝':'hao','郦':'li','郭':'guo','都':'du','鄂':'e','鄢':'yan','酆':'feng','里':'li','金':'jin','钟':'zhong','钦':'qin','钭':'dou','钮':'niu','钱':'qian','长':'chang','门':'men','闫':'yan','闵':'min','闻':'wen','闾':'lv','阎':'yan','阙':'que','阚':'kan','阮':'ruan','阳':'yang','阴':'yin','陆':'lu','陈':'chen','陶':'tao','隆':'long','隗':'wei','雍':'yong','雕':'diao','雷':'lei','霍':'huo','靳':'jin','鞠':'ju','韦':'wei','韩':'han','韶':'shao','项':'xiang','须':'xu','顾':'gu','颛':'zhuan','颜':'yan','饶':'rao','马':'ma','驷':'si','骆':'luo','高':'gao','鬱':'yu','魏':'wei','鱼':'yu','鲁':'lu','鲍':'bao','鲜':'xian','麻':'ma','黄':'huang','黎':'li','齐':'qi','龙':'long','龚':'gong',
+};
 
-const person_last_names = [
-  '丁', '万', '严', '丰', '乌', '乐', '乔', '于', '云', '井', '付', '代', '仲',
-  '任', '伍', '伦', '何', '余', '侧', '侯', '俞', '倪', '傅', '元', '光', '关',
-  '冬', '冯', '冷', '刀', '刁', '刘', '刚', '区', '半', '华', '单', '卜', '卢',
-  '古', '可', '叶', '后', '吕', '含', '吴', '周', '呼', '和', '咏', '品', '哏',
-  '唐', '回', '坤', '夏', '多', '夜', '龙', '奇', '姜', '威', '孔', '孙', '孟',
-  '宁', '宇', '安', '宋', '官', '宥', '家', '寐', '尤', '尧', '尹', '屠', '岳',
-  '崔', '川', '左', '巫', '常', '平', '应', '庞', '康', '庾', '廖', '张', '弦',
-  '張', '彭', '徐', '德', '恒', '恩', '恭', '慕', '成', '戴', '房', '承', '拳',
-  '文', '方', '施', '易', '星', '春', '晃', '晨', '景', '暴', '曲', '曹', '曾',
-  '朱', '朴', '权', '李', '杜', '杨', '林', '枫', '柯', '柳', '桑', '梁', '梨',
-  '樊', '欧', '残', '殷', '毕', '毛', '民', '永', '江', '汤', '汪', '沈', '沙',
-  '河', '波', '泽', '洗', '洪', '派', '浩', '海', '渔', '温', '游', '满', '漠',
-  '潘', '澎', '火', '炎', '烧', '焦', '熊', '牙', '牛', '狗', '猪', '王', '甘',
-  '田', '甲', '白', '皓', '石', '祁', '祝', '秀', '秦', '程', '窦', '立', '童',
-  '笑', '符', '简', '精', '纪', '绪', '罗', '羽', '翁', '老', '肖', '胖', '胜',
-  '胡', '腾', '臧', '艺', '艾', '芮', '苏', '苟', '范', '荒', '莫', '萧', '葛',
-  '董', '蒋', '蒙', '蓝', '蔡', '薛', '藏', '蛋', '袁', '覃', '言', '誓', '许',
-  '谢', '谭', '贰', '费', '贺', '贾', '赖', '赵', '路', '车', '辛', '过', '迟',
-  '邓', '邝', '邰', '邱', '郁', '郎', '郑', '郝', '郭', '酷', '释', '金', '钟',
-  '钦', '钮', '镐', '闫', '阎', '阚', '阮', '阳', '阿', '陆', '陈', '陶', '雨',
-  '雷', '霍', '韦', '韩', '顾', '颜', '饶', '馒', '马', '骆', '高', '魏', '鲁',
-  '鲍', '鸿', '鹏', '鹿', '麦', '黄', '黎', '黑', '齐',
-];
+const _person_first_names_male_data = {
+  '潇健':'xiaojian','大成':'dacheng','贺雄':'hexiong','家宇':'jiayu','屿':'yu','湑凯':'xukai','志铭':'zhiming','一劼':'yijie','博琨':'bokun','永澍':'yongshu','卓熙':'zhuoxi','佳铮':'jiazheng','钟炜':'zhongwei','凤星':'fengxing','金锋':'jinfeng','乾宇':'qianyu','盛':'sheng','颀炜':'qiwei','晟卓':'shengzhuo','帅':'shuai','竟东':'jingdong','平琦':'pingqi','伟亮':'weiliang','璐凯':'lukai','肃':'su','楷善':'kaishan','海阳':'haiyang','皓俊':'haojun','伟祥':'weixiang','晨祎':'chenyi','霄泽':'xiaoze','沛泽':'peize','永旭':'yongxu','鹏帆':'pengfan','政旭':'zhengxu','东阳':'dongyang','健强':'jianqiang','俊燚':'junyi','默然':'moran','谨昊':'jinhao','国政':'guozheng','翊鸿':'yihong','千炜':'qianwei','尧城':'yaocheng','钰伟':'yuwei','耀':'yao','嘉文':'jiawen','健健':'jianjian','序':'xu','孝金':'xiaojin','佳肴':'jiayao','天骑':'tianqi','泽枫':'zefeng','守浩':'shouhao','鹏月':'pengyue','恒阅':'hengyue','泓臻':'hongzhen','晶硕':'jingshuo','忠元':'zhongyuan','华森':'huasen','旭畅':'xuchang','国强':'guoqiang','文治':'wenzhi','纪雄':'jixiong','嘉衡':'jiaheng','伟杰':'weijie','兆辉':'zhaohui','思成':'sicheng','林旭':'linxu','少辉':'shaohui','星淇':'xingqi','昊喆':'haozhe','飞扬':'feiyang','晓贺':'xiaohe','瑀翀':'yuchong','仁昭':'renzhao','胜涛':'shengtao','鸥卜':'oubu','云宝':'yunbao','瑞涵':'ruihan','川':'chuan','铠滔':'kaitao','明炬':'mingju','运乾':'yunqian','新富':'xinfu','羿灿':'yican','锦前':'jinqian','伍沐':'wumu','威弘':'weihong','拯':'zheng','江洋':'jiangyang','杭杰':'hangjie','天鑫':'tianxin','雪通':'xuetong','茂新':'maoxin','泽仕':'zeshi','方洋':'fangyang','煜杰':'yujie','韪铭':'weiming','家瑜':'jiayu',
+};
 
-// console.log(JSON.stringify(person_last_names.map(v => pinyin(v, { style: 'normal' }).flat().join(''))));
-const person_last_names_pinyin = [
-  'ding', 'wan', 'yan', 'feng', 'wu', 'le', 'qiao', 'yu', 'yun', 'jing', 'fu',
-  'dai', 'zhong', 'ren', 'wu', 'lun', 'he', 'yu', 'ce', 'hou', 'yu', 'ni',
-  'fu', 'yuan', 'guang', 'guan', 'dong', 'feng', 'leng', 'dao', 'diao', 'liu',
-  'gang', 'qu', 'ban', 'hua', 'dan', 'bu', 'lu', 'gu', 'ke', 'ye', 'hou',
-  'lv', 'han', 'wu', 'zhou', 'hu', 'he', 'yong', 'pin', 'gen', 'tang', 'hui',
-  'kun', 'xia', 'duo', 'ye', 'long', 'qi', 'jiang', 'wei', 'kong', 'sun', 'meng',
-  'ning', 'yu', 'an', 'song', 'guan', 'you', 'jia', 'mei', 'you', 'yao', 'yin',
-  'tu', 'yue', 'cui', 'chuan', 'zuo', 'wu', 'chang', 'ping', 'ying', 'pang',
-  'kang', 'yu', 'liao', 'zhang', 'xian', 'zhang', 'peng', 'xu', 'de', 'heng',
-  'en', 'gong', 'mu', 'cheng', 'dai', 'fang', 'cheng', 'quan', 'wen', 'fang',
-  'shi', 'yi', 'xing', 'chun', 'huang', 'chen', 'jing', 'bao', 'qu', 'cao',
-  'zeng', 'zhu', 'pu', 'quan', 'li', 'du', 'yang', 'lin', 'feng', 'ke', 'liu',
-  'sang', 'liang', 'li', 'fan', 'ou', 'can', 'yin', 'bi', 'mao', 'min', 'yong',
-  'jiang', 'tang', 'wang', 'shen', 'sha', 'he', 'bo', 'ze', 'xi', 'hong',
-  'pai', 'hao', 'hai', 'yu', 'wen', 'you', 'man', 'mo', 'pan', 'peng', 'huo',
-  'yan', 'shao', 'jiao', 'xiong', 'ya', 'niu', 'gou', 'zhu', 'wang', 'gan',
-  'tian', 'jia', 'bai', 'hao', 'shi', 'qi', 'zhu', 'xiu', 'qin', 'cheng',
-  'dou', 'li', 'tong', 'xiao', 'fu', 'jian', 'jing', 'ji', 'xu', 'luo', 'yu',
-  'weng', 'lao', 'xiao', 'pang', 'sheng', 'hu', 'teng', 'zang', 'yi', 'ai',
-  'rui', 'su', 'gou', 'fan', 'huang', 'mo', 'xiao', 'ge', 'dong', 'jiang',
-  'meng', 'lan', 'cai', 'xue', 'cang', 'dan', 'yuan', 'tan', 'yan', 'shi',
-  'xu', 'xie', 'tan', 'er', 'fei', 'he', 'gu', 'lai', 'zhao', 'lu', 'che',
-  'xin', 'guo', 'chi', 'deng', 'kuang', 'tai', 'qiu', 'yu', 'lang', 'zheng',
-  'hao', 'guo', 'ku', 'shi', 'jin', 'zhong', 'qin', 'niu', 'gao', 'yan', 'yan',
-  'kan', 'ruan', 'yang', 'a', 'lu', 'chen', 'tao', 'yu', 'lei', 'huo', 'wei',
-  'han', 'gu', 'yan', 'rao', 'man', 'ma', 'luo', 'gao', 'wei', 'lu', 'bao',
-  'hong', 'peng', 'lu', 'mai', 'huang', 'li', 'hei', 'qi',
-];
+const _person_first_names_female_data = {
+  '艳娇':'yanjiao','晓思':'xiaosi','轶伟':'yiwei','晓涵':'xiaohan','若晴':'ruoqing','铭璇':'mingxuan','玉灿':'yucan','馥宁':'funing','赛琼':'saiqiong','恬祎':'tianyi','靖雪':'jingxue','潇丹':'xiaodan','超月':'chaoyue','子怡':'ziyi','李妃':'lifei','瑞鸿':'ruihong','芳源':'fangyuan','祺钰':'qiyu','雅琪':'yaqi','配如':'peiru','俣佳':'yujia','议丹':'yidan','雅凡':'yafan','梓楠':'zinan','坤宇':'kunyu','星楠':'xingnan','祺琦':'qiqi','叶青':'yeqing','煜':'yu','林凡':'linfan','婷文':'tingwen','莹雪':'yingxue','洢柠':'yining','晓薇':'xiaowei','馨妍':'xinyan','阳阳':'yangyang','钰莹':'yuying','婉祺':'wanqi','紫琼':'ziqiong','雨涵':'yuhan','昕怡':'xinyi','一楠':'yinan','天冉':'tianran','天茹':'tianru','欣彤':'xintong','玥涵':'yuehan','艳婷':'yanting','贺尧':'heyao','梦召':'mengzhao','禾苗':'hemiao','亚捷':'yajie','自翼':'ziyi','小雅':'xiaoya','佳荣':'jiarong','贻冉':'yiran','淙淙':'congcong','玉帆':'yufan','雨萌':'yumeng','艳非':'yanfei','家幸':'jiaxing','祺昕':'qixin','丽君':'lijun','佳淇':'jiaqi','泓悦':'hongyue','思齐':'siqi','懿纯':'yichun','艾妮':'aini','亦苗':'yimiao','静哲':'jingzhe','笑蓉':'xiaorong','天为':'tianwei','砚心':'yanxin','伊璇':'yixuan','姿':'zi','欢':'huan','展':'zhan','芮颍':'ruiying','琼玉':'qiongyu','晓函':'xiaohan','艺馨':'yixin','赛亚':'saiya','佳曼':'jiaman','馨宁':'xinning','紫予':'ziyu','石良':'shiliang','奥博':'aobo','聪敏':'congmin','怡雯':'yiwen','杨灿':'yangcan','雲河':'yunhe','怿萱':'yixuan','馨玥':'xinyue','苏宇':'suyu','艺灿':'yican','思慧':'sihui','铭浛':'minghan','博淼':'bomiao','艺蒙':'yimeng','伊明':'yiming','瑞瑞':'ruirui',
+};
 
-const person_first_names_male = [
-  '宇澄', '子鸣', '势安', '文乐', '通', '福助', '战', '凌诺', '明学', '少翌', '泉',
-  '兆骏', '建年', '暐议', '敬基', '英华', '家辉', '瀚中', '煌奇', '乐', '炜', '岳',
-  '中基', '志强', '镜清', '雅森', '海泉', '圣文', '智民', '小源', '佳界', '欣',
-  '克群', '国锋', '斯楞', '伟', '言', '镇涛', '安东', '俊凯', '绍洋', '牛', '鸿明',
-  '振东', '国祥', '腾', '铭捷', '志辉', '智钦', '利', '家凯', '文聪', '魏西',
-  '晨宇', '仔', '德豪', '云', '文军', '宗沛', '苏羽', '云鹏', '泊', '小骚', '志文',
-  '冠宇', '明志', '保怡', '光', '喆', '东', '宇中', '常胜', '明育', '潮', '威煌',
-  '阳', '涛', '雨阳', '一鸣', '亚纶', '力行', '静晨', '浩然', '宾', '励林', '洪刚',
-  '洛洛', '键', '挺', '怀静', '乃麟', '澄庆', '逸晨', '未央', '之谦', '海啸',
-  '家成', '娃', '珏', '子韬', '格叶', '寅', '祖名', '惟仁', '浩康', '罡', '东君',
-  '方圆', '国豪', '旻佑', '晰', '明洋', '志健', '吉汉', '哲明', '盛强', '鲲',
-  '国丰', '子洋', '振棠', '继聪', '江', '崇正', '琥', '熙水', '卫健', '图', '中平',
-  '德钟', '汉声', '敦豪', '继铃', '承光', '识贤', '晋豪', '协志', '治平', '川晖',
-  '启田', '胜', '汤豪', '畊宏', '江龙', '文森', '天朔', '志安', '岳庭', '韶声',
-  '云迪', '坤', '气', '建祥', '大佑', '旭东', '洛宾', '宇威', '尚实', '泳毅',
-  '嘉强', '天华', '依轮', '铮亮', '晓峰', '家强', '宏伟', '山亮', '启贤', '信哲',
-  '浚伟', '艺兴', '虔哲', '春兮', '冠廷', '唯', '云霄', '过年', '浩贤', '晓宇',
-  '永康', '国荣', '子冈', '世超', '允谦', '杨', '源', '琪力', '武贝', '少聪',
-  '东阳', '冠蒲', '山', '哥亮', '学友', '来宁', '时丰', '恺蔚', '自强', '航生',
-  '思诚', '品超', '宥嘉', '晟铭', '萌萌', '品源', '光平', '岗山', '赫宣', '明章',
-  '晓', '昕阳', '志祥', '思远', '志光', '卓羲', '若权', '嘉尔', '剑辉', '义达',
-  '国敬', '程明', '智成', '明', '明瀚', '文程', '紫骅', '猫', '一杰', '远喆', '晨',
-  '嘉颖', '庚', '毅鹏', '志浩', '仕伟', '善为', '提', '不易', '恕权', '若昀', '爽',
-  '琪', '圣', '睿', '臣刚', '宗泽', '浚龙', '尊', '正宵', '桓宇',
-];
-
-// console.log(JSON.stringify(person_first_names_male.map(v => pinyin(v, { style: 'normal' }).flat().join(''))));
-const person_first_names_male_pinyin = [
-  'yucheng', 'ziming', 'shian', 'wenle', 'tong', 'fuzhu', 'zhan', 'lingnuo',
-  'mingxue', 'shaoyi', 'quan', 'zhaojun', 'jiannian', 'weiyi', 'jingji', 'yinghua',
-  'jiahui', 'hanzhong', 'huangqi', 'le', 'wei', 'yue', 'zhongji', 'zhiqiang',
-  'jingqing', 'yasen', 'haiquan', 'shengwen', 'zhimin', 'xiaoyuan', 'jiajie',
-  'xin', 'kequn', 'guofeng', 'sileng', 'wei', 'yan', 'zhentao', 'andong', 'junkai',
-  'shaoyang', 'niu', 'hongming', 'zhendong', 'guoxiang', 'teng', 'mingjie',
-  'zhihui', 'zhiqin', 'li', 'jiakai', 'wencong', 'weixi', 'chenyu', 'zi', 'dehao',
-  'yun', 'wenjun', 'zongpei', 'suyu', 'yunpeng', 'bo', 'xiaosao', 'zhiwen',
-  'guanyu', 'mingzhi', 'baoyi', 'guang', 'zhe', 'dong', 'yuzhong', 'changsheng',
-  'mingyu', 'chao', 'weihuang', 'yang', 'tao', 'yuyang', 'yiming', 'yalun', 'lihang',
-  'jingchen', 'haoran', 'bin', 'lilin', 'honggang', 'luoluo', 'jian', 'ting',
-  'huaijing', 'nailin', 'chengqing', 'yichen', 'weiyang', 'zhiqian', 'haixiao',
-  'jiacheng', 'wa', 'jue', 'zitao', 'geye', 'yin', 'zuming', 'weiren', 'haokang',
-  'gang', 'dongjun', 'fangyuan', 'guohao', 'minyou', 'xi', 'mingyang', 'zhijian',
-  'jihan', 'zheming', 'shengqiang', 'kun', 'guofeng', 'ziyang', 'zhentang', 'jicong',
-  'jiang', 'chongzheng', 'hu', 'xishui', 'weijian', 'tu', 'zhongping', 'dezhong',
-  'hansheng', 'dunhao', 'jiling', 'chengguang', 'shixian', 'jinhao', 'xiezhi',
-  'zhiping', 'chuanhui', 'qitian', 'sheng', 'tanghao', 'genghong', 'jianglong',
-  'wensen', 'tianshuo', 'zhian', 'yueting', 'shaosheng', 'yundi', 'kun', 'qi',
-  'jianxiang', 'dayou', 'xudong', 'luobin', 'yuwei', 'shangshi', 'yongyi',
-  'jiaqiang', 'tianhua', 'yilun', 'zhengliang', 'xiaofeng', 'jiaqiang', 'hongwei',
-  'shanliang', 'qixian', 'xinzhe', 'junwei', 'yixing', 'qianzhe', 'chunxi',
-  'guanting', 'wei', 'yunxiao', 'guonian', 'haoxian', 'xiaoyu', 'yongkang',
-  'guorong', 'zigang', 'shichao', 'yunqian', 'yang', 'yuan', 'qili', 'wubei',
-  'shaocong', 'dongyang', 'guanpu', 'shan', 'geliang', 'xueyou', 'laining',
-  'shifeng', 'kaiwei', 'ziqiang', 'hangsheng', 'sicheng', 'pinchao', 'youjia',
-  'shengming', 'mengmeng', 'pinyuan', 'guangping', 'gangshan', 'hexuan', 'mingzhang',
-  'xiao', 'xinyang', 'zhixiang', 'siyuan', 'zhiguang', 'zhuoxi', 'ruoquan', 'jiaer',
-  'jianhui', 'yida', 'guojing', 'chengming', 'zhicheng', 'ming', 'minghan', 'wencheng',
-  'zihua', 'mao', 'yijie', 'yuanzhe', 'chen', 'jiaying', 'geng', 'yipeng', 'zhihao',
-  'shiwei', 'shanwei', 'ti', 'buyi', 'shuquan', 'ruoyun', 'shuang', 'qi', 'sheng',
-  'rui', 'chengang', 'zongze', 'junlong', 'zun', 'zhengxiao', 'huanyu',
-];
-
-const person_first_names_female = [
-  '依依', '小云', '艳泓', '珂', '泱', '雁诗', '子萱', '萱', '瑞兮', '妃平', '慧君',
-  '姿彤', '伟苓', '梅', '卓妍', '熹蛮', '雅洁', '婧祎', '芳', '绮', '秋凤', '淑怡',
-  '晓玫', '文煜', '丽颖', '敏莉', '璐', '颂茹', '德玛', '灵', '提莫', '蕊', '豆',
-  '悄', '小笛', '妙玲', '格玛', '卡措', '玟岐', '之璧', '戴', '芮', '婕', '姗',
-  '美', '莎', '美惠', '秀琳', '瞳', '悸', '乐诗', '柏芝', '烧', '瑶', '汐', '怡文',
-  '姝', '丹', '子姗', '莎莎', '晓彤', '雪', '小敏', '湫泓', '鸟', '湘婷', '诗诗',
-  '小熊', '洛菲', '明真', '人凤', '奂均', '笔畅', '诗钦', '冰冰', '安琪', '晴',
-  '海英', '梵溪', '珣', '文慧', '依纯', '虹', '佳薇', '译贤', '郁', '欣潼', '妍熙',
-  '小妞', '安咛', '小兜', '筱蓉', '洋', '倩莲', '美辰', '美美', '文珣', '明娟',
-  '依婷', '凝', '凌', '兮', '安禹', '韵', '洛施', '湘怡', '芬兰', '蕙玲', '芷蕾',
-  '清', '世哲', '希儿', '英苹', '震', '若溪', '三', '佩雯', '思涵', '倩敏', '桑',
-  '洁丽', '欣欣', '娅', '梦园', '海俏', '碧晨', '馨', '兴瑜', '至贤', '倩倩',
-  '艺纱', '文欣', '小芹', '家妹', '海', '嘉莹', '润洁', '熙', '琰', '子宜', '宁',
-  '采洁', '思慧', '妙可', '小平', '韦伶', '籁天', '爽', '璐岢', '左左', '线',
-  '菲儿', '晨唏', '霄雲', '小花', '曦', '小皮', '心瑶', '美麟', '彤', '松韵',
-  '僖仪', '池', '袁', '诗芸', '光', '蕙兰', '琼之', '洁', '芷昀', '玉卿', '雨霏',
-  '百何', '杨林', '淳佳', '凌霞', '乃文', '梦妮', '燊悦', '辛尉', '宝如', '丽莎',
-  '妞', '淑娜', '倩玉', '桐舟', '思函', '雪琳', '绮贞', '雨轩', '二妮', '怡萍',
-  '雨欣', '维维', '燕妮', '凡', '菲菲', '以轩', '咏琪', '幂', '霄云', '子曼',
-  '嘉丽', '浠', '荭菲', '侃', '亚', '诗安', '纯如', '红', '羽幽', '薇', '欢',
-  '馥甄', '毓芬', '洁仪', '静音', '凯琳', '钰琪', '海玲', '美满', '婉婷', '霞',
-  '旭方', '小霞', '毛', '临', '贝', '姗姗', '娟儿', '婉莹', '笙', '秋华', '宝珠',
-  '仲薇', '蕾', '海媚', '斯华', '雯婕', '二汶', '洁文', '子月', '又琪', '祖英',
-  '俐婷', '晓楠', '路得', '芯瑜', '琬婷', '殊', '玥菲', '艺娜', '汶', '佳明',
-  '千雅', '逸璇', '靖姗', '茜',
-];
-
-// console.log(JSON.stringify(person_first_names_female.map(v => pinyin(v, { style: 'normal' }).flat().join(''))));
-const person_first_names_female_pinyin = [
-  'yiyi', 'xiaoyun', 'yanhong', 'ke', 'yang', 'yanshi', 'zixuan', 'xuan', 'ruixi',
-  'feiping', 'huijun', 'zitong', 'weiling', 'mei', 'zhuoyan', 'ximan', 'yajie',
-  'jingyi', 'fang', 'qi', 'qiufeng', 'shuyi', 'xiaomei', 'wenyu', 'liying', 'minli',
-  'lu', 'songru', 'dema', 'ling', 'timo', 'rui', 'dou', 'qiao', 'xiaodi', 'miaoling',
-  'gema', 'qiacuo', 'minqi', 'zhibi', 'dai', 'rui', 'jie', 'shan', 'mei', 'suo',
-  'meihui', 'xiulin', 'tong', 'ji', 'leshi', 'baizhi', 'shao', 'yao', 'xi', 'yiwen',
-  'shu', 'dan', 'zishan', 'suosuo', 'xiaotong', 'xue', 'xiaomin', 'qiuhong', 'niao',
-  'xiangting', 'shishi', 'xiaoxiong', 'luofei', 'mingzhen', 'renfeng', 'huanjun',
-  'bichang', 'shiqin', 'bingbing', 'anqi', 'qing', 'haiying', 'fanxi', 'xun',
-  'wenhui', 'yichun', 'hong', 'jiawei', 'yixian', 'yu', 'xintong', 'yanxi', 'xiaoniu',
-  'anning', 'xiaodou', 'xiaorong', 'yang', 'qianlian', 'meichen', 'meimei', 'wenxun',
-  'mingjuan', 'yiting', 'ning', 'ling', 'xi', 'anyu', 'yun', 'luoshi', 'xiangyi',
-  'fenlan', 'huiling', 'zhilei', 'qing', 'shizhe', 'xier', 'yingping', 'zhen', 'ruoxi',
-  'san', 'peiwen', 'sihan', 'qianmin', 'sang', 'jieli', 'xinxin', 'ya', 'mengyuan',
-  'haiqiao', 'bichen', 'xin', 'xingyu', 'zhixian', 'qianqian', 'yisha', 'wenxin',
-  'xiaoqin', 'jiamei', 'hai', 'jiaying', 'runjie', 'xi', 'yan', 'ziyi', 'ning',
-  'caijie', 'sihui', 'miaoke', 'xiaoping', 'weiling', 'laitian', 'shuang', 'luke',
-  'zuozuo', 'xian', 'feier', 'chenxi', 'xiaoyun', 'xiaohua', 'xi', 'xiaopi', 'xinyao',
-  'meilin', 'tong', 'songyun', 'xiyi', 'chi', 'yuan', 'shiyun', 'guang', 'huilan',
-  'qiongzhi', 'jie', 'zhiyun', 'yuqing', 'yufei', 'baihe', 'yanglin', 'chunjia',
-  'lingxia', 'naiwen', 'mengni', 'shenyue', 'xinwei', 'baoru', 'lisuo', 'niu', 'shuna',
-  'qianyu', 'tongzhou', 'sihan', 'xuelin', 'qizhen', 'yuxuan', 'erni', 'yiping',
-  'yuxin', 'weiwei', 'yanni', 'fan', 'feifei', 'yixuan', 'yongqi', 'mi', 'xiaoyun',
-  'ziman', 'jiali', 'xi', 'hongfei', 'kan', 'ya', 'shian', 'chunru', 'hong', 'yuyou',
-  'wei', 'huan', 'fuzhen', 'yufen', 'jieyi', 'jingyin', 'kailin', 'yuqi', 'hailing',
-  'meiman', 'wanting', 'xia', 'xufang', 'xiaoxia', 'mao', 'lin', 'bei', 'shanshan',
-  'juaner', 'wanying', 'sheng', 'qiuhua', 'baozhu', 'zhongwei', 'lei', 'haimei',
-  'sihua', 'wenjie', 'erwen', 'jiewen', 'ziyue', 'youqi', 'zuying', 'liting', 'xiaonan',
-  'lude', 'xinyu', 'wanting', 'shu', 'yuefei', 'yina', 'wen', 'jiaming', 'qianya',
-  'yixuan', 'jingshan', 'qian',
-];
-
-const person_jobs = [
+const _person_jobs = [
   '客户关系经理/主管', '化妆品研发', '仓库经理/主管', '运动健身', '综合业务专员', '审核员',
   '市场/营销/拓展经理', '调墨技师', '飞机维修机械师', '网页设计/制作/美工', '房地产项目招投标',
   '医药招商', 'CNC工程师', '医疗器械销售代表', '学徒工', '语音/视频/图形开发工程师', '造纸研发',
@@ -192,76 +21,62 @@ const person_jobs = [
   '汽车检验/检测', '高级软件工程师',
 ];
 
+function name_update(first_names_male_data = null, first_names_female_data = null) {
+  this._person_first_names_male_data = first_names_male_data;
+  this._person_first_names_male = Object.keys(this._person_first_names_male_data);
+  this._person_first_names_female_data = first_names_female_data;
+  this._person_first_names_female = Object.keys(this._person_first_names_female_data);
+  this._person_first_names_data = Object.assign({}, first_names_male_data, first_names_female_data);
+  this._person_first_names = Object.keys(this._person_first_names_data);
+}
+
 function last_name() {
-  return this.pick(this.person_last_names);
+  return this.pick(this._person_last_names);
 }
 
-function last_name_pinyin(name = null) {
-  if (name && this.person_last_names.indexOf(name) > -1) {
-    return this.person_last_names_pinyin[this.person_last_names.indexOf(name)];
-  }
-  return this.pick(this.person_last_names_pinyin);
-}
-
-function first_name() {
-  return this.pick(this.person_first_names_male, person_first_names_female);
-}
-
-function first_name_pinyin(name = null) {
-  if (name && this.person_first_names_male.indexOf(name) > -1) {
-    return this.person_first_names_male_pinyin[this.person_first_names_male.indexOf(name)];
-  }
-  if (name && person_first_names_female.indexOf(name) > -1) {
-    return this.person_first_names_female_pinyin[person_first_names_female.indexOf(name)];
-  }
-  return this.pick(this.person_first_names_male_pinyin, this.person_first_names_female_pinyin);
+function last_name_pinyin(name = this.last_name()) {
+  return this._person_last_names_data[name] || '';
 }
 
 function first_name_male() {
-  return this.pick(this.person_first_names_male);
+  return this.pick(this._person_first_names_male);
 }
 
-// function first_name_male_pinyin(name = null) {
-//   if (name && this.person_first_names_male.indexOf(name) > -1) {
-//     return this.person_first_names_male_pinyin[this.person_first_names_male.indexOf(name)];
-//   }
-//   return this.pick(this.person_first_names_male_pinyin);
-// }
+function first_name_male_pinyin(name = this.first_name_male()) {
+  return this._person_first_names_male_data[name] || '';
+}
 
 function first_name_female() {
-  return this.pick(person_first_names_female);
+  return this.pick(this._person_first_names_female);
 }
 
-// function first_name_female_pinyin(name = null) {
-//   if (name && person_first_names_female.indexOf(name) > -1) {
-//     return this.person_first_names_female_pinyin[person_first_names_female.indexOf(name)];
-//   }
-//   return this.pick(this.person_first_names_female_pinyin);
-// }
+function first_name_female_pinyin(name = this.first_name_female()) {
+  return this._person_first_names_female_data[name] || '';
+}
+
+function first_name() {
+  return this.pick(this._person_first_names);
+}
+
+function first_name_pinyin(name = this.first_name()) {
+  return this._person_first_names_data[name] || '';
+}
 
 function name() {
-  return this.last_name() + this.first_name();
-}
-
-function name_pinyin(name = null) {
-  return this.last_name_pinyin(name && name.substr(0, 1)) + this.first_name_pinyin(name && name.substr(1));
+  return this.last_name() +  this.first_name();
 }
 
 function name_male() {
   return this.last_name() + this.first_name_male();
 }
 
-// function name_male_pinyin(name = null) {
-//   return this.last_name_pinyin(name && name.substr(0, 1)) + this.first_name_male_pinyin(name && name.substr(1));
-// }
-
 function name_female() {
   return this.last_name() + this.first_name_female();
 }
 
-// function name_female_pinyin(name = null) {
-//   return this.last_name_pinyin(name && name.substr(0, 1)) + this.first_name_female_pinyin(name && name.substr(1));
-// }
+function name_pinyin(name = this.name()) {
+  return this.last_name_pinyin(name.substr(0, 1)) + this.first_name_pinyin(name.substr(1));
+}
 
 function username() {
   return this.name_pinyin();
@@ -272,7 +87,7 @@ function password() {
 }
 
 function job() {
-  return this.pick(this.person_jobs);
+  return this.pick(this._person_jobs);
 }
 
 function phone() {
@@ -280,28 +95,25 @@ function phone() {
 }
 
 module.exports = function(pino) {
-  pino.person_last_names = person_last_names;
-  pino.person_last_names_pinyin = person_last_names_pinyin;
-  pino.person_first_names_male = person_first_names_male;
-  pino.person_first_names_male_pinyin = person_first_names_male_pinyin;
-  pino.person_first_names_female = person_first_names_female;
-  pino.person_first_names_female_pinyin = person_first_names_female_pinyin;
-  pino.person_jobs = person_jobs;
+  pino.register('name_update', name_update);
+
+  pino._person_last_names_data = _person_last_names_data;
+  pino._person_last_names = Object.keys(pino._person_last_names_data);
+  pino.name_update(_person_first_names_male_data, _person_first_names_female_data);
+  pino._person_jobs = _person_jobs;
 
   pino.register('last_name', last_name);
   pino.register('last_name_pinyin', last_name_pinyin);
+  pino.register('first_name_male', first_name_male);
+  pino.register('first_name_male_pinyin', first_name_male_pinyin);
+  pino.register('first_name_female', first_name_female);
+  pino.register('first_name_female_pinyin', first_name_female_pinyin);
   pino.register('first_name', first_name);
   pino.register('first_name_pinyin', first_name_pinyin);
-  pino.register('first_name_male', first_name_male);
-  // pino.register('first_name_male_pinyin', first_name_male_pinyin);
-  pino.register('first_name_female', first_name_female);
-  // pino.register('first_name_female_pinyin', first_name_female_pinyin);
   pino.register('name', name);
-  pino.register('name_pinyin', name_pinyin);
   pino.register('name_male', name_male);
-  // pino.register('name_male_pinyin', name_male_pinyin);
   pino.register('name_female', name_female);
-  // pino.register('name_female_pinyin', name_female_pinyin);
+  pino.register('name_pinyin', name_pinyin);
   pino.register('username', username);
   pino.register('password', password);
   pino.register('job', job);

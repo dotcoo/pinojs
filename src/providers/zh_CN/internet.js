@@ -1,37 +1,37 @@
-const internet_free_email_domains = [
+const _internet_free_email_domains = [
   'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com',
   '163.com', '126.com', 'yeah.net', 'qq.com', 'foxmail.com',
   'sina.com.cn', 'sohu.com',
 ];
 
-const internet_protocols = [
+const _internet_protocols = [
   'http', 'https',
 ];
 
-const internet_tlds = [
+const _internet_tlds = [
   'com', 'net', 'cn', 'com.cn', 'net.cn',
 ];
 
-const internet_hosts = [
+const _internet_hosts = [
   'www', 'www', 'www', 'www', 'oa', 'mail', 'email', 'disk', 'im', 'data', 'file',
 ];
 
-const internet_url_paths = [
+const _internet_url_paths = [
   'app', 'main', 'wp-content', 'search', 'category', 'tag', 'categories',
   'tags', 'blog', 'posts', 'list', 'explore',
 ];
 
-const internet_url_pages = [
+const _internet_url_pages = [
   'index', 'home', 'search', 'main', 'post', 'homepage', 'category',
   'register', 'login', 'faq', 'about', 'terms', 'privacy', 'author',
 ];
 
-const internet_url_extensions = [
+const _internet_url_extensions = [
   'html', 'htm', 'php', 'jsp', 'asp',
 ];
 
 function domain_tld() {
-  return this.pick(this.internet_tlds);
+  return this.pick(this._internet_tlds);
 }
 
 function domain_name(domain_name = null) {
@@ -39,7 +39,7 @@ function domain_name(domain_name = null) {
 }
 
 function domain_host() {
-  return this.pick(this.internet_hosts);
+  return this.pick(this._internet_hosts);
 }
 
 function domain(domain_name = null) {
@@ -51,19 +51,19 @@ function hostname(domain_name = null) {
 }
 
 function free_email_domain() {
-  return this.pick(this.internet_free_email_domains);
+  return this.pick(this._internet_free_email_domains);
 }
 
 function free_email() {
-  return `${this.name_pinyin()}@${this.pick(this.internet_free_email_domains)}`;
+  return `${this.name_pinyin()}@${this.pick(this._internet_free_email_domains)}`;
 }
 
 function company_email_domain() {
-  return `${this.company_name_pinyin()}.${this.pick(this.internet_tlds)}`;
+  return `${this.company_name_pinyin()}.${this.pick(this._internet_tlds)}`;
 }
 
 function company_email() {
-  return `${this.name_pinyin()}@${this.company_name_pinyin()}.${this.pick(this.internet_tlds)}`;
+  return `${this.name_pinyin()}@${this.company_name_pinyin()}.${this.pick(this._internet_tlds)}`;
 }
 
 function email() {
@@ -83,7 +83,7 @@ function mac_address() {
 }
 
 function protocal() {
-  return this.pick(this.internet_protocols);
+  return this.pick(this._internet_protocols);
 }
 
 function site(domain_name = null) {
@@ -91,15 +91,15 @@ function site(domain_name = null) {
 }
 
 function url_path(depth = 2) {
-  return '/' + this.range(depth, () => this.pick(this.internet_url_paths)).join('/');
+  return '/' + this.range(depth, () => this.pick(this._internet_url_paths)).join('/');
 }
 
 function url_page() {
-  return this.pick(this.internet_url_pages);
+  return this.pick(this._internet_url_pages);
 }
 
 function url_extension() {
-  return this.pick(this.internet_url_extensions);
+  return this.pick(this._internet_url_extensions);
 }
 
 function url(domain_name = null) {
@@ -107,13 +107,13 @@ function url(domain_name = null) {
 }
 
 module.exports = function(pino) {
-  pino.internet_free_email_domains = internet_free_email_domains;
-  pino.internet_protocols = internet_protocols;
-  pino.internet_tlds = internet_tlds;
-  pino.internet_hosts = internet_hosts;
-  pino.internet_url_paths = internet_url_paths;
-  pino.internet_url_pages = internet_url_pages;
-  pino.internet_url_extensions = internet_url_extensions;
+  pino._internet_free_email_domains = _internet_free_email_domains;
+  pino._internet_protocols = _internet_protocols;
+  pino._internet_tlds = _internet_tlds;
+  pino._internet_hosts = _internet_hosts;
+  pino._internet_url_paths = _internet_url_paths;
+  pino._internet_url_pages = _internet_url_pages;
+  pino._internet_url_extensions = _internet_url_extensions;
 
   pino.register('domain_tld', domain_tld);
   pino.register('domain_name', domain_name);
