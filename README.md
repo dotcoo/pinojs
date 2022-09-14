@@ -1,8 +1,8 @@
-English | [简体中文](https://github.com/wuyawl/pinojs/blob/master/README.zh-CN.md)
+[English](README.md) | [简体中文](README.zh-CN.md)
 
 ## Introduction
 
-[pinojs](https://github.com/wuyawl/pinojs), Intercept ajax requests and respond to fake data.
+[pinojs](https://github.com/dotcoo/pinojs), Intercept ajax requests and respond to fake data.
 
 ## Installing
 
@@ -566,6 +566,6 @@ xhr5.onreadystatechange = function() {
 
 ## License
 
-[MIT](https://github.com/wuyawl/pinojs/blob/master/LICENSE) license.
+[MIT](LICENSE) license.
 
 Copyright (c) 2020-present dotcoo zhao

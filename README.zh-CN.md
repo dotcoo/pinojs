@@ -1,8 +1,8 @@
-[English](https://github.com/wuyawl/pinojs/blob/master/README.md) | 简体中文
+[English](README.md) | [简体中文](README.zh-CN.md)
 
 ## 简介
 
-[pinojs](https://github.com/wuyawl/pinojs)， 拦截ajax请求并响应假数据。
+[pinojs](https://github.com/dotcoo/pinojs)， 拦截ajax请求并响应假数据。
 
 ## 安装
 
@@ -558,6 +558,6 @@ xhr5.onreadystatechange = function() {
 
 ## License
 
-[MIT](https://github.com/wuyawl/pinojs/blob/master/LICENSE) license.
+[MIT](LICENSE) license.
 
 Copyright (c) 2020-present dotcoo zhao

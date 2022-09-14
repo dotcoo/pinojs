@@ -1,6 +1,6 @@
 {
   "name": "pinojs",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Intercept ajax requests and respond to fake data.",
   "main": "src/index.js",
   "scripts": {
@@ -13,8 +13,9 @@
     "pino",
     "pinojs"
   ],
-  "author": "dotcoo@163.com",
-  "homepage": "https://github.com/wee9/pinojs",
+  "author": "dotcoo <dotcoo@163.com> (http://www.dotcoo.com)",
+  "homepage": "https://github.com/dotcoo/pinojs#readme",
+  "repository": "github:dotcoo/pinojs",
   "license": "ISC",
   "devDependencies": {
     "axios": "^0.19.2",
