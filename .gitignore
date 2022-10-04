@@ -1,5 +1,1 @@
-/package-lock.json
-/yarn.lock
-/node_modules
-/docs
-/tools
+node_modules

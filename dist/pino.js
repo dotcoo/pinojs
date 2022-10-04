@@ -96,10 +96,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
 // ====== constant ======
 
 const MIN_BYTE = -128;
@@ -297,7 +295,7 @@ pino.use = function(func) {
 
 // ====== export ======
 
-/* harmony default export */ __webpack_exports__["default"] = (pino);
+module.exports = pino;
 
 
 /***/ }),

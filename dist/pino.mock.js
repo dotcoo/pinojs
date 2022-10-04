@@ -99,7 +99,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "default", function() { return /* binding */ mock; });
 
 // CONCATENATED MODULE: ./src/mock/Server.js
 function requestLog(req) {
@@ -486,7 +490,6 @@ fetch.handle = async function(req) {
 /* harmony default export */ var mock_fetch = (fetch);
 
 // CONCATENATED MODULE: ./src/mock/index.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return mock; });
 
 
 
