@@ -124,9 +124,13 @@ function image_avatar(options) {
   return canvas.toDataURL();
 }
 
-module.exports = function(pino) {
-  pino.register('image_url', image_url);
-  pino.register('image_data_url', image_data_url);
-  pino.register('image_random_matrix', image_random_matrix);
-  pino.register('image_avatar', image_avatar);
+export default function(pino) {
+  pino.registers({
+    // data
+    // method
+    image_url,
+    image_data_url,
+    image_random_matrix,
+    image_avatar,
+  });
 };

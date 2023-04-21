@@ -1,3 +1,5 @@
+const { default: pino } = require('../dist/pino.cjs');
+
 // ### 随机基础类型
 
 console.log(pino.bool(), pino.boolean()); // true false // 随机出现 true 和 false
@@ -75,12 +77,6 @@ console.log(pino.range(1, 10, i => i * i)); // [1, 4, 9, 16, 25, 36, 49, 64, 81]
 console.log(pino.range(1, 10, 2, i => i * i)); // [1, 9, 25, 49, 81]
 
 console.log(pino.range(10, 1, -2, i => i * i)); // [100, 64, 36, 16, 4]
-
-// 分页数据
-
-// 方法签名: pino.page(total, page_current, page_size, (i, arr) => i)
-
-console.log(pino.page(83, 1, 10, i => i * i)); // [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
 // ### 生成嵌套数据
 

@@ -10,7 +10,7 @@ function date_expr(expr, date = new Date()) {
       if (!result) {
         break;
       }
-      const [_, number, unit] = result;
+      const [_, number, unit] = result; // eslint-disable-line
       if ('ymdhis'.indexOf(unit) === -1) {
         throw new Error('error unit!');
       }
@@ -21,6 +21,10 @@ function date_expr(expr, date = new Date()) {
     return new Date();
   } else if (typeof expr === 'string') {
     return new Date(expr);
+  } else if (typeof expr === 'object' && expr !== null) {
+    const { y = 0, m = 0, d = 0, h = 0, i = 0, s = 0 } = expr;
+    const mDate = new Date(date.getFullYear() + y, date.getMonth() + m + 1, 0);
+    return new Date(date.getFullYear() + y, date.getMonth() + m, Math.min(mDate.getDate(), date.getDate()) + d, date.getHours() + h, date.getMinutes() + i, date.getSeconds() + s);
   } else {
     return expr;
   }
@@ -44,8 +48,12 @@ function date(start = 0, end = 4294967295000, format = 'y-m-d h:i:s') {
   return this.date_format(new Date(this.number(start.getTime(), end.getTime(), 0)), format);
 }
 
-module.exports = function(pino) {
-  pino.register('date_expr', date_expr);
-  pino.register('date_format', date_format);
-  pino.register('date', date);
+export default function(pino) {
+  pino.registers({
+    // data
+    // method
+    date_expr,
+    date_format,
+    date,
+  });
 };

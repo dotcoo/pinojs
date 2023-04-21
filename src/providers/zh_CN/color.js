@@ -1,4 +1,4 @@
-const _color_names = [
+const color_names = [
   'AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque',
   'Black', 'BlanchedAlmond', 'Blue', 'BlueViolet', 'Brown', 'BurlyWood', 'CadetBlue',
   'Chartreuse', 'Chocolate', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Crimson',
@@ -26,7 +26,7 @@ const _color_names = [
 ];
 
 function color_name() {
-  return this.pick(this._color_names);
+  return this.random(this.data.color_names);
 }
 
 function color() {
@@ -84,18 +84,21 @@ function rgba_colorful() {
   return `rgba(${r},${g},${b},${a})`;
 }
 
-module.exports = function(pino) {
-  pino._color_names = _color_names;
-
-  pino.register('color_name', color_name);
-  pino.register('color', color);
-  pino.register('hex_color', hex_color);
-  pino.register('rgb_color', rgb_color);
-  pino.register('rgba_color', rgba_color);
-  pino.register('is_colorful', is_colorful);
-  pino.register('random_colorful', random_colorful);
-  pino.register('colorful', colorful);
-  pino.register('hex_colorful', hex_colorful);
-  pino.register('rgb_colorful', rgb_colorful);
-  pino.register('rgba_colorful', rgba_colorful);
+export default function(pino) {
+  pino.registers({
+    // data
+    color_names,
+    // method
+    color_name,
+    color,
+    hex_color,
+    rgb_color,
+    rgba_color,
+    is_colorful,
+    random_colorful,
+    colorful,
+    hex_colorful,
+    rgb_colorful,
+    rgba_colorful,
+  });
 };

@@ -1,14 +1,14 @@
-const address = require('./address');
-const automotive = require('./automotive');
-const color = require('./color');
-const company = require('./company');
-const date = require('./date');
-const image = require('./image');
-const internet = require('./internet');
-const lorem = require('./lorem');
-const person = require('./person');
+import address from './address';
+import automotive from './automotive';
+import color from './color';
+import company from './company';
+import date from './date';
+import image from './image';
+import internet from './internet';
+import lorem from './lorem';
+import person from './person';
 
-module.exports = function(pino) {
+export default function(pino) {
   address(pino);
   automotive(pino);
   color(pino);

@@ -1,36 +1,40 @@
 {
   "name": "pinojs",
-  "version": "0.7.5",
-  "description": "Intercept ajax requests and respond to fake data.",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cross-env NODE_ENV=development webpack-dev-server",
-    "build": "cross-env NODE_ENV=production webpack -p --config webpack.config.js",
-    "build:mock": "cross-env NODE_ENV=production webpack -p --config webpack.mock.config.js"
-  },
-  "keywords": [
-    "pino",
-    "pinojs"
-  ],
+  "version": "1.0.0",
+  "description": "generate fake data.",
   "author": "dotcoo <dotcoo@163.com> (http://www.dotcoo.com)",
   "homepage": "https://github.com/dotcoo/pinojs#readme",
   "repository": "github:dotcoo/pinojs",
   "license": "ISC",
+  "keywords": [
+    "pino",
+    "pinojs"
+  ],
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/pino.cjs",
+  "module": "./dist/pino.js",
+  "exports": {
+    ".": {
+      "require": "./dist/pino.cjs",
+      "import": "./dist/pino.js"
+    },
+    "./zhCN_data": {
+      "require": "./dist/pino_zhCN_data.cjs",
+      "import": "./dist/pino_zhCN_data.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "devDependencies": {
-    "axios": "^0.27.2",
-    "cross-env": "^7.0.0",
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.19.1",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "html-webpack-plugin": "^4.5.2",
-    "jquery": "^3.4.1",
-    "terser-webpack-plugin": "^2.3.5",
-    "webpack": "^4.41.6",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3"
+    "vite": "^4.3.0"
+  },
+  "dependencies": {
+    "eslint": "^8.38.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-standard": "^5.0.0"
   }
 }

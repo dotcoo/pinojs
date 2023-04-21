@@ -1,4 +1,4 @@
-const _address_countries = [
+const address_countries = [
   '阿富汗', '阿拉斯加', '阿尔巴尼亚', '阿尔及利亚', '安道尔', '安哥拉', '安圭拉岛英', '安提瓜和巴布达',
   '阿根廷', '亚美尼亚', '阿鲁巴岛', '阿森松', '澳大利亚', '奥地利', '阿塞拜疆', '巴林', '孟加拉国',
   '巴巴多斯', '白俄罗斯', '比利时', '伯利兹', '贝宁', '百慕大群岛', '不丹', '玻利维亚', '波斯尼亚和黑塞哥维那',
@@ -25,7 +25,7 @@ const _address_countries = [
   '也门', '南斯拉夫', '扎伊尔', '赞比亚', '桑给巴尔', '津巴布韦', '中华人民共和国', '中国',
 ];
 
-const _address_provinces = [
+const address_provinces = [
   '北京市', '上海市', '天津市', '重庆市',
   '内蒙古自治区', '山西省', '河北省', '吉林省', '江苏省', '辽宁省', '黑龙江省',
   '安徽省', '山东省', '浙江省', '江西省', '福建省', '湖南省', '湖北省',
@@ -34,18 +34,27 @@ const _address_provinces = [
   '台湾省', '香港特别行政区', '澳门特别行政区',
 ];
 
-const _address_cities = [
-  '北京', '上海', '天津', '重庆', '哈尔滨', '长春', '沈阳', '呼和浩特',
-  '石家庄', '乌鲁木齐', '兰州', '西宁', '西安', '银川', '郑州', '济南', '太原',
-  '合肥', '武汉', '长沙', '南京', '成都', '贵阳', '昆明', '南宁', '拉萨',
-  '杭州', '南昌', '广州', '福州', '台北', '海口', '香港', '澳门', '通辽',
-  '兴安盟', '太原', '辛集', '邯郸', '沈阳', '辽阳', '兴城', '北镇', '阜新',
-  '哈尔滨', '齐齐哈尔', '淮安', '张家港', '海门', '六安', '巢湖', '马鞍山',
-  '永安', '宁德', '嘉禾', '荆门', '潜江', '大冶', '宜都', '佛山', '深圳',
-  '潮州', '惠州', '汕尾', '东莞', '梧州', '柳州', '合山', '六盘水', '关岭',
-];
+const address_cities_data = {
+  '北京': 'beijing', '上海': 'shanghai', '天津': 'tianjin', '重庆': 'chongqing',
+  '呼和浩特': 'huhehaote', '太原': 'taiyuan', '石家庄': 'shijiazhuang', '长春': 'changchun',
+  '南京': 'nanjing', '沈阳': 'shenyang', '哈尔滨': 'haerbin', '合肥': 'hefei', '济南': 'jinan',
+  '杭州': 'hangzhou', '南昌': 'nanchang', '福州': 'fuzhou', '长沙': 'changsha', '武汉': 'wuhan',
+  '郑州': 'zhengzhou', '广州': 'guangzhou', '南宁': 'nanning', '贵阳': 'guiyang', '海口': 'haikou',
+  '成都': 'chengdu', '昆明': 'kunming', '西安': 'xian', '兰州': 'lanzhou', '银川': 'yinchuan',
+  '西宁': 'xining', '乌鲁木齐': 'wulumuqi', '拉萨': 'lasa', '台北': 'taibei', '香港': 'xianggang',
+  '澳门': 'aomen', '兴安盟': 'xinganmeng', '桂林': 'guilin', '辛集': 'xinji', '邯郸': 'handan',
+  '通辽': 'tongliao', '辽阳': 'liaoyang', '兴城': 'xingcheng', '北镇': 'beizhen', '阜新': 'fuxin',
+  '嘉兴': 'jiaxing', '齐齐哈尔': 'qiqihaer', '淮安': 'huaian', '张家港': 'zhangjiagang',
+  '海门': 'haimen', '六安': 'liuan', '巢湖': 'chaohu', '马鞍山': 'maanshan', '永安': 'yongan',
+  '宁德': 'ningde', '嘉禾': 'jiahe', '荆门': 'jingmen', '潜江': 'qianjiang', '大冶': 'daye',
+  '宜都': 'yidu', '佛山': 'foshan', '深圳': 'shenzhen', '潮州': 'chaozhou', '惠州': 'huizhou',
+  '汕尾': 'shanwei', '东莞': 'dongguan', '梧州': 'wuzhou', '柳州': 'liuzhou', '合山': 'heshan',
+  '六盘水': 'liupanshui', '关岭': 'guanling', '铁岭': 'tieling',
+};
 
-const _address_districts = [
+const address_cities = Object.keys(address_cities_data);
+
+const address_districts = [
   '西夏', '永川', '秀英', '高港', '清城', '兴山', '锡山', '清河',
   '龙潭', '华龙', '海陵', '滨城', '东丽', '高坪', '沙湾', '平山',
   '城北', '海港', '沙市', '双滦', '长寿', '山亭', '南湖', '浔阳',
@@ -59,11 +68,11 @@ const _address_districts = [
   '港区', '巩义', '上街', '荥阳', '中牟', '登封', '新密', '新郑',
 ];
 
-const _address_districts_suffixes = [
+const address_districts_suffixes = [
   '市', '区', '县',
 ];
 
-const _address_streets = [
+const address_streets = [
   '一马路', '三全路', '三马路', '东大街', '东风东路', '东风南路', '东风路', '丰乐路',
   '丰产路', '丰庆路', '二七路', '二马路', '京广路', '人民路', '伊河路', '伏牛路',
   '众意西路', '众意路', '兴隆街', '农业东路', '农业南路', '农业路', '农科路', '冬青街',
@@ -80,7 +89,7 @@ const _address_streets = [
   '长兴路', '长椿路', '陇海路', '雪松路', '领航路', '颍河路', '黄河东路', '黄河南路',
 ];
 
-const _address_buildings = [
+const address_buildings = [
   '世贸大厦', '东方鼎盛中心', '中华大厦', '中原万达广场', '中国人保大厦', '中油新澳大厦',
   '中科金座', '五行嘉园', '亚新广场', '亚星SOHO国际', '企业壹号大厦', '传媒创意中心',
   '佳田国际广场', '兰德中心', '兴达国贸', '凯利大厦', '创艺中心', '升龙大厦', '升龙广场',
@@ -98,11 +107,11 @@ const _address_buildings = [
   '顺驰第一国际', '领秀国际中心',
 ];
 
-const _address_buildings_units = [
+const address_buildings_units = [
   'A座', 'B座', 'C座', 'D座', 'E座', 'F座',
 ];
 
-const _address_communities = [
+const address_communities = [
   '一处庭院', '七里香堤', '万龙花园', '世茂云尚城', '世豪小公馆', '东城花园', '东文雅小区',
   '东方梦园', '东润泰和', '东瑞佳苑', '中建文苑', '中方园', '中海锦苑', '中联花园', '中鼎花园',
   '丰乐花苑', '丰庆佳苑', '丰庆华府', '丽水人家', '九锦台', '京广花园', '人和花园', '亿安花园',
@@ -134,15 +143,15 @@ const _address_communities = [
 ];
 
 function country() {
-  return this.pick(this._address_countries);
+  return this.random(this.data.address_countries);
 }
 
 function province() {
-  return this.pick(this._address_provinces);
+  return this.random(this.data.address_provinces);
 }
 
 function city_name() {
-  return this.pick(this._address_cities);
+  return this.random(this.data.address_cities);
 }
 
 function city_suffix() {
@@ -150,23 +159,23 @@ function city_suffix() {
 }
 
 function city() {
-  return this.pick(this._address_cities) + '市';
+  return this.random(this.data.address_cities) + '市';
 }
 
 function district_name() {
-  return this.pick(this._address_districts);
+  return this.random(this.data.address_districts);
 }
 
 function district_suffix() {
-  return this.pick(this._address_districts_suffixes);
+  return this.random(this.data.address_districts_suffixes);
 }
 
 function district() {
-  return this.pick(this._address_districts) + this.pick(this._address_districts_suffixes);
+  return this.random(this.data.address_districts) + this.random(this.data.address_districts_suffixes);
 }
 
 function street_name() {
-  return this.pick(this._address_streets);
+  return this.random(this.data.address_streets);
 }
 
 function street_number() {
@@ -174,15 +183,15 @@ function street_number() {
 }
 
 function street() {
-  return this.pick(this._address_streets) + this.street_number();
+  return this.random(this.data.address_streets) + this.street_number();
 }
 
 function building_name() {
-  return this.pick(this._address_buildings);
+  return this.random(this.data.address_buildings);
 }
 
 function building_unit() {
-  return this.pick(this._address_buildings_units);
+  return this.random(this.data.address_buildings_units);
 }
 
 function building_number() {
@@ -190,11 +199,11 @@ function building_number() {
 }
 
 function building() {
-  return this.pick(this._address_buildings) + this.pick(this._address_buildings_units) + this.building_number();
+  return this.random(this.data.address_buildings) + this.random(this.data.address_buildings_units) + this.building_number();
 }
 
 function community_name() {
-  return this.pick(this._address_communities);
+  return this.random(this.data.address_communities);
 }
 
 function community_unit() {
@@ -206,15 +215,15 @@ function community_number() {
 }
 
 function community() {
-  return this.pick(this._address_communities) + this.community_unit() + this.community_number();
+  return this.random(this.data.address_communities) + this.community_unit() + this.community_number();
 }
 
-function office_address() {
-  return /* this.country() + */ this.province() + this.city() + this.district() + this.street() + this.building();
+function office_address(country = false) {
+  return (country ? this.country() : '') + this.province() + this.city() + this.district() + this.street() + this.building();
 }
 
-function home_address() {
-  return /* this.country() + */ this.province() + this.city() + this.district() + this.street() + this.community();
+function home_address(country = false) {
+  return (country ? this.country() : '') + this.province() + this.city() + this.district() + this.street() + this.community();
 }
 
 function address() {
@@ -225,38 +234,42 @@ function postcode() {
   return this.number(100000, 999999, 0);
 }
 
-module.exports = function(pino) {
-  pino._address_countries = _address_countries;
-  pino._address_provinces = _address_provinces;
-  pino._address_cities = _address_cities;
-  pino._address_districts = _address_districts;
-  pino._address_districts_suffixes = _address_districts_suffixes;
-  pino._address_streets = _address_streets;
-  pino._address_buildings = _address_buildings;
-  pino._address_buildings_units = _address_buildings_units;
-  pino._address_communities = _address_communities;
-
-  pino.register('country', country);
-  pino.register('province', province);
-  pino.register('city_name', city_name);
-  pino.register('city_suffix', city_suffix);
-  pino.register('city', city);
-  pino.register('district_name', district_name);
-  pino.register('district_suffix', district_suffix);
-  pino.register('district', district);
-  pino.register('street_name', street_name);
-  pino.register('street_number', street_number);
-  pino.register('street', street);
-  pino.register('building_name', building_name);
-  pino.register('building_unit', building_unit);
-  pino.register('building_number', building_number);
-  pino.register('building', building);
-  pino.register('community_name', community_name);
-  pino.register('community_unit', community_unit);
-  pino.register('community_number', community_number);
-  pino.register('community', community);
-  pino.register('home_address', home_address);
-  pino.register('office_address', office_address);
-  pino.register('address', address);
-  pino.register('postcode', postcode);
+export default function(pino) {
+  pino.registers({
+    // data
+    address_countries,
+    address_provinces,
+    address_cities_data,
+    address_cities,
+    address_districts,
+    address_districts_suffixes,
+    address_streets,
+    address_buildings,
+    address_buildings_units,
+    address_communities,
+    // methods
+    country,
+    province,
+    city_name,
+    city_suffix,
+    city,
+    district_name,
+    district_suffix,
+    district,
+    street_name,
+    street_number,
+    street,
+    building_name,
+    building_unit,
+    building_number,
+    building,
+    community_name,
+    community_unit,
+    community_number,
+    community,
+    home_address,
+    office_address,
+    address,
+    postcode,
+  });
 };
