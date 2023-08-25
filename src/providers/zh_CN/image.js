@@ -72,16 +72,16 @@ function image_random_matrix(width, height, ratio = 0.4) {
     matrix[width * h + width - 1 - w] = true;
     count++;
   }
-  if (process.env.NODE_ENV === 'development') {
-    let show = '';
-    for (let i = 0; i < matrix.length; i++) {
-      show += matrix[i] ? '黑' : '  ';
-      if ((i + 1) % width === 0) {
-        show += '\n';
-      }
-    }
-    console.log(show);
-  }
+  // if (process.env.NODE_ENV === 'development') {
+  //   let show = '';
+  //   for (let i = 0; i < matrix.length; i++) {
+  //     show += matrix[i] ? '黑' : '  ';
+  //     if ((i + 1) % width === 0) {
+  //       show += '\n';
+  //     }
+  //   }
+  //   console.log(show);
+  // }
   return matrix;
 }
 

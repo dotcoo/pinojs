@@ -5,11 +5,18 @@ export default defineConfig({
     // sourcemap: true,
     lib: {
       entry: {
-        'pino': './src/index.js',
-        'pino_zhCN_data': './src/providers/zh_CN/data/index.js',
+        'pinojs': './src/index.js',
+        'pinojs_data_zhCN': './src/providers/zh_CN/data/index.js',
       },
+      formats: ['es', 'cjs'],
       // name: 'pino',
-      // fileName: (format, entryName) => entryName+'.'+format+'.js'
+      // fileName: (format, entryName) => entryName+'.'+({es:'mjs',cjs:'cjs'}[format]),
+      fileName: (format, entryName) => `${entryName}.${format}.js`,
+    },
+    rollupOptions: {
+      output: {
+        exports: 'named',
+      },
     },
   },
 });

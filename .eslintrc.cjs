@@ -12,6 +12,7 @@ module.exports = {
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
+    pinojs: true,
     pino: true,
     axios: true,
     $: true,

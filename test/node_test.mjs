@@ -1,5 +1,8 @@
-const { default: pino } = require('../dist/pino.cjs');
+#!/usr/local/bin/node
 
+import pino from 'pinojs';
+
+console.log(process.versions.node);
 
 // ### 随机基础类型
 
@@ -244,7 +247,7 @@ const image_url = pino.image_url({
   background: pino.colorful(), // optional
   foreground: pino.colorful(), // optional
   format: 'png', // optional
-  text: 'pino.js', // optional
+  text: 'pinojs', // optional
 });
 
 console.log('%ci', `color: rgba(0,0,0,0); padding: 0 100px; line-height: 160px; background: url('${image_url}') no-repeat;`);
@@ -255,7 +258,7 @@ if (typeof window !== 'undefined') {
     height: 160,
     background: pino.colorful(), // optional
     foreground: pino.colorful(), // optional
-    text: 'pin.js', // optional
+    text: 'pinojs', // optional
     font: 'bold 20px "Impact"', // optional
   });
 

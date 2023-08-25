@@ -55,17 +55,17 @@ const address_cities_data = {
 const address_cities = Object.keys(address_cities_data);
 
 const address_districts = [
-  '西夏', '永川', '秀英', '高港', '清城', '兴山', '锡山', '清河',
+  '西下', '永川', '秀英', '高港', '清城', '兴山', '锡山', '清河',
   '龙潭', '华龙', '海陵', '滨城', '东丽', '高坪', '沙湾', '平山',
   '城北', '海港', '沙市', '双滦', '长寿', '山亭', '南湖', '浔阳',
   '南长', '友好', '安次', '翔安', '沈河', '魏都', '西峰', '萧山',
-  '金平', '沈北新', '孝南', '上街', '城东', '牧野', '大东',
-  '白云', '花溪', '南山', '新城', '怀柔', '六枝特', '涪城',
+  '金平', '沈北', '孝南', '宝安', '城东', '牧野', '大东', '罗湖',
+  '白云', '花溪', '南山', '新城', '怀柔', '长宁', '涪城', '福田',
   '清浦', '南溪', '淄川', '高明', '东城', '崇文', '朝阳', '大兴',
-  '房山', '门头沟', '黄浦', '徐汇', '静安', '普陀', '闵行', '和平',
-  '蓟州', '永川', '长寿', '璧山', '合川', '梁平', '丰都', '江北',
+  '房山', '浦东', '黄浦', '徐汇', '静安', '普陀', '闵行', '和平',
+  '蓟州', '龙岗', '盐田', '璧山', '合川', '梁平', '丰都', '江北',
   '金水', '二七', '中原', '管城', '惠济', '高新', '经开', '郑东',
-  '港区', '巩义', '上街', '荥阳', '中牟', '登封', '新密', '新郑',
+  '偃师', '巩义', '上街', '荥阳', '中牟', '登封', '新密', '新郑',
 ];
 
 const address_districts_suffixes = [
@@ -179,7 +179,7 @@ function street_name() {
 }
 
 function street_number() {
-  return this.number(1, 366, 0) + '号';
+  return this.number(1, 999, 0) + '号';
 }
 
 function street() {
@@ -195,7 +195,7 @@ function building_unit() {
 }
 
 function building_number() {
-  return this.number(1, 31, 0) + this.number(1, 31, 0).toString().padStart(2, 0) + '室';
+  return this.number(1, 31, 0) + this.number(1, 30, 0).toString().padStart(2, 0) + '室';
 }
 
 function building() {
@@ -211,7 +211,7 @@ function community_unit() {
 }
 
 function community_number() {
-  return this.number(1, 21, 0) + '楼' + this.number(1, 121, 0) + '号';
+  return this.number(1, 21, 0) + '层' + this.number(1, 121, 0) + '室';
 }
 
 function community() {

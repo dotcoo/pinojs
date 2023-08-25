@@ -1,40 +1,42 @@
 {
   "name": "pinojs",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "generate fake data.",
-  "author": "dotcoo <dotcoo@163.com> (http://www.dotcoo.com)",
+  "author": "dotcoo <dotcoo@163.com> (http://blog.dotcoo.com)",
   "homepage": "https://github.com/dotcoo/pinojs#readme",
   "repository": "github:dotcoo/pinojs",
   "license": "ISC",
   "keywords": [
     "pino",
-    "pinojs"
+    "pinojs",
+    "fibjs"
   ],
   "type": "module",
-  "files": ["dist"],
-  "main": "./dist/pino.cjs",
-  "module": "./dist/pino.js",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/pinojs.cjs.js",
+  "module": "./dist/pinojs.es.js",
   "exports": {
     ".": {
-      "require": "./dist/pino.cjs",
-      "import": "./dist/pino.js"
+      "require": "./dist/pinojs.cjs.js",
+      "import": "./dist/pinojs.es.js"
     },
-    "./zhCN_data": {
-      "require": "./dist/pino_zhCN_data.cjs",
-      "import": "./dist/pino_zhCN_data.js"
+    "./data/zhCN.js": {
+      "require": "./dist/pinojs_data_zhCN.cjs.js",
+      "import": "./dist/pinojs_data_zhCN.es.js"
     }
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "pnpm run build:cjs:es && pnpm run build:iife",
+    "build:cjs:es": "vite build",
+    "build:iife": "vite build --mode iife -c vite.iife.config.js",
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^4.3.0"
-  },
-  "dependencies": {
-    "eslint": "^8.38.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-standard": "^5.0.0"
+    "eslint": "^8.48.0",
+    "eslint-config-standard": "^17.1.0",
+    "vite": "^4.4.9"
   }
 }

@@ -1,21 +1,23 @@
+/* eslint-disable */
+
 import zhCN from './providers/zh_CN';
 
-export const MIN_BYTE = -128;
-export const MAX_BYTE = 127;
-export const MIN_UBYTE = 0;
-export const MAX_UBYTE = 255;
-export const MIN_SHORT = -32768;
-export const MAX_SHORT = 32767;
-export const MIN_USHORT = 0;
-export const MAX_USHORT = 65535;
-export const MIN_INT = -2147483648;
-export const MAX_INT = 2147483647;
-export const MIN_UINT = 0;
-export const MAX_UINT = 4294967295;
-export const MIN_BIGINT = Number.MIN_SAFE_INTEGER;
-export const MAX_BIGINT = Number.MAX_SAFE_INTEGER;
-export const MIN_UBIGINT = 0;
-export const MAX_UBIGINT = Number.MAX_SAFE_INTEGER;
+export const BYTE_MIN    = -128;
+export const BYTE_MAX    = 127;
+export const UBYTE_MIN   = 0;
+export const UBYTE_MAX   = 255;
+export const SHORT_MIN   = -32768;
+export const SHORT_MAX   = 32767;
+export const USHORT_MIN  = 0;
+export const USHORT_MAX  = 65535;
+export const INT_MIN     = -2147483648;
+export const INT_MAX     = 2147483647;
+export const UINT_MIN    = 0;
+export const UINT_MAX    = 4294967295;
+export const BIGINT_MIN  = Number.MIN_SAFE_INTEGER;
+export const BIGINT_MAX  = Number.MAX_SAFE_INTEGER;
+export const UBIGINT_MIN = 0;
+export const UBIGINT_MAX = Number.MAX_SAFE_INTEGER;
 
 // ====== tools ======
 
@@ -51,27 +53,27 @@ export class Pino {
     this.boolean = x(this.boolean.bind(this));
 
     // number
-    this.int = x(this.number.bind(this, MIN_INT, MAX_INT, 0));
-    this.int8 = x(this.number.bind(this, MIN_BYTE, MAX_BYTE, 0));
-    this.int16 = x(this.number.bind(this, MIN_SHORT, MAX_SHORT, 0));
-    this.int32 = x(this.number.bind(this, MIN_INT, MAX_INT, 0));
-    this.int64 = x(this.number.bind(this, MIN_BIGINT, MAX_BIGINT, 0));
-    this.uint = x(this.number.bind(this, MIN_UINT, MAX_UINT, 0));
-    this.uint8 = x(this.number.bind(this, MIN_UBYTE, MAX_UBYTE, 0));
-    this.uint16 = x(this.number.bind(this, MIN_USHORT, MAX_USHORT, 0));
-    this.uint32 = x(this.number.bind(this, MIN_UINT, MAX_UINT, 0));
-    this.uint64 = x(this.number.bind(this, MIN_UBIGINT, MAX_UBIGINT, 0));
-    this.float = x(this.number.bind(this, MIN_INT, MAX_INT, 1));
-    this.float8 = x(this.number.bind(this, MIN_BYTE, MAX_BYTE, 1));
-    this.float16 = x(this.number.bind(this, MIN_SHORT, MAX_SHORT, 1));
-    this.float32 = x(this.number.bind(this, MIN_INT, MAX_INT, 1));
-    this.float64 = x(this.number.bind(this, MIN_BIGINT, MAX_BIGINT, 1));
-    this.ufloat = x(this.number.bind(this, MIN_UINT, MAX_UINT, 1));
-    this.ufloat8 = x(this.number.bind(this, MIN_UBYTE, MAX_UBYTE, 1));
-    this.ufloat16 = x(this.number.bind(this, MIN_USHORT, MAX_USHORT, 1));
-    this.ufloat32 = x(this.number.bind(this, MIN_UINT, MAX_UINT, 1));
-    this.ufloat64 = x(this.number.bind(this, MIN_UBIGINT, MAX_UBIGINT, 1));
-    this.number = x(this.number.bind(this, MIN_INT, MAX_INT, 0));
+    this.int      = x(this.number.bind(this, INT_MIN    , INT_MAX    , 0));
+    this.int8     = x(this.number.bind(this, BYTE_MIN   , BYTE_MAX   , 0));
+    this.int16    = x(this.number.bind(this, SHORT_MIN  , SHORT_MAX  , 0));
+    this.int32    = x(this.number.bind(this, INT_MIN    , INT_MAX    , 0));
+    this.int64    = x(this.number.bind(this, BIGINT_MIN , BIGINT_MAX , 0));
+    this.uint     = x(this.number.bind(this, UINT_MIN   , UINT_MAX   , 0));
+    this.uint8    = x(this.number.bind(this, UBYTE_MIN  , UBYTE_MAX  , 0));
+    this.uint16   = x(this.number.bind(this, USHORT_MIN , USHORT_MAX , 0));
+    this.uint32   = x(this.number.bind(this, UINT_MIN   , UINT_MAX   , 0));
+    this.uint64   = x(this.number.bind(this, UBIGINT_MIN, UBIGINT_MAX, 0));
+    this.float    = x(this.number.bind(this, INT_MIN    , INT_MAX    , 1));
+    this.float8   = x(this.number.bind(this, BYTE_MIN   , BYTE_MAX   , 1));
+    this.float16  = x(this.number.bind(this, SHORT_MIN  , SHORT_MAX  , 1));
+    this.float32  = x(this.number.bind(this, INT_MIN    , INT_MAX    , 1));
+    this.float64  = x(this.number.bind(this, BIGINT_MIN , BIGINT_MAX , 1));
+    this.ufloat   = x(this.number.bind(this, UINT_MIN   , UINT_MAX   , 1));
+    this.ufloat8  = x(this.number.bind(this, UBYTE_MIN  , UBYTE_MAX  , 1));
+    this.ufloat16 = x(this.number.bind(this, USHORT_MIN , USHORT_MAX , 1));
+    this.ufloat32 = x(this.number.bind(this, UINT_MIN   , UINT_MAX   , 1));
+    this.ufloat64 = x(this.number.bind(this, UBIGINT_MIN, UBIGINT_MAX, 1));
+    this.number   = x(this.number.bind(this, INT_MIN    , INT_MAX    , 0));
 
     // string
     this.string = x(this.string.bind(this));
@@ -95,7 +97,7 @@ export class Pino {
   // ====== types ======
 
   boolean() {
-    return Math.floor(Math.random() * MAX_INT) % 2 === 1;
+    return Math.floor(Math.random() * INT_MAX) % 2 === 1;
   }
 
   string(len = 8, chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
@@ -106,7 +108,7 @@ export class Pino {
     return str;
   }
 
-  number(defmin = MIN_INT, defmax = MAX_INT, defdecimal = -1, min = defmin, max = defmax, decimal = defdecimal) {
+  number(defmin = INT_MIN, defmax = INT_MAX, defdecimal = -1, min = defmin, max = defmax, decimal = defdecimal) {
     let n = min + Math.random() * (max - min);
     if (decimal > -1) {
       n = n.toFixed(decimal) - 0;
@@ -117,10 +119,7 @@ export class Pino {
   // ====== range ======
 
   range(...args) {
-    let start = 0;
-    let end = 0;
-    let step = 1;
-    let func = (i, a) => i;
+    let start = 0, end = 0, step = 1, func = (i, a) => i;
     if (typeof args[args.length - 1] === 'function') {
       func = args.pop();
     }
@@ -156,8 +155,7 @@ export class Pino {
       }
       return this.shuffle(values);
     };
-    let values = [];
-    let index = 0;
+    let values = [], index = 0;
     return (i, a) => {
       if (index >= values.length) {
         values = generate(...args);
@@ -183,7 +181,7 @@ export class Pino {
   }
 
   random(a) {
-    return a[Math.random() * MAX_INT % a.length | 0];
+    return a[Math.random() * INT_MAX % a.length | 0];
   }
 
   // ====== extension ======
@@ -213,5 +211,9 @@ export class Pino {
 
 const pino = new Pino();
 pino.use(zhCN);
+
+if (import.meta.env.MODE === 'iife') {
+  globalThis.pino = pino;
+}
 
 export default pino;
