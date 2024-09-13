@@ -1,3 +1,9 @@
+// Copyright 2021 The dotcoo <dotcoo@163.com>. All rights reserved.
+
+/* eslint-disable */
+
+'use strict';
+
 function date_expr(expr, date = new Date()) {
   if (typeof expr === 'number') {
     return new Date(expr);
@@ -45,15 +51,21 @@ function date_format(date, format = 'y-m-d h:i:s') {
 function date(start = 0, end = 4294967295000, format = 'y-m-d h:i:s') {
   start = this.date_expr(start);
   end = this.date_expr(end);
-  return this.date_format(new Date(this.number(start.getTime(), end.getTime(), 0)), format);
+  return this.date_format(new Date(this.int64(start.getTime(), end.getTime())), format);
 }
 
-export default function(pino) {
-  pino.registers({
-    // data
-    // method
-    date_expr,
-    date_format,
-    date,
-  });
+function install(pino) {
+  const o = pino
+  const { data: d, method: m } = pino;
+
+  // data
+
+  // methods
+  o.date_expr = m(date_expr);
+  o.date_format = m(date_format);
+  o.date = m(date);
+}
+
+export {
+  install as default,
 };

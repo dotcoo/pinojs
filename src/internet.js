@@ -1,3 +1,9 @@
+// Copyright 2021 The dotcoo <dotcoo@163.com>. All rights reserved.
+
+/* eslint-disable */
+
+'use strict';
+
 const internet_free_email_domains = [
   'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com',
   '163.com', '126.com', 'yeah.net', 'qq.com', 'foxmail.com',
@@ -106,35 +112,41 @@ function url(domain_name = null) {
   return `${this.site(domain_name)}${this.url_path()}/${this.url_page()}.${this.url_extension()}`;
 }
 
-export default function(pino) {
-  pino.registers({
-    // data
-    internet_free_email_domains,
-    internet_protocols,
-    internet_tlds,
-    internet_hosts,
-    internet_url_paths,
-    internet_url_pages,
-    internet_url_extensions,
-    // method
-    domain_tld,
-    domain_name,
-    domain_host,
-    domain,
-    hostname,
-    free_email_domain,
-    free_email,
-    company_email_domain,
-    company_email,
-    email,
-    ipv4,
-    ipv6,
-    mac_address,
-    protocal,
-    site,
-    url_path,
-    url_page,
-    url_extension,
-    url,
-  });
+function install(pino) {
+  const o = pino
+  const { data: d, method: m } = pino;
+
+  // data
+  d.internet_free_email_domains = internet_free_email_domains;
+  d.internet_protocols = internet_protocols;
+  d.internet_tlds = internet_tlds;
+  d.internet_hosts = internet_hosts;
+  d.internet_url_paths = internet_url_paths;
+  d.internet_url_pages = internet_url_pages;
+  d.internet_url_extensions = internet_url_extensions;
+
+  // methods
+  o.domain_tld = m(domain_tld);
+  o.domain_name = m(domain_name);
+  o.domain_host = m(domain_host);
+  o.domain = m(domain);
+  o.hostname = m(hostname);
+  o.free_email_domain = m(free_email_domain);
+  o.free_email = m(free_email);
+  o.company_email_domain = m(company_email_domain);
+  o.company_email = m(company_email);
+  o.email = m(email);
+  o.ipv4 = m(ipv4);
+  o.ipv6 = m(ipv6);
+  o.mac_address = m(mac_address);
+  o.protocal = m(protocal);
+  o.site = m(site);
+  o.url_path = m(url_path);
+  o.url_page = m(url_page);
+  o.url_extension = m(url_extension);
+  o.url = m(url);
+}
+
+export {
+  install as default,
 };

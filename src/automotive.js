@@ -1,3 +1,9 @@
+// Copyright 2021 The dotcoo <dotcoo@163.com>. All rights reserved.
+
+/* eslint-disable */
+
+'use strict';
+
 const automotive_provinces = {
   北京: '京',
   天津: '津',
@@ -54,15 +60,21 @@ function license_plate() {
   return this.random(this.data.automotive_names) + this.string(1, 'ABCDEFGHJKLMNPQRSTUVWXYZ') + this.string(5, 'ABCDEFGHJKLMNPQRSTUVWXYZ01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789');
 }
 
-export default function(pino) {
-  pino.registers({
-    // data
-    automotive_provinces,
-    automotive_names,
-    // method
-    license_plate_p2n,
-    license_plate_province,
-    license_plate_city,
-    license_plate,
-  });
+function install(pino) {
+  const o = pino
+  const { data: d, method: m } = pino;
+
+  // data
+  d.automotive_provinces = automotive_provinces;
+  d.automotive_names = automotive_names;
+
+  // methods
+  o.license_plate_p2n = m(license_plate_p2n);
+  o.license_plate_province = m(license_plate_province);
+  o.license_plate_city = m(license_plate_city);
+  o.license_plate = m(license_plate);
+}
+
+export {
+  install as default,
 };

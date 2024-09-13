@@ -1,29 +1,13 @@
-function image_url(options) {
-  const opts = {
-    width: 600,
-    height: 400,
-    background: 0,
-    foreground: 0,
-    format: 'png',
-    text: '',
-  };
-  Object.assign(opts, options);
-  opts.background = opts.background.replace('#', '');
-  opts.foreground = opts.foreground.replace('#', '');
-  return `https://dummyimage.com/${opts.width}x${opts.height}/${opts.background}/${opts.foreground}.${opts.format}?text=${encodeURIComponent(opts.text)}`;
-}
+// Copyright 2021 The dotcoo <dotcoo@163.com>. All rights reserved.
 
-let canvas = null;
-let ctx = null;
+/* eslint-disable */
+
+'use strict';
 
 function image_data_url(options) {
-  if (typeof window === 'undefined') {
-    return '';
-  }
-  if (canvas === null || ctx === null) {
-    canvas = window.document.createElement('canvas');
-    ctx = canvas.getContext('2d');
-  }
+  if (typeof window === 'undefined') { return ''; }
+  const canvas = window.document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
   const opts = {
     width: 600,
     height: 400,
@@ -33,12 +17,12 @@ function image_data_url(options) {
     font: '',
   };
   Object.assign(opts, options);
-  ctx.clearRect(0, 0, opts.width, opts.height);
   opts.text = opts.text ? opts.text : `${opts.width}x${opts.height}`;
   opts.textlen = opts.text.split('').map(c => encodeURIComponent(c).length <= 3 ? 1 : 1.2).reduce((a, c) => a + c, 0);
   opts.font = opts.font ? opts.font : `bold ${Math.floor(opts.width / (opts.textlen))}px '微软雅黑'`;
   canvas.width = opts.width;
   canvas.height = opts.height;
+  ctx.clearRect(0, 0, opts.width, opts.height);
   ctx.fillStyle = opts.background;
   ctx.fillRect(0, 0, opts.width, opts.height);
   ctx.font = opts.font;
@@ -50,13 +34,9 @@ function image_data_url(options) {
 }
 
 function image_random_matrix(width, height, ratio = 0.4) {
-  if (typeof window === 'undefined') {
-    return '';
-  }
-  if (canvas === null || ctx === null) {
-    canvas = window.document.createElement('canvas');
-    ctx = canvas.getContext('2d');
-  }
+  if (typeof window === 'undefined') { return ''; }
+  const canvas = window.document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
   ratio /= 2;
   const wh = width / 2;
   const matrix = new Array(width * height).fill(false);
@@ -86,13 +66,9 @@ function image_random_matrix(width, height, ratio = 0.4) {
 }
 
 function image_avatar(options) {
-  if (typeof window === 'undefined') {
-    return '';
-  }
-  if (canvas === null || ctx === null) {
-    canvas = window.document.createElement('canvas');
-    ctx = canvas.getContext('2d');
-  }
+  if (typeof window === 'undefined') { return ''; }
+  const canvas = window.document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
   const opts = {
     width: 360, // 图片宽度
     height: 360, // 图片高度
@@ -105,12 +81,12 @@ function image_avatar(options) {
     ratio: 0.4, // 填充比例
   };
   Object.assign(opts, options);
-  ctx.clearRect(0, 0, opts.width, opts.height);
   opts.dot_cols = opts.dot_cols === null ? opts.dot : opts.dot_cols;
   opts.dot_rows = opts.dot_rows === null ? opts.dot : opts.dot_rows;
   opts.color = this.colorful(opts.diff);
   canvas.width = opts.width;
   canvas.height = opts.height;
+  ctx.clearRect(0, 0, opts.width, opts.height);
   ctx.fillStyle = opts.color;
   const dot_width = (opts.width - opts.padding * 2) / opts.dot_cols;
   const dot_height = (opts.height - opts.padding * 2) / opts.dot_rows;
@@ -124,13 +100,18 @@ function image_avatar(options) {
   return canvas.toDataURL();
 }
 
-export default function(pino) {
-  pino.registers({
-    // data
-    // method
-    image_url,
-    image_data_url,
-    image_random_matrix,
-    image_avatar,
-  });
+function install(pino) {
+  const o = pino
+  const { data: d, method: m } = pino;
+
+  // data
+
+  // methods
+  o.image_data_url = m(image_data_url);
+  o.image_random_matrix = m(image_random_matrix);
+  o.image_avatar = m(image_avatar);
+}
+
+export {
+  install as default,
 };

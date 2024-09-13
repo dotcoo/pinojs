@@ -1,3 +1,9 @@
+// Copyright 2021 The dotcoo <dotcoo@163.com>. All rights reserved.
+
+/* eslint-disable */
+
+'use strict';
+
 const lorem_words = [
   '活动', '重要', '显示', '大小', '使用', '最后', '系列', '注意', '一些', '其中',
   '我的', '怎么', '最新', '只要', '为了', '一下', '位置', '组织', '日期', '成功',
@@ -42,17 +48,23 @@ function text(len = 200) {
   const proba = this.probability(['，', 8], ['。', 2]);
   let text = '';
   while (text.length < len) {
-    text += this.range(this.number(3, 9, 0), this.word).join('') + proba();
+    text += this.range(this.int(3, 9), this.word).join('') + proba();
   }
   return text.substr(0, len - 1) + '。';
 }
 
-export default function(pino) {
-  pino.registers({
-    // data
-    lorem_words,
-    // method
-    word,
-    text,
-  });
+function install(pino) {
+  const o = pino
+  const { data: d, method: m } = pino;
+
+  // data
+  d.lorem_words = lorem_words;
+
+  // methods
+  o.word = m(word);
+  o.text = m(text);
+}
+
+export {
+  install as default,
 };

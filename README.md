@@ -15,73 +15,62 @@ npm install pinojs
 using cdn
 
 ``` html
-<script src="https://unpkg.com/pinojs/dist/pinojs.iife.js"></script>
+<script src="https://unpkg.com/pinojs/dist/pinojs.umd.cjs"></script>
+```
+
+## Usage
+
+ES
+
+```js
+import pino from 'pinojs';
+
+pino.xxx();
+```
+
+CommonJS
+
+```js
+const { default: pino } = require('pinojs');
+
+pino.xxx();
+```
+
+UMD
+
+```js
+const pino = pinojs.default;
+
+pino.xxx();
 ```
 
 ## Example
 
-### Random
+### value
 
-``` js
-// random return true or false
-console.log(pino.bool(), pino.boolean()); // true or false
+```js
+// pino.bool()
+console.log(pino.bool(), pino.boolean()); // true false
 
-// pino.number(min, max, precision);
-console.log(pino.number()); // 725529809.7393556
+// pino.int(min, max)
+console.log(pino.int()); // 725529809
 
-// pino.string(len, chars);
+// pino.string(len, charts)
 console.log(pino.string(10)); // pm7s6eyg29
 
-// other
-console.log(pino.float(), pino.float8(), pino.float16(), pino.float32(), pino.float64()); // 1885965470.3914413 94.31532790863642 5527.827595874842 -2017764709.9286506 2715833847827471.5
+// more
 
-console.log(pino.ufloat(), pino.ufloat8(), pino.ufloat16(), pino.ufloat32(), pino.ufloat64()); // 1738532697.7559228 235.0860977653759 4454.686755517535 616772531.1650121 1597656664024015.8
-
+// pino.int(min, max)
 console.log(pino.int(), pino.int8(), pino.int16(), pino.int32(), pino.int64()); // 1179924614 25 30226 -1897697086 -899786393304780
 
+// pino.uint(min, max)
 console.log(pino.uint(), pino.uint8(), pino.uint16(), pino.uint32(), pino.uint64()); // 1886266343 88 12053 40027370 4276249758040316
 ```
 
-### Currying
+### array
 
-``` js
-// random multiple data
-const scores = [];
-for (let i = 0; i < 35; i++) {
-  scores.push(pino.number(0, 101, 1));
-}
-console.log(scores);
-
-// currying, binding parameter
-const score = pino.number.currying(0, 101, 1);
-for (let i = 0; i < 35; i++) {
-  scores.push(score()); // Easier to understand
-}
-console.log(scores);
-```
-
-### Object
-
-``` js
-const age = pino.number.currying(18, 25, 0);
-
-const user = {
-  username: pino.string(10),
-  password: pino.string(8),
-  gender: pino.bool(),
-  age: age(),
-  score: score(),
-};
-
-console.log(user); // {username: "zecf37u9r5", password: "4tq8tp80", gender: false, age: 21, score: 80}
-```
-
-### Array
-
-``` js
-// definition: pino.range(start, end, step, (i, arr) => i)
-
-// generate array
+```js
+// pino.range(start, end, step, (i, arr) => i)
 console.log(pino.range(10)); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 console.log(pino.range(1, 10)); // [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -90,7 +79,6 @@ console.log(pino.range(1, 10, 2)); // [1, 3, 5, 7, 9]
 
 console.log(pino.range(10, 1, -2)); // [10, 8, 6, 4, 2]
 
-// generate array callback
 console.log(pino.range(10, i => i * i)); // [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
 console.log(pino.range(1, 10, i => i * i)); // [1, 4, 9, 16, 25, 36, 49, 64, 81]
@@ -100,101 +88,99 @@ console.log(pino.range(1, 10, 2, i => i * i)); // [1, 9, 25, 49, 81]
 console.log(pino.range(10, 1, -2, i => i * i)); // [100, 64, 36, 16, 4]
 ```
 
-### Complex Data
+### object
 
-``` js
+```js
+console.log({
+  username: pino.string(10),
+  password: pino.string(8),
+  gender: pino.bool(),
+  age: pino.int(18, 25),
+  score: pino.int(0, 101),
+}); // { username: "zecf37u9r5", password: "4tq8tp80", gender: false, age: 21, score: 80 }
+```
+
+### currying
+
+```js
+const total = 66;
+const page = 1;
+const limit = 10;
+const username = pino.string.currying(10);
+const password = pino.string.currying(8);
+const gender = pino.bool.currying();
+const age = pino.int.currying(18, 25);
+const score = pino.int.currying(0, 101);
 console.log({
   code: 0,
   message: 'ok',
   data: {
-    users: pino.range(0, 10, (i, arr) => ({
-      id: i + 1,
-      username: pino.string(10),
-      password: pino.string(8),
-      gender: pino.bool(),
+    list: pino.range(limit, (i, a) => ({
+      username: username(),
+      password: password(),
+      gender: gender(),
       age: age(),
       score: score(),
     })),
-    total: 83,
+    total,
+    page,
+    limit,
   },
 });
-
-// {
-//   "code": 0,
-//   "message": "ok",
-//   "data": {
-//     "users": [
-//       { "id": 1, "username": "g9ga2c00i1", "password": "yd7i8n6q", "gender": true, "age": 21, "score": 29 },
-//       { "id": 2, "username": "l02nb8kakj", "password": "0vs77xww", "gender": true, "age": 25, "score": 36 },
-//       { "id": 3, "username": "zec8d9wo1v", "password": "wsyouewk", "gender": true, "age": 25, "score": 36 },
-//       { "id": 4, "username": "kiiiwm3p6b", "password": "9c6f4auk", "gender": false, "age": 24, "score": 83 },
-//       { "id": 5, "username": "tkbsyak59t", "password": "j6fkfw35", "gender": false, "age": 23, "score": 5} ,
-//       { "id": 6, "username": "g3jaxe7yrx", "password": "4zdqp8v3", "gender": true, "age": 20, "score": 65 },
-//       { "id": 7, "username": "h6y6hugg4l", "password": "9v8vnnt8", "gender": false, "age": 22, "score": 12 },
-//       { "id": 8, "username": "n0xxj2ypza", "password": "ls68t0dt", "gender": true, "age": 22, "score": 84 },
-//       { "id": 9, "username": "udzjshjkbl", "password": "6mpr7p0v", "gender": false, "age": 23, "score": 44 },
-//       { "id": 10, "username": "ix4s0apuhc", "password": "q6svlpo6", "gender": false, "age": 24, "score": 4}
-//     ],
-//     "total": 83
-//   }
-// }
+/*
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "list": [
+      { "username": "X9NioRASpp", "password": "ViITv6Ft", "gender": true, "age": 22, "score": 27 },
+      { "username": "ussfLQZH4w", "password": "Ybzl1bBN", "gender": false, "age": 23, "score": 93 },
+      { "username": "BEMvwnhqcI", "password": "GL0YeGPL", "gender": true, "age": 23, "score": 1 },
+      { "username": "apSrrGg7TH", "password": "quOHRya7", "gender": false, "age": 21, "score": 97 },
+      { "username": "KNuGvSSLem", "password": "AouIa6rw", "gender": true, "age": 23, "score": 73 },
+      { "username": "XRZzPUVTan", "password": "lhmwBs20", "gender": false, "age": 20, "score": 41 },
+      { "username": "SJwegQgwiQ", "password": "OhYDfxOZ", "gender": false, "age": 22, "score": 73 },
+      { "username": "npecoXO71M", "password": "z6XsezYO", "gender": false, "age": 22, "score": 64 },
+      { "username": "dIt61wKp5S", "password": "S5iE67RW", "gender": true, "age": 24, "score": 61 },
+      { "username": "Db08eZIgEt", "password": "PhZIFPP8", "gender": false, "age": 18, "score": 100 }
+    ],
+    "total": 66,
+    "page": 1,
+    "limit": 10
+  }
+}
+*/
 ```
 
-### Probability
+### probability
 
-``` js
-// Sometimes our types are not consistent. For example, 
-// the gender and grades in the database user table 
-// are nullable, which means that we need to generate 
-// null, bool and number. If we only generate one type 
-// of data, the generated data is too perfect , At this 
-// time, you need to control the probability.
-
-// definition: probability([value1, count], [value2, count], ...)
-
-// gender
-const gender_probability = pino.probability(
-  [null, 6], // unfilled, proportion: `6.59340%`, formula: `6 / (6 + 53 + 32)`
-  [true, 53], // male, proportion: `58.24175%`, formula: `53 / (6 + 53 + 32)`
-  [false, 32], // female, proportion: `35.16483%`, formula: `32 / (6 + 53 + 32)`
-);
-
-// score
+```js
+// pino.probability([value|func, proba], [value|func, proba], ...)
 const score_probability = pino.probability(
-  [pino.number.currying(0, 60, 0), 3], // C
-  [pino.number.currying(60, 80, 0), 9], // B
-  [pino.number.currying(80, 100, 0), 32], // A
-  [100, 2], // A+
+  [pino.int.currying(0, 60), 1],
+  [pino.int.currying(60, 80), 2],
+  [pino.int.currying(80, 100), 6],
+  [100, 1],
 );
-
-// result
-console.log({
-  data: {
-    users: pino.range(0, 10, (i, arr) => ({
-      id: i + 1,
-      username: pino.string(10),
-      gender: gender_probability(),
-      score: score_probability(),
-    })),
-  },
-});
-
-// {
-//   "data": {
-//     "users": [
-//       { "id": 1, "username": "67kuoy4om5", "gender": true, "score": 91 },
-//       { "id": 2, "username": "ct5ljsac5j", "gender": true, "score": 92 },
-//       { "id": 3, "username": "h4io7nqy05", "gender": true, "score": 88 },
-//       { "id": 4, "username": "7bloq8aczd", "gender": true, "score": 61 },
-//       { "id": 5, "username": "ol6vmal1ps", "gender": null, "score": 91 },
-//       { "id": 6, "username": "pcwe8js8xj", "gender": false, "score": 78 },
-//       { "id": 7, "username": "ghy1uwaby0", "gender": false, "score": 100 },
-//       { "id": 8, "username": "2ga0z5ocm3", "gender": false, "score": 89 },
-//       { "id": 9, "username": "fs02zimkp3", "gender": true, "score": 69 },
-//       { "id": 10, "username": "z1z4nsblw0", "gender": false, "score": 89 }
-//     ]
-//   }
-// }
+console.log(pino.range(10, i => ({
+  id: i + 1,
+  username: username(),
+  score: score_probability(),
+})));
+/*
+[
+  { "id": 1, "username": "GS6guox1nB", "score": 85 },
+  { "id": 2, "username": "dmjH7Iv2p6", "score": 29 },
+  { "id": 3, "username": "BHY4KLiiX4", "score": 80 },
+  { "id": 4, "username": "o3KuDb5dnk", "score": 66 },
+  { "id": 5, "username": "KE58vRKFbc", "score": 100 },
+  { "id": 6, "username": "H5TCIRD6jk", "score": 89 },
+  { "id": 7, "username": "p6aTIJ3PiU", "score": 92 },
+  { "id": 8, "username": "c6Dg8U3Tf3", "score": 64 },
+  { "id": 9, "username": "79qInCr83w", "score": 99 },
+  { "id": 10, "username": "8fitq1wuYa", "score": 82 }
+]
+*/
 ```
 
 ### Address
@@ -280,17 +266,6 @@ console.log(pino.range(10, pino.date.currying('-3d', '+3d', 'y-m-d')));
 ### Image
 
 ``` js
-const image_url = pino.image_url({
-  width: 200,
-  height: 160,
-  background: pino.colorful(), // optional
-  foreground: pino.colorful(), // optional
-  format: 'png', // optional
-  text: 'pinojs', // optional
-});
-
-console.log('%ci', `color: rgba(0,0,0,0); padding: 0 100px; line-height: 160px; background: url('${image_url}') no-repeat;`);
-
 if (typeof window !== 'undefined') {
   const image_data_url = pino.image_data_url({
     width: 200,

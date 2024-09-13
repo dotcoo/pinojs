@@ -1,3 +1,9 @@
+// Copyright 2021 The dotcoo <dotcoo@163.com>. All rights reserved.
+
+/* eslint-disable */
+
+'use strict';
+
 const color_names = [
   'AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque',
   'Black', 'BlanchedAlmond', 'Blue', 'BlueViolet', 'Brown', 'BurlyWood', 'CadetBlue',
@@ -84,21 +90,27 @@ function rgba_colorful() {
   return `rgba(${r},${g},${b},${a})`;
 }
 
-export default function(pino) {
-  pino.registers({
-    // data
-    color_names,
-    // method
-    color_name,
-    color,
-    hex_color,
-    rgb_color,
-    rgba_color,
-    is_colorful,
-    random_colorful,
-    colorful,
-    hex_colorful,
-    rgb_colorful,
-    rgba_colorful,
-  });
+function install(pino) {
+  const o = pino
+  const { data: d, method: m } = pino;
+
+  // data
+  d.color_names = color_names;
+
+  // methods
+  o.color_name = m(color_name);
+  o.color = m(color);
+  o.hex_color = m(hex_color);
+  o.rgb_color = m(rgb_color);
+  o.rgba_color = m(rgba_color);
+  o.is_colorful = m(is_colorful);
+  o.random_colorful = m(random_colorful);
+  o.colorful = m(colorful);
+  o.hex_colorful = m(hex_colorful);
+  o.rgb_colorful = m(rgb_colorful);
+  o.rgba_colorful = m(rgba_colorful);
+}
+
+export {
+  install as default,
 };

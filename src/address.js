@@ -1,3 +1,9 @@
+// Copyright 2021 The dotcoo <dotcoo@163.com>. All rights reserved.
+
+/* eslint-disable */
+
+'use strict';
+
 const address_countries = [
   '阿富汗', '阿拉斯加', '阿尔巴尼亚', '阿尔及利亚', '安道尔', '安哥拉', '安圭拉岛英', '安提瓜和巴布达',
   '阿根廷', '亚美尼亚', '阿鲁巴岛', '阿森松', '澳大利亚', '奥地利', '阿塞拜疆', '巴林', '孟加拉国',
@@ -179,7 +185,7 @@ function street_name() {
 }
 
 function street_number() {
-  return this.number(1, 999, 0) + '号';
+  return this.int(1, 999) + '号';
 }
 
 function street() {
@@ -195,7 +201,7 @@ function building_unit() {
 }
 
 function building_number() {
-  return this.number(1, 31, 0) + this.number(1, 30, 0).toString().padStart(2, 0) + '室';
+  return this.int(1, 31) + this.int(1, 30).toString().padStart(2, 0) + '室';
 }
 
 function building() {
@@ -207,11 +213,11 @@ function community_name() {
 }
 
 function community_unit() {
-  return this.number(1, 7, 0) + '号楼' + this.number(1, 4, 0) + '单元';
+  return this.int(1, 7) + '号楼' + this.int(1, 4) + '单元';
 }
 
 function community_number() {
-  return this.number(1, 21, 0) + '层' + this.number(1, 121, 0) + '室';
+  return this.int(1, 21) + '层' + this.int(1, 121) + '室';
 }
 
 function community() {
@@ -231,45 +237,51 @@ function address() {
 }
 
 function postcode() {
-  return this.number(100000, 999999, 0);
+  return this.int(100000, 999999);
 }
 
-export default function(pino) {
-  pino.registers({
-    // data
-    address_countries,
-    address_provinces,
-    address_cities_data,
-    address_cities,
-    address_districts,
-    address_districts_suffixes,
-    address_streets,
-    address_buildings,
-    address_buildings_units,
-    address_communities,
-    // methods
-    country,
-    province,
-    city_name,
-    city_suffix,
-    city,
-    district_name,
-    district_suffix,
-    district,
-    street_name,
-    street_number,
-    street,
-    building_name,
-    building_unit,
-    building_number,
-    building,
-    community_name,
-    community_unit,
-    community_number,
-    community,
-    home_address,
-    office_address,
-    address,
-    postcode,
-  });
+function install(pino) {
+  const o = pino
+  const { data: d, method: m } = pino;
+
+  // data
+  d.address_countries = address_countries;
+  d.address_provinces = address_provinces;
+  d.address_cities_data = address_cities_data;
+  d.address_cities = address_cities;
+  d.address_districts = address_districts;
+  d.address_districts_suffixes = address_districts_suffixes;
+  d.address_streets = address_streets;
+  d.address_buildings = address_buildings;
+  d.address_buildings_units = address_buildings_units;
+  d.address_communities = address_communities;
+
+  // methods
+  o.country = m(country);
+  o.province = m(province);
+  o.city_name = m(city_name);
+  o.city_suffix = m(city_suffix);
+  o.city = m(city);
+  o.district_name = m(district_name);
+  o.district_suffix = m(district_suffix);
+  o.district = m(district);
+  o.street_name = m(street_name);
+  o.street_number = m(street_number);
+  o.street = m(street);
+  o.building_name = m(building_name);
+  o.building_unit = m(building_unit);
+  o.building_number = m(building_number);
+  o.building = m(building);
+  o.community_name = m(community_name);
+  o.community_unit = m(community_unit);
+  o.community_number = m(community_number);
+  o.community = m(community);
+  o.home_address = m(home_address);
+  o.office_address = m(office_address);
+  o.address = m(address);
+  o.postcode = m(postcode);
+}
+
+export {
+  install as default,
 };
