@@ -1,42 +1,46 @@
 {
   "name": "pinojs",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "generate fake data.",
   "author": "dotcoo <dotcoo@163.com> (http://blog.dotcoo.com)",
   "homepage": "https://github.com/dotcoo/pinojs#readme",
-  "repository": "github:dotcoo/pinojs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dotcoo/pinojs.git"
+  },
   "license": "ISC",
   "keywords": [
     "pino",
     "pinojs",
     "fibjs"
   ],
-  "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/pinojs.cjs.js",
-  "module": "./dist/pinojs.es.js",
+  "type": "module",
+  "main": "dist/pinojs.js",
+  "unpkg": "dist/pinojs.umd.cjs",
+  "jsdelivr": "dist/pinojs.umd.cjs",
   "exports": {
     ".": {
-      "require": "./dist/pinojs.cjs.js",
-      "import": "./dist/pinojs.es.js"
+      "import": "./dist/pinojs.js",
+      "require": "./dist/pinojs.cjs"
     },
-    "./data/zhCN.js": {
-      "require": "./dist/pinojs_data_zhCN.cjs.js",
-      "import": "./dist/pinojs_data_zhCN.es.js"
+    "./rich": {
+      "import": "./dist/pinojs.rich.js",
+      "require": "./dist/pinojs.rich.cjs"
     }
   },
   "scripts": {
     "dev": "vite",
-    "build": "pnpm run build:cjs:es && pnpm run build:iife",
-    "build:cjs:es": "vite build",
-    "build:iife": "vite build --mode iife -c vite.iife.config.js",
+    "build": "vite build && vite build --mode=rich --emptyOutDir=false",
     "preview": "vite preview"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-config-standard": "^17.1.0",
     "vite": "~4.5.3"
+  },
+  "peerDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0"
   }
 }

@@ -1,17 +1,13 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => ({
   build: {
-    // sourcemap: true,
     lib: {
       entry: {
-        'pinojs': './src/index.js',
-        'pinojs_data_zhCN': './src/providers/zh_CN/data/index.js',
+        [mode == 'rich' ? 'pinojs.rich' : 'pinojs']: './src/index.js',
       },
-      formats: ['es', 'cjs'],
-      // name: 'pino',
-      // fileName: (format, entryName) => entryName+'.'+({es:'mjs',cjs:'cjs'}[format]),
-      fileName: (format, entryName) => `${entryName}.${format}.js`,
+      formats: ['es', 'cjs', 'umd'],
+      name: 'pinojs',
     },
     rollupOptions: {
       output: {
@@ -19,4 +15,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
