@@ -61,11 +61,12 @@ function shuffle(a) {
 function unique(func) {
   const values = new Set();
   return (...args) => {
-    let value = null;
-    for (let i = 1; values.has(value); i++) {
-      if (i % 4096 == 0) { console.warn(new Error('pinojs.unique() has a risk of dead loop!').stack); }
+    let value = null, i = 0;
+    do {
       value = func(...args);
-    }
+      i++;
+      if (i % 4096 == 0) { console.warn(new Error('pinojs.unique() has a risk of dead loop!').stack); }
+    } while(values.has(value));
     values.add(value);
     return value;
   };
@@ -98,6 +99,7 @@ function currying(...args) {
 function method(func, ...args) {
   const method = func.bind(this, ...args);
   method.currying = currying.bind(method);
+  method.unique = unique.bind(method, method);
   return method;
 }
 

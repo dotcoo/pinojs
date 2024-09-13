@@ -97,6 +97,12 @@ function test(pino) {
   }
   */
 
+  // ### unique 唯一
+
+  // pino.unique(func)
+  console.log(pino.range(20, pino.uint8.unique())); // [198, 35, 46, 22, 162, 45, 171, 6, 184, 87, 210, 108, 88, 44, 138, 32, 69, 97, 216, 249]
+  console.log(pino.range(20, pino.unique(pino.uint8))); // [226, 224, 35, 84, 99, 195, 251, 216, 133, 237, 90, 51, 213, 109, 69, 11, 78, 89, 200, 93]
+
   // ### probability 概率
 
   // pino.probability([value|func, proba], [value|func, proba], ...)
