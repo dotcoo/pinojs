@@ -1,8 +1,8 @@
 #!/usr/local/bin/fibjs
 
 const { default: pino } = require('../dist/pinojs.cjs');
-const { test } = require('./index.cjs');
+require('./index.js');
 
 console.log(process.versions.node);
 
-test(pino);
+globalThis.test(pino);

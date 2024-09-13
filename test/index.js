@@ -356,4 +356,4 @@ function test(pino) {
   console.log(pino.range(10, pino.phone));
 }
 
-module.exports.test = test;
+globalThis.test = test;
