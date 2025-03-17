@@ -6,7 +6,6 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => ({
       entry: {
         [mode == 'rich' ? 'pinojs.rich' : 'pinojs']: './src/index.js',
       },
-      formats: ['es', 'cjs', 'umd'],
       name: 'pinojs',
     },
     rollupOptions: {
