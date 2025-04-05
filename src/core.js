@@ -24,16 +24,16 @@ function string(len = 0, chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJ
 }
 
 function range(...args) {
-  let start = 0, end = 0, step = 1, func = typeof args[args.length - 1] === 'function' ? args.pop() : (i, a) => i;
+  let a = [], start = 0, end = 0, step = 1, func = typeof args[args.length - 1] === 'function' ? args.pop() : (i, a) => i;
   switch (args.length) {
     case 1: [end] = args; break;
     case 2: [start, end] = args; break;
     case 3: [start, end, step] = args; break;
+    default: throw new Error('the number of parameters is incorrect!'); break;
   }
   if (step == 0) { throw new Error('step cannot be 0!'); }
-  const a = [], [min, max] = start <= end ? [start, end] : [end, start];
-  for (let i = start; i != end && i >= min && i <= max; i += step) {
-    a.push(func.length ? func(i, a) : func());
+  for (let n = Math.abs(end - start), s = Math.abs(step), d = (start <= end ? 1 : -1), i = 0; i < n; i += s) {
+    a.push(func.length ? func(start + i * d, a) : func());
   }
   return a;
 }

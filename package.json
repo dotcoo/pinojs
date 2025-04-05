@@ -1,6 +1,6 @@
 {
   "name": "pinojs",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "generate fake data.",
   "author": "dotcoo <dotcoo@163.com> (http://blog.dotcoo.com)",
   "homepage": "https://github.com/dotcoo/pinojs#readme",
@@ -37,10 +37,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^6.2.2"
-  },
-  "peerDependencies": {
     "eslint": "^9.22.0",
-    "eslint-config-standard": "^17.1.0"
+    "eslint-config-standard": "^17.1.0",
+    "vite": "^6.2.2"
   }
 }
