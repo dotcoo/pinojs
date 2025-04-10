@@ -1,7 +1,7 @@
 #!/usr/local/bin/fibjs
 
-const { default: pino } = require('../dist/pinojs.cjs');
-require('./index.js');
+const { pino } = require('../dist/pinojs.umd.cjs');
+require('./main.js');
 
 console.log(process.versions.node);
 
