@@ -1,6 +1,6 @@
 {
   "name": "pinojs",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "generate fake data.",
   "author": "dotcoo <dotcoo@163.com> (http://blog.dotcoo.com)",
   "homepage": "https://github.com/dotcoo/pinojs#readme",
@@ -36,6 +36,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^6.2.6"
+    "vite": "^6.3.5"
   }
 }
