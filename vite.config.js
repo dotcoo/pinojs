@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => ({
+export default defineConfig(({ mode }) => ({
   build: {
     lib: {
       entry: {
