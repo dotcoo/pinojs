@@ -23,7 +23,7 @@ npm install pinojs
 ES
 
 ```js
-import pino from 'pinojs';
+import { pino } from 'pinojs';
 
 pino.xxx();
 ```
@@ -31,7 +31,7 @@ pino.xxx();
 CommonJS
 
 ```js
-const { default: pino } = require('pinojs');
+const { pino } = require('pinojs');
 
 pino.xxx();
 ```
@@ -39,7 +39,7 @@ pino.xxx();
 UMD
 
 ```js
-const pino = pinojs.default;
+const { pino } = pinojs;
 
 pino.xxx();
 ```

@@ -37,6 +37,18 @@ function test(pino) {
 
   console.log(pino.range(10, 1, -2, i => i * i)); // [100, 64, 36, 16, 4]
 
+  console.log(pino.range(10));
+  console.log(pino.range(-10, 10));
+  console.log(pino.range(-10, 10, 2));
+  console.log(pino.range(-10));
+  console.log(pino.range(10, -10));
+  console.log(pino.range(10, -10, 2));
+  console.log(pino.range(10, (...args) => args));
+  console.log(pino.range(10, (...args) => args, false));
+  console.log(pino.range(10, -10, 2, (...args) => args));
+  console.log(pino.range(10, -10, 2, (...args) => args, true));
+  console.log(pino.range(10, -10, 2, (...args) => args, false));
+
   // ### object 对象
 
   console.log({
@@ -198,9 +210,9 @@ function test(pino) {
 
   console.log(pino.date_format(new Date(), 'y-m-d h:i:s')); // y: Year, m: Month, d: Day, h: Hours, i: Minutes, s: Second
 
-  console.log(pino.range(10, pino.date));
+  console.log(pino.range(10, pino.date, false));
 
-  console.log(pino.range(10, pino.date.currying('-3d', '+3d', 'y-m-d')));
+  console.log(pino.range(10, pino.date.currying('-3d', '+3d', 'y-m-d'), false));
 
   // ### 图片
 
